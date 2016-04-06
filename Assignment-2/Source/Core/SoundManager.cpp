@@ -10,7 +10,7 @@ SoundManager::SoundManager(void) {
 
 	// Make sure the sounds are initialized to null or your check is useless! (garbage data can be read as !NULL).
 	for (int i = 0; i < NUM_SOUNDS; i++) {
-		gameSounds[0] = NULL;
+		gameSounds[i] = NULL;
 	}
 
 	/* Initialize all SDL subsystems */
@@ -31,7 +31,7 @@ SoundManager::SoundManager(void) {
 	music = Mix_LoadMUS( "../Assets/music.wav" ); 
 #endif
 #ifdef _WIN32
-	music = Mix_LoadMUS( "../../../Game-Tech-12/Assignment-2/Assets/music.wav" ); 
+	//music = Mix_LoadMUS( "../../../Mynecraft/Assignment-2/Assets/music.wav" ); 
 #endif
 
 	Mix_VolumeMusic(50);

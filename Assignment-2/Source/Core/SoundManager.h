@@ -12,7 +12,7 @@
 
 class SoundManager {
 public:
-	enum { NUM_SOUNDS } sounds;
+	enum { SOUND, NUM_SOUNDS } sounds;
 
 	SoundManager(void);
 	~SoundManager(void);
