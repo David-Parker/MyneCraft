@@ -52,6 +52,8 @@ void Application::init()
 
 		createObjects();
 
+		//testPerlinGeneration();
+
 	}
 	catch (Exception e) {
 		std::cout << "Exception Caught: " << e.what() << std::endl;
@@ -385,6 +387,23 @@ void Application::createObjects(void) {
 	
 	mSceneManager->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
+}
+
+void Application::testPerlinGeneration(void) {
+	int xmax = 10;
+	int ymax = xmax;
+	int rndmax = 9;
+	float avg;
+	float perlinArray[xmax][ymax];
+	Perlin* perlin = new Perlin(xmax, ymax, rndmax, 1000);
+
+	for ( int i = 0 ; i < xmax ; i++ ) 
+		for ( int j = 0 ; j < ymax ; j++ )
+			perlinArray[i][j] = perlin->getPerlin(i, j);
+
+	for ( int i = 0 ; i < xmax ; i++ )
+		for ( int j = 0 ; j < ymax ; j++ )
+			std::cout << "X: " << i << " Y: " << j << " Perlin: " << perlinArray[i][j] << std::endl;
 }
 /* 
 * End Initialization Methods

@@ -26,6 +26,7 @@
 #include <cstring>
 #include <cstdlib>
 
+#include "Perlin.h"
 #include "NetManager.h"
 #include "GameManager.h"
 #include "OISManager.h"
@@ -83,6 +84,7 @@ public:
 	void setupGM(void);
 	void setupLighting(void);
 	void createObjects(void);
+	void testPerlinGeneration();
 	bool Quit(const CEGUI::EventArgs &e);
 
 	bool setupNetwork(bool);
