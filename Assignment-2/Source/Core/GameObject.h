@@ -25,7 +25,7 @@
 //Some declarations within the game object class
 class GameObject {
 public: 
-	enum objectType {PADDLE_OBJECT, BALL_OBJECT, FLOOR_OBJECT, WALL_OBJECT, FRONT_WALL_OBJECT, BACK_WALL_OBJECT, NO_TYPE};
+	enum objectType { CUBE_OBJECT, NO_TYPE};
 
 protected:
 	Ogre::String name;

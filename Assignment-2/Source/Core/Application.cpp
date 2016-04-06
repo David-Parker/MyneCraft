@@ -52,7 +52,7 @@ void Application::init()
 
 		createObjects();
 
-		//testPerlinGeneration();
+		// testPerlinGeneration();
 
 	}
 	catch (Exception e) {
@@ -103,7 +103,11 @@ bool Application::frameRenderingQueued(const FrameEvent &evt)
 // Called once per predefined frame
 bool Application::update(const FrameEvent &evt) {
 
+
 	OIS::KeyCode lastKey = _oisManager->lastKeyPressed();
+	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
+	playerCam->setPosition(camMan->getPosition());
+	playerCam->lookAt(Ogre::Vector3(0,0,0));
 
 	if (lastKey == OIS::KC_M) {
 		gameManager->mute();
@@ -121,7 +125,7 @@ bool Application::update(const FrameEvent &evt) {
 	}
 
 	
-	_simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
+	// _simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
 
 	return true;
 }
@@ -197,6 +201,18 @@ void Application::createRootEntity(std::string name, std::string mesh, int x, in
 	ogreNode->setPosition(x, y, z);
 }
 
+Ogre::Entity* Application::createRootEntity(std::string mesh, int x, int y, int z) {
+
+	Ogre::Entity* ogreEntity = mSceneManager->createEntity(mesh);
+	ogreEntity->setCastShadows(true);
+	Ogre::SceneNode* ogreNode = mSceneManager->getRootSceneNode()->createChildSceneNode();
+	ogreNode->attachObject(ogreEntity);
+	ogreNode->setPosition(x, y, z);
+	ogreNode->setScale(50,50,50);
+
+	return ogreEntity;
+}
+
 void Application::createChildEntity(std::string name, std::string mesh, Ogre::SceneNode* sceneNode, int x, int y, int z) {
 
 	Ogre::Entity* ogreEntity = mSceneManager->createEntity(name, mesh);
@@ -206,21 +222,27 @@ void Application::createChildEntity(std::string name, std::string mesh, Ogre::Sc
 	ogreNode->setPosition(x, y, z);
 }
 
-// Ball* Application::createBall(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Real scale, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim) {
+Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim) {
+	float fi = (float)x/(float)100.0f;
+	float fj = (float)z/(float)100.0f;
 
-// 	createRootEntity(nme, meshName, x, y, z);
-// 	Ogre::SceneNode* sn = mSceneManager->getSceneNode(nme);
-// 	Ogre::Entity* ent = SceneHelper::getEntity(mSceneManager, nme, 0);
-// 	const btTransform pos;
-// 	OgreMotionState* ms = new OgreMotionState(pos, sn);
-// 	sn->setScale(scale,scale,scale);
-// 	ent->setMaterialName("ball");
+	y = (int)((perlin->getPerlin(fi, fj))*100);
+	createRootEntity(nme, meshName, x*scale.x*2, y*scale.y*2, z*scale.z*2);
+	Ogre::SceneNode* sn = mSceneManager->getSceneNode(nme);
+	Ogre::Entity* ent = SceneHelper::getEntity(mSceneManager, nme, 0);
+	const btTransform pos;
+	OgreMotionState* ms = new OgreMotionState(pos, sn);
+	sn->setScale(scale.x, scale.y, scale.z);
 
-// 	Ball* obj = new Ball(nme, tp, mSceneManager, ssm, sn, ent, ms, mySim, mss, rest, frict, scale, kinematic);
-// 	obj->addToSimulator();
+	sn->pitch(pitch);
+	sn->yaw(yaw);
+	sn->roll(roll);
 
-// 	return obj;
-// }
+	Cube* obj = new Cube(nme, tp, mSceneManager, ssm, sn, ent, ms, mySim, mss, rest, frict, scale, kinematic);
+	obj->addToSimulator();
+
+	return obj;
+}
 
 /*
 * End Create Object Methods 
@@ -342,19 +364,31 @@ void Application::setupCEGUI(void) {
 }
 
 void Application::setupCameras(void) {
+
 	Ogre::Camera* camMan = mSceneManager->createCamera("Camera Man");
+	playerCam = mSceneManager->createCamera("Player Cam");
+
+	playerCam->setAutoAspectRatio(true);
+	playerCam->setPosition(0,5000,0);
+	playerCam->lookAt(0,0,0);
+	playerCam->setNearClipDistance(1.0f);
+	playerCam->setFarClipDistance(10.0f);
+
+	camMan->setAutoAspectRatio(true);
+	camMan->setPosition(0,300,0);
+	camMan->lookAt(0,120,1800);
+
 	// Add viewport and cameras
 	mRenderWindow->addViewport(camMan);
 
-	camMan->setAutoAspectRatio(true);
-	camMan->setPosition(0,120,400);
-	camMan->lookAt(0,120,1800);
-
 	cameras = std::vector<Ogre::Camera*>();
 	cameras.push_back(camMan);
+	cameras.push_back(playerCam);
 
 	cameraMan = new OgreBites::SdkCameraMan(camMan);
 	_oisManager->setupCameraMan(cameraMan);
+	camMan->setFarClipDistance(10000.0f);
+	std::cout << camMan->getFarClipDistance() << std::endl;
 }
 
 /* Setup GameManager */
@@ -370,36 +404,41 @@ void Application::setupGM(void) {
 
 void Application::setupLighting(void) {
 
-	mSceneManager->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
-	mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
-
-	Ogre::Light* directionalLight = mSceneManager->createLight("Sun");
-	directionalLight->setType(Ogre::Light::LightTypes::LT_DIRECTIONAL);
-	directionalLight->setCastShadows(true);
-	directionalLight->setDiffuseColour(Ogre::ColourValue(.8, .8, .8));
-	directionalLight->setSpecularColour(Ogre::ColourValue(.8, .8, .8));
-
-	directionalLight->setDirection(Ogre::Vector3(0, -1, .1));
+	// mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 
 }
 
 void Application::createObjects(void) {
-	
-	mSceneManager->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
+	int xmax = 128;
+	int ymax = xmax;
+	int rndmax = 8;
+	perlin = new Perlin(xmax, ymax, rndmax, 10);
+
+	for(int i = 0; i < xmax; i++) {
+		for(int j = 0; j < ymax; j++) {
+			char buf[32];
+			sprintf(buf, "Cube_%d_%d", i,j);
+			std::string name = std::string(buf);
+			createCube(name, GameObject::objectType::CUBE_OBJECT, "Cube-Grass.mesh", i, 0, j, Ogre::Vector3(50, 50, 50), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 1.0f, 0.8f, false, _simulator);
+		}	
+	}
 }
 
 void Application::testPerlinGeneration(void) {
-	int xmax = 10;
+	int xmax = 100;
 	int ymax = xmax;
-	int rndmax = 9;
+	int rndmax = 8;
 	float avg;
-	float perlinArray[xmax][ymax];
-	Perlin* perlin = new Perlin(xmax, ymax, rndmax, 1000);
+	int perlinArray[xmax][ymax];
+	Perlin* perlin = new Perlin(xmax, ymax, rndmax, 10);
 
 	for ( int i = 0 ; i < xmax ; i++ ) 
-		for ( int j = 0 ; j < ymax ; j++ )
-			perlinArray[i][j] = perlin->getPerlin(i, j);
+		for ( int j = 0 ; j < ymax ; j++ ) {
+			float fi = (float)i/(float)xmax;
+			float fj = (float)j/(float)ymax;
+			perlinArray[i][j] = (int)((perlin->getPerlin(fi, fj))*100);
+		}
 
 	for ( int i = 0 ; i < xmax ; i++ )
 		for ( int j = 0 ; j < ymax ; j++ )

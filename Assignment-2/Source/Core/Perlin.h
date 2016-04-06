@@ -7,8 +7,6 @@
 
 class Perlin {
 private:
-	int xMax;
-	int yMax;
 	int size;
 	int randomMax;
 	int correction;
@@ -18,6 +16,8 @@ public:
 	Perlin(int, int, int, int);
 	void generateGradientTrivial();
 	float lerp(float, float, float);
-	float dotGridGradient(float, float, int, int);
+	float dotGridGradient(int, int, float, float);
 	float getPerlin(float, float);
+	int xMax;
+	int yMax;
 };
