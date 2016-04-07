@@ -14,6 +14,7 @@
 #include <deque>
 
 class GameObject;
+class StaticObject;
 
 class Simulator { 
 protected: 
@@ -24,11 +25,13 @@ protected:
        btDiscreteDynamicsWorld* dynamicsWorld;
        btAlignedObjectArray<btCollisionShape*> collisionShapes;
        std::deque<GameObject*> objList; 
+       std::deque<StaticObject*> objListStatic;
 public: 
        Simulator(); 
        ~Simulator(); 
 
        void addObject(GameObject* o); 
+       void addObject(StaticObject* o); 
        bool removeObject(GameObject* o); 
        void stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps = 1, const Ogre::Real fixedTimestep = 1.0f/60.0f); 
 };

@@ -32,6 +32,7 @@
 #include "OISManager.h"
 #include "Simulator.h"
 #include "Cube.h"
+#include "StaticObject.h"
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
 {

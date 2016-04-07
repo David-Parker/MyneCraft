@@ -384,7 +384,7 @@ void Application::setupCameras(void) {
 	camMan->setAutoAspectRatio(true);
 	camMan->setPosition(0,300,0);
 	camMan->lookAt(0,120,1800);
-	camMan->setFarClipDistance(10000.0f);
+	camMan->setFarClipDistance(0.0f);
 
 	// Add viewport and cameras
 	mRenderWindow->addViewport(camMan);
@@ -417,27 +417,34 @@ void Application::setupLighting(void) {
 
 void Application::createObjects(void) {
 
-	int xmax = 256;
+	static Ogre::Entity* grassCube = nullptr;
+
+	if(grassCube == nullptr) {
+		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
+	}
+
+	int xmax = 1024;
 	int ymax = xmax;
 	int rndmax = 8;
 	float density = 1.56f; // 1 is very steep, 10 is pretty flat.
 	perlin = new Perlin(xmax, ymax, rndmax, density);
 
+	// Static Geometries will eventually become Chunks
 	Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
 
 	for(int i = 0; i < xmax; i++) {
 		for(int j = 0; j < ymax; j++) {
-			char buf[32];
-			sprintf(buf, "Cube_%d_%d", i,j);
-			std::string name = std::string(buf);
-			createCube(name, GameObject::objectType::CUBE_OBJECT, "Cube-Grass.mesh", i, 0, j, Ogre::Vector3(50, 50, 50), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 1.0f, 0.8f, false, _simulator);
-			Ogre::SceneNode* sn = mSceneManager->getSceneNode(name);
-			Ogre::Vector3 pos = sn->getPosition();
-			Ogre::Quaternion orient = sn->getOrientation();
+			float fi = (float)i / (float)100.0f;
+			float fj = (float)j / (float)100.0f;
+
 			Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
-			Ogre::Entity* cubeEnt = SceneHelper::getEntity(mSceneManager, name, 0);
-			sn->detachAllObjects();
-			sg->addEntity(cubeEnt, pos, orient, scale);
+
+			int y = (int)((perlin->getPerlin(fi, fj)) * 100);
+			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
+
+			StaticObject* so = new StaticObject(grassCube, scale, pos, _simulator);
+
+			sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}	
 	}
 	sg->build();

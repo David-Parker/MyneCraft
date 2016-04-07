@@ -1,8 +1,9 @@
 #include "Simulator.h"
 #include "GameObject.h"
+#include "StaticObject.h"
 #include <exception>
 
-Simulator::Simulator() : objList(), collisionShapes() { 
+Simulator::Simulator() : objList(), collisionShapes(), objListStatic() { 
   collisionConfiguration = new btDefaultCollisionConfiguration(); 
   dispatcher = new btCollisionDispatcher(collisionConfiguration); 
   overlappingPairCache = new btDbvtBroadphase(); 
@@ -14,6 +15,11 @@ Simulator::Simulator() : objList(), collisionShapes() {
 
 void Simulator::addObject (GameObject* o) { 
   objList.push_back(o); 
+  dynamicsWorld->addRigidBody(o->getBody());       
+}
+
+void Simulator::addObject (StaticObject* o) { 
+  objListStatic.push_back(o); 
   dynamicsWorld->addRigidBody(o->getBody());       
 }
 
@@ -33,4 +39,5 @@ void Simulator::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, co
 			outer->cCallBack->ctxt.hit = false;
 		}
 	}
+	// TODO refactor collision check for optimization and add iteration of objListStatic
 }
