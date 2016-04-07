@@ -22,7 +22,7 @@ Application::Application()
 {
 }
 
-Application::~Application()
+Application::~Application() 
 {
 }
 
@@ -225,13 +225,20 @@ void Application::createChildEntity(std::string name, std::string mesh, Ogre::Sc
 }
 
 Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim) {
-	float fi = (float)x/(float)100.0f;
-	float fj = (float)z/(float)100.0f;
+	float fi = (float)x/(float)400.0f;
+	float fj = (float)z/(float)400.0f;
 
 	y = (int)((perlin->getPerlin(fi, fj))*100);
-	createRootEntity(nme, meshName, x*scale.x*2, y*scale.y*2, z*scale.z*2);
-	Ogre::SceneNode* sn = mSceneManager->getSceneNode(nme);
-	Ogre::Entity* ent = SceneHelper::getEntity(mSceneManager, nme, 0);
+
+	//int test = (int)(perlin->getSimplex(fi, fj)*100);
+
+
+	//createRootEntity(nme, meshName, x*scale.x*2, y*scale.y*2, z*scale.z*2);
+	Ogre::SceneNode* sn = mSceneManager->getRootSceneNode()->createChildSceneNode(nme);
+	sn->attachObject(grassCube);
+	sn->setPosition(x*scale.x * 2, y*scale.y * 2, z*scale.z * 2);
+	sn->setScale(50,50,50);
+	//Ogre::Entity* ent = SceneHelper::getEntity(mSceneManager, nme, 0);
 	const btTransform pos;
 	OgreMotionState* ms = new OgreMotionState(pos, sn);
 	sn->setScale(scale.x, scale.y, scale.z);
@@ -240,7 +247,7 @@ Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre:
 	sn->yaw(yaw);
 	sn->roll(roll);
 
-	Cube* obj = new Cube(nme, tp, mSceneManager, ssm, sn, ent, ms, mySim, mss, rest, frict, scale, kinematic);
+	Cube* obj = new Cube(nme, tp, mSceneManager, ssm, sn, grassCube, ms, mySim, mss, rest, frict, scale, kinematic);
 	obj->addToSimulator();
 
 	return obj;
@@ -417,10 +424,14 @@ void Application::setupLighting(void) {
 
 void Application::createObjects(void) {
 
-	int xmax = 128;
+	int xmax = 512;
 	int ymax = xmax;
 	int rndmax = 8;
 	perlin = new Perlin(xmax, ymax, rndmax, 10);
+
+	if (grassCube == nullptr) {
+		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
+	}
 
 	Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
 
@@ -429,14 +440,22 @@ void Application::createObjects(void) {
 			char buf[32];
 			sprintf(buf, "Cube_%d_%d", i,j);
 			std::string name = std::string(buf);
-			createCube(name, GameObject::objectType::CUBE_OBJECT, "Cube-Grass.mesh", i, 0, j, Ogre::Vector3(50, 50, 50), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 1.0f, 0.8f, false, _simulator);
-			Ogre::SceneNode* sn = mSceneManager->getSceneNode(name);
-			Ogre::Vector3 pos = sn->getPosition();
-			Ogre::Quaternion or = sn->getOrientation();
+			//createCube(name, GameObject::objectType::CUBE_OBJECT, "Cube-Grass.mesh", i, 0, j, Ogre::Vector3(50, 50, 50), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 1.0f, 0.8f, false, _simulator);
+			//Ogre::Vector3 pos = sn->getPosition();
+			//Ogre::Quaternion or = sn->getOrientation();
+			//Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
+			float fi = (float)i / (float)100.0f;
+			float fj = (float)j / (float)100.0f;
+
 			Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
-			Ogre::Entity* cubeEnt = SceneHelper::getEntity(mSceneManager, name, 0);
-			sn->detachAllObjects();
-			sg->addEntity(cubeEnt, pos, or, scale);
+
+			int y = (int)((perlin->getPerlin(fi, fj)) * 100);
+			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
+			Ogre::Quaternion q{};
+			sg->addEntity(grassCube, pos, q, scale);
+			/*Ogre::Entity* cubeEnt = SceneHelper::getEntity(mSceneManager, name, 0);*/
+			//sn->detachAllObjects();
+			//sg->addEntity(grassCube, pos, or, scale);
 		}	
 	}
 	sg->build();

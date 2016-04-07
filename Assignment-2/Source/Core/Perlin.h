@@ -18,6 +18,7 @@ public:
 	float lerp(float, float, float);
 	float dotGridGradient(int, int, float, float);
 	float getPerlin(float, float);
+	float getSimplex(float, float);
 	int xMax;
 	int yMax;
 };

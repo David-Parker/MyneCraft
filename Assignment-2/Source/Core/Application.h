@@ -61,6 +61,7 @@ public:
 	std::vector<Ogre::Camera*> cameras;
 
 	Ogre::StaticGeometry* sg;
+	Ogre::Entity* grassCube = nullptr;
 
 	Perlin* perlin;
 
