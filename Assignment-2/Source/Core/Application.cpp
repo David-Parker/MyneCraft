@@ -52,6 +52,8 @@ void Application::init()
 
 		createObjects();
 
+		sg = mSceneManager->createStaticGeometry("CubeArea");
+
 		// testPerlinGeneration();
 
 	}
@@ -265,8 +267,14 @@ void Application::setupWindowRendererSystem(void) {
 
 	// load plugins
 #ifdef _WIN32
-	mRoot->loadPlugin("RenderSystem_GL_d");
-	mRoot->loadPlugin("Plugin_ParticleFX_d");
+	#ifdef _DEBUG
+		mRoot->loadPlugin("RenderSystem_GL_d");
+		mRoot->loadPlugin("Plugin_ParticleFX_d");
+	#else
+		mRoot->loadPlugin("RenderSystem_GL");
+		mRoot->loadPlugin("Plugin_ParticleFX");
+	#endif
+
 #endif
 #ifdef __linux__
 	mRoot->loadPlugin("/lusr/opt/ogre-1.9/lib/OGRE/RenderSystem_GL");
@@ -333,7 +341,6 @@ void Application::setupOIS(void) {
     _oisManager->initialise( mRenderWindow );
     _oisManager->addKeyListener( (OIS::KeyListener*)_oisManager, "keyboardListener" );
     _oisManager->addMouseListener( (OIS::MouseListener*)_oisManager, "mouseListener" );
-
 }
 
 void Application::setupCEGUI(void) {
@@ -377,6 +384,7 @@ void Application::setupCameras(void) {
 	camMan->setAutoAspectRatio(true);
 	camMan->setPosition(0,300,0);
 	camMan->lookAt(0,120,1800);
+	camMan->setFarClipDistance(10000.0f);
 
 	// Add viewport and cameras
 	mRenderWindow->addViewport(camMan);
@@ -387,7 +395,6 @@ void Application::setupCameras(void) {
 
 	cameraMan = new OgreBites::SdkCameraMan(camMan);
 	_oisManager->setupCameraMan(cameraMan);
-	camMan->setFarClipDistance(10000.0f);
 	std::cout << camMan->getFarClipDistance() << std::endl;
 }
 
@@ -415,19 +422,29 @@ void Application::createObjects(void) {
 	int rndmax = 8;
 	perlin = new Perlin(xmax, ymax, rndmax, 10);
 
+	Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
+
 	for(int i = 0; i < xmax; i++) {
 		for(int j = 0; j < ymax; j++) {
 			char buf[32];
 			sprintf(buf, "Cube_%d_%d", i,j);
 			std::string name = std::string(buf);
 			createCube(name, GameObject::objectType::CUBE_OBJECT, "Cube-Grass.mesh", i, 0, j, Ogre::Vector3(50, 50, 50), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 1.0f, 0.8f, false, _simulator);
+			Ogre::SceneNode* sn = mSceneManager->getSceneNode(name);
+			Ogre::Vector3 pos = sn->getPosition();
+			Ogre::Quaternion or = sn->getOrientation();
+			Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
+			Ogre::Entity* cubeEnt = SceneHelper::getEntity(mSceneManager, name, 0);
+			sn->detachAllObjects();
+			sg->addEntity(cubeEnt, pos, or, scale);
 		}	
 	}
+	sg->build();
 }
 
 void Application::testPerlinGeneration(void) {
-	int xmax = 100;
-	int ymax = xmax;
+	const int xmax = 100;
+	const int ymax = xmax;
 	int rndmax = 8;
 	float avg;
 	int perlinArray[xmax][ymax];

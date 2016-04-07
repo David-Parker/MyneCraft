@@ -60,6 +60,8 @@ public:
 	
 	std::vector<Ogre::Camera*> cameras;
 
+	Ogre::StaticGeometry* sg;
+
 	Perlin* perlin;
 
 	int points;
