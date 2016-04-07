@@ -25,6 +25,7 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
+#include <vector>
 
 #include "Perlin.h"
 #include "NetManager.h"
@@ -33,6 +34,7 @@
 #include "Simulator.h"
 #include "Cube.h"
 #include "StaticObject.h"
+#include "Chunk.h"
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
 {
@@ -64,6 +66,8 @@ public:
 	Ogre::StaticGeometry* sg;
 
 	Perlin* perlin;
+
+	std::vector<Chunk*> chunks;
 
 	int points;
 	int width;

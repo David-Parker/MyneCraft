@@ -384,7 +384,7 @@ void Application::setupCameras(void) {
 	camMan->setAutoAspectRatio(true);
 	camMan->setPosition(0,300,0);
 	camMan->lookAt(0,120,1800);
-	camMan->setFarClipDistance(0.0f);
+	camMan->setFarClipDistance(20000.0f);
 
 	// Add viewport and cameras
 	mRenderWindow->addViewport(camMan);
@@ -423,18 +423,18 @@ void Application::createObjects(void) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 	}
 
-	int xmax = 256;//1024;
+	int xmax = 128;
 	int ymax = xmax;
-	int zmax = 32;
-	int rndmax = 8;
-	bool threeD = false;
+	bool threeD = true;
 	perlin = new Perlin();
 
 	// Static Geometries will eventually become Chunks
-	Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
 
 	if ( threeD ) {
-		//Perlin 3D
+	//Perlin 3D
+		xmax = ymax = 256;
+		int zmax = 32;
+		Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
 		for(int i = 0; i < xmax; i++) {
 			for(int j = 0; j < ymax; j++) {
 				for ( int k = 0 ; k < zmax ; k++ ) {
@@ -454,27 +454,16 @@ void Application::createObjects(void) {
 				}
 			}	
 		}
+		sg->build();
 	}
 	else {
-		float steepness = 75.0f;
 		//Perlin 2D
-		for(int i = 0; i < xmax; i++) {
-			for(int j = 0; j < ymax; j++) {
-				float fi = (float)i/100.0f;
-				float fj = (float)j/100.0f;
-
-				Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
-				int y = (int)((perlin->perlin(fi, fj, 0) * steepness));
-				
-				Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
-
-				StaticObject* so = new StaticObject(grassCube, scale, pos, _simulator);
-
-				sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-			}	
+		for (int i = 0; i < xmax; i += CHUNK_SIZE) {
+			for (int j = 0; j < ymax; j += CHUNK_SIZE) {
+				chunks.push_back(new Chunk(i, i + CHUNK_SIZE, j, j + CHUNK_SIZE, mSceneManager, perlin, _simulator));
+			}
 		}
 	}
-	sg->build();
 }
 /* 
 * End Initialization Methods
