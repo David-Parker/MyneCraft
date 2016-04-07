@@ -50,8 +50,6 @@ void Application::init()
 
 		setupLighting();
 
-		initCubes();
-
 		createObjects();
 
 		sg = mSceneManager->createStaticGeometry("CubeArea");
@@ -417,43 +415,44 @@ void Application::setupLighting(void) {
 
 }
 
-void Application::initCubes() {
-	grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
-	snowCube = mSceneManager->createEntity("Cube-Snow.mesh");
-}
-
 void Application::createObjects(void) {
 
-	int xmax = 512;
+	int xmax = 1024;
 	int ymax = xmax;
 	int rndmax = 8;
 	float density = 1.5f; // 1 is very steep, 10 is pretty flat.
 	perlin = new Perlin(xmax, ymax, rndmax, density);
 
 	// Static Geometries will eventually become Chunks
-	Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
+	// Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
 
-	for(int i = 0; i < xmax; i++) {
-		for(int j = 0; j < ymax; j++) {
-			float fi = (float)i / (float)100.0f;
-			float fj = (float)j / (float)100.0f;
-
-			Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
-
-			int y = (int)((perlin->getPerlin(fi, fj)) * 100);
-			Ogre::Vector3 pos(i*scale.x * 2.01, y*scale.y * 2, j*scale.z * 2);
-
-			StaticObject* so;
-
-			if(y >= 15)
-				so = new StaticObject(snowCube, scale, pos, _simulator);
-			else
-				so = new StaticObject(grassCube, scale, pos, _simulator);
-
-			sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-		}	
+	for (int i = 0; i < xmax; i += CHUNK_SIZE) {
+		for (int j = 0; j < ymax; j += CHUNK_SIZE) {
+			chunks.push_back(new Chunk(i, i + CHUNK_SIZE, j, j + CHUNK_SIZE, mSceneManager, perlin, _simulator));
+		}
 	}
-	sg->build();
+
+	// for(int i = 0; i < xmax; i++) {
+	// 	for(int j = 0; j < ymax; j++) {
+	// 		float fi = (float)i / (float)100.0f;
+	// 		float fj = (float)j / (float)100.0f;
+
+	// 		Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
+
+	// 		int y = (int)((perlin->getPerlin(fi, fj)) * 100);
+	// 		Ogre::Vector3 pos(i*scale.x * 2.01, y*scale.y * 2, j*scale.z * 2);
+
+	// 		StaticObject* so;
+
+	// 		if(y >= 15)
+	// 			so = new StaticObject(snowCube, scale, pos, _simulator);
+	// 		else
+	// 			so = new StaticObject(grassCube, scale, pos, _simulator);
+
+	// 		sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+	// 	}	
+	// }
+	// sg->build();
 }
 /* 
 * End Initialization Methods

@@ -25,6 +25,7 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
+#include <vector>
 
 #include "Perlin.h"
 #include "NetManager.h"
@@ -33,6 +34,7 @@
 #include "Simulator.h"
 #include "Cube.h"
 #include "StaticObject.h"
+#include "Chunk.h"
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
 {
@@ -65,8 +67,7 @@ public:
 
 	Perlin* perlin;
 
-	Ogre::Entity* grassCube = nullptr;
-	Ogre::Entity* snowCube = nullptr;
+	std::vector<Chunk*> chunks;
 
 	int points;
 	int width;
@@ -94,7 +95,6 @@ public:
 	void setupCameras(void);
 	void setupGM(void);
 	void setupLighting(void);
-	void initCubes();
 	void createObjects(void);
 	bool Quit(const CEGUI::EventArgs &e);
 
