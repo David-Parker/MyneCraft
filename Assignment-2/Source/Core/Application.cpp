@@ -227,8 +227,8 @@ void Application::createChildEntity(std::string name, std::string mesh, Ogre::Sc
 Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim) {
 	float fi = (float)x/(float)100.0f;
 	float fj = (float)z/(float)100.0f;
-
-	y = (int)((perlin->getPerlin(fi, fj))*100);
+	y = 0;
+	//y = (int)((perlin->getPerlin(fi, 0, fj))*100);
 	createRootEntity(nme, meshName, x*scale.x*2, y*scale.y*2, z*scale.z*2);
 	Ogre::SceneNode* sn = mSceneManager->getSceneNode(nme);
 	Ogre::Entity* ent = SceneHelper::getEntity(mSceneManager, nme, 0);
@@ -423,29 +423,56 @@ void Application::createObjects(void) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 	}
 
-	int xmax = 1024;
+	int xmax = 256;//1024;
 	int ymax = xmax;
+	int zmax = 32;
 	int rndmax = 8;
-	float density = 1.56f; // 1 is very steep, 10 is pretty flat.
-	perlin = new Perlin(xmax, ymax, rndmax, density);
+	bool threeD = false;
+	perlin = new Perlin();
 
 	// Static Geometries will eventually become Chunks
 	Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
 
-	for(int i = 0; i < xmax; i++) {
-		for(int j = 0; j < ymax; j++) {
-			float fi = (float)i / (float)100.0f;
-			float fj = (float)j / (float)100.0f;
+	if ( threeD ) {
+		//Perlin 3D
+		for(int i = 0; i < xmax; i++) {
+			for(int j = 0; j < ymax; j++) {
+				for ( int k = 0 ; k < zmax ; k++ ) {
+					float fi = (float)i/30.0f;
+					float fj = (float)j/30.0f;
+					float fk = (float)k/15.0f;
 
-			Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
+					Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
+					int y = (int)((perlin->perlin(fi, fj, fk) * 100) - 10);
+					if ( y >= 0 ) {
+						Ogre::Vector3 pos(i*scale.x * 2, k*scale.y * 2, j*scale.z * 2);
 
-			int y = (int)((perlin->getPerlin(fi, fj)) * 100);
-			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
+						StaticObject* so = new StaticObject(grassCube, scale, pos, _simulator);
 
-			StaticObject* so = new StaticObject(grassCube, scale, pos, _simulator);
+						sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+					}
+				}
+			}	
+		}
+	}
+	else {
+		float steepness = 75.0f;
+		//Perlin 2D
+		for(int i = 0; i < xmax; i++) {
+			for(int j = 0; j < ymax; j++) {
+				float fi = (float)i/100.0f;
+				float fj = (float)j/100.0f;
 
-			sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-		}	
+				Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
+				int y = (int)((perlin->perlin(fi, fj, 0) * steepness));
+				
+				Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
+
+				StaticObject* so = new StaticObject(grassCube, scale, pos, _simulator);
+
+				sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+			}	
+		}
 	}
 	sg->build();
 }
