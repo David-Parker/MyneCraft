@@ -65,6 +65,9 @@ public:
 
 	Perlin* perlin;
 
+	Ogre::Entity* grassCube = nullptr;
+	Ogre::Entity* snowCube = nullptr;
+
 	int points;
 	int width;
 	int height;
@@ -91,6 +94,7 @@ public:
 	void setupCameras(void);
 	void setupGM(void);
 	void setupLighting(void);
+	void initCubes();
 	void createObjects(void);
 	bool Quit(const CEGUI::EventArgs &e);
 

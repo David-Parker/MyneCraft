@@ -50,6 +50,8 @@ void Application::init()
 
 		setupLighting();
 
+		initCubes();
+
 		createObjects();
 
 		sg = mSceneManager->createStaticGeometry("CubeArea");
@@ -384,7 +386,7 @@ void Application::setupCameras(void) {
 	camMan->setAutoAspectRatio(true);
 	camMan->setPosition(0,300,0);
 	camMan->lookAt(0,120,1800);
-	camMan->setFarClipDistance(0.0f);
+	camMan->setFarClipDistance(20000.0f);
 
 	// Add viewport and cameras
 	mRenderWindow->addViewport(camMan);
@@ -415,18 +417,17 @@ void Application::setupLighting(void) {
 
 }
 
+void Application::initCubes() {
+	grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
+	snowCube = mSceneManager->createEntity("Cube-Snow.mesh");
+}
+
 void Application::createObjects(void) {
 
-	static Ogre::Entity* grassCube = nullptr;
-
-	if(grassCube == nullptr) {
-		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
-	}
-
-	int xmax = 1024;
+	int xmax = 512;
 	int ymax = xmax;
 	int rndmax = 8;
-	float density = 1.56f; // 1 is very steep, 10 is pretty flat.
+	float density = 1.5f; // 1 is very steep, 10 is pretty flat.
 	perlin = new Perlin(xmax, ymax, rndmax, density);
 
 	// Static Geometries will eventually become Chunks
@@ -440,9 +441,14 @@ void Application::createObjects(void) {
 			Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
 
 			int y = (int)((perlin->getPerlin(fi, fj)) * 100);
-			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
+			Ogre::Vector3 pos(i*scale.x * 2.01, y*scale.y * 2, j*scale.z * 2);
 
-			StaticObject* so = new StaticObject(grassCube, scale, pos, _simulator);
+			StaticObject* so;
+
+			if(y >= 15)
+				so = new StaticObject(snowCube, scale, pos, _simulator);
+			else
+				so = new StaticObject(grassCube, scale, pos, _simulator);
 
 			sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}	
