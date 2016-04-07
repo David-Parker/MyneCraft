@@ -425,7 +425,7 @@ void Application::createObjects(void) {
 
 	int xmax = 128;
 	int ymax = xmax;
-	bool threeD = true;
+	bool threeD = false;
 	perlin = new Perlin();
 
 	// Static Geometries will eventually become Chunks
