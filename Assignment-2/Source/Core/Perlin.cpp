@@ -2,14 +2,15 @@
 
 /* PsuedoCode taken from https://en.wikipedia.org/wiki/Perlin_noise */
 
-Perlin::Perlin(int xMx, int yMx, int rndMx, int crct) : xMax(xMx), yMax(yMx), randomMax(rndMx), correction(crct), size(xMx*yMx) {
+Perlin::Perlin(int xMx, int yMx, int rndMx, float dnsty) : xMax(xMx), yMax(yMx), randomMax(rndMx), density(dnsty), size(xMx*yMx) {
 	size = xMax * yMax;
 	std::vector<std::vector<std::vector<float>>> tmp(xMax, std::vector<std::vector<float>>(yMax, std::vector<float>(2,0)));
 	gradient = tmp;
+	density = (density > 0.0f ? density : 0.1f);
 	generateGradientTrivial();
 }
 void Perlin::generateGradientTrivial() {
-	static int moTWO = randomMax/2;
+	static float moTWO = randomMax/2;
 	for ( int i = 0 ; i < xMax ; i++ ) {
 		for ( int j = 0 ; j < yMax ; j++ ) {
 			gradient[i][j][0] = float(rand()%randomMax)/moTWO; 
@@ -59,5 +60,5 @@ float Perlin::getPerlin(float x, float y) {
     ix1 = lerp(n0, n1, sx);
     value = lerp(ix0, ix1, sy);
  
-     return value;
+     return value / density;
 }

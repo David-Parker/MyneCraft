@@ -417,10 +417,11 @@ void Application::setupLighting(void) {
 
 void Application::createObjects(void) {
 
-	int xmax = 128;
+	int xmax = 256;
 	int ymax = xmax;
 	int rndmax = 8;
-	perlin = new Perlin(xmax, ymax, rndmax, 10);
+	float density = 1.56f; // 1 is very steep, 10 is pretty flat.
+	perlin = new Perlin(xmax, ymax, rndmax, density);
 
 	Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
 
@@ -432,34 +433,14 @@ void Application::createObjects(void) {
 			createCube(name, GameObject::objectType::CUBE_OBJECT, "Cube-Grass.mesh", i, 0, j, Ogre::Vector3(50, 50, 50), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 1.0f, 0.8f, false, _simulator);
 			Ogre::SceneNode* sn = mSceneManager->getSceneNode(name);
 			Ogre::Vector3 pos = sn->getPosition();
-			Ogre::Quaternion or = sn->getOrientation();
+			Ogre::Quaternion orient = sn->getOrientation();
 			Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
 			Ogre::Entity* cubeEnt = SceneHelper::getEntity(mSceneManager, name, 0);
 			sn->detachAllObjects();
-			sg->addEntity(cubeEnt, pos, or, scale);
+			sg->addEntity(cubeEnt, pos, orient, scale);
 		}	
 	}
 	sg->build();
-}
-
-void Application::testPerlinGeneration(void) {
-	const int xmax = 100;
-	const int ymax = xmax;
-	int rndmax = 8;
-	float avg;
-	int perlinArray[xmax][ymax];
-	Perlin* perlin = new Perlin(xmax, ymax, rndmax, 10);
-
-	for ( int i = 0 ; i < xmax ; i++ ) 
-		for ( int j = 0 ; j < ymax ; j++ ) {
-			float fi = (float)i/(float)xmax;
-			float fj = (float)j/(float)ymax;
-			perlinArray[i][j] = (int)((perlin->getPerlin(fi, fj))*100);
-		}
-
-	for ( int i = 0 ; i < xmax ; i++ )
-		for ( int j = 0 ; j < ymax ; j++ )
-			std::cout << "X: " << i << " Y: " << j << " Perlin: " << perlinArray[i][j] << std::endl;
 }
 /* 
 * End Initialization Methods

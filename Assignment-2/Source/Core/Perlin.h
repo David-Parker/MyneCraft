@@ -9,11 +9,11 @@ class Perlin {
 private:
 	int size;
 	int randomMax;
-	int correction;
+	float density; /* Density domain is (0, 10+). 0 is unpopulated 10 is extremely dense. */
 	std::vector<std::vector<std::vector<float>>> gradient;
 	
 public:
-	Perlin(int, int, int, int);
+	Perlin(int, int, int, float);
 	void generateGradientTrivial();
 	float lerp(float, float, float);
 	float dotGridGradient(int, int, float, float);
