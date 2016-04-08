@@ -133,23 +133,18 @@ bool Application::update(const FrameEvent &evt) {
 			int oldYEnd = currentChunk->_yEnd;
 			Ogre::Vector3 scale = currentChunk->_scale;
 
-			//Ensures (for now) that the same chunk is added to the static geometry many times.
-			sg->reset();
-
 			if (pos.x > oldXEnd*scale.x * 2) {
-				chunks.push_back(currentChunk = new Chunk(sg, oldXEnd, oldYStart, mSceneManager, perlin, _simulator));
+				chunks.push_back(currentChunk = new Chunk(oldXEnd, oldYStart, mSceneManager, perlin, _simulator));
 			}
 			else if (pos.x < oldXStart*scale.x * 2) {
-				chunks.push_back(currentChunk = new Chunk(sg, oldXStart - CHUNK_SIZE, oldYStart, mSceneManager, perlin, _simulator));
+				chunks.push_back(currentChunk = new Chunk(oldXStart - CHUNK_SIZE, oldYStart, mSceneManager, perlin, _simulator));
 			}
 			else if (pos.z > oldYEnd*scale.y * 2) {
-				chunks.push_back(currentChunk = new Chunk(sg, oldXStart, oldYEnd, mSceneManager, perlin, _simulator));
+				chunks.push_back(currentChunk = new Chunk(oldXStart, oldYEnd, mSceneManager, perlin, _simulator));
 			}
 			else if (pos.z < oldYStart*scale.y * 2) {
-				chunks.push_back(currentChunk = new Chunk(sg, oldXStart, oldYStart - CHUNK_SIZE, mSceneManager, perlin, _simulator));
+				chunks.push_back(currentChunk = new Chunk(oldXStart, oldYStart - CHUNK_SIZE, mSceneManager, perlin, _simulator));
 			}
-			sg->destroy();
-			sg->build();
 		}
 	}
 	catch (Exception e) {
@@ -483,8 +478,7 @@ void Application::createObjects(void) {
 		sg->build();
 	}
 	else {
-		chunks.push_back(currentChunk = new Chunk(sg, 0, 0, mSceneManager, perlin, _simulator));
-		sg->build();
+		chunks.push_back(currentChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator));
 	}
 }
 /* 

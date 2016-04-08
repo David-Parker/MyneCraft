@@ -16,7 +16,7 @@ private:
 	std::vector<StaticObject *> staticObjects;
 
 public:
-	Chunk(Ogre::StaticGeometry*, int, int, Ogre::SceneManager*, Perlin*, Simulator*);
+	Chunk(int, int, Ogre::SceneManager*, Perlin*, Simulator*);
 	bool pointInChunk(float x, float y);
 	Ogre::Vector3 _scale;
 	int _xStart = 0;

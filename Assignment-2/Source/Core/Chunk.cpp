@@ -1,7 +1,7 @@
 #include "Chunk.h"
 
 
-Chunk::Chunk(Ogre::StaticGeometry* sg, int xStart, int yStart, Ogre::SceneManager* mSceneManager, Perlin* perlin, Simulator* sim) : _sg(sg), _xStart(xStart), _yStart(yStart) {
+Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, Perlin* perlin, Simulator* sim) : _xStart(xStart), _yStart(yStart) {
 
 	// create unique name
 	char buf[32];
@@ -14,6 +14,8 @@ Chunk::Chunk(Ogre::StaticGeometry* sg, int xStart, int yStart, Ogre::SceneManage
 	_yEnd = yStart + CHUNK_SIZE;
 
 	float steepness = 75.0f;
+
+	_sg = mSceneManager->createStaticGeometry(name);
 
 	if (grassCube == nullptr & snowCube == nullptr) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
@@ -34,6 +36,8 @@ Chunk::Chunk(Ogre::StaticGeometry* sg, int xStart, int yStart, Ogre::SceneManage
 				_sg->addEntity(grassCube, pos, Ogre::Quaternion::IDENTITY, scale);
 		}
 	}
+
+	_sg->build();
 }
 
 bool Chunk::pointInChunk(float x, float y) {
