@@ -124,26 +124,45 @@ bool Application::update(const FrameEvent &evt) {
 	}
 
 	Ogre::Vector3 pos = camMan->getPosition();
+	static int range = CHUNK_SIZE * 1;
 
 	try {
-		if (!currentChunk->pointInChunk(pos.x, pos.z) && !(pos.x < 0 || pos.z < 0)) {
-			int oldXStart = currentChunk->_xStart;
-			int oldXEnd = currentChunk->_xEnd;
-			int oldYStart = currentChunk->_yStart;
-			int oldYEnd = currentChunk->_yEnd;
-			Ogre::Vector3 scale = currentChunk->_scale;
+		//if (!currentChunk->pointInChunk(pos.x, pos.z)) {
+		//	int oldXStart = currentChunk->_xStart;
+		//	int oldXEnd = currentChunk->_xEnd;
+		//	int oldYStart = currentChunk->_yStart;
+		//	int oldYEnd = currentChunk->_yEnd;
+		//	Ogre::Vector3 scale = currentChunk->_scale;
 
-			if (pos.x > oldXEnd*scale.x * 2) {
-				chunks.push_back(currentChunk = new Chunk(oldXEnd, oldYStart, mSceneManager, perlin, _simulator));
-			}
-			else if (pos.x < oldXStart*scale.x * 2) {
-				chunks.push_back(currentChunk = new Chunk(oldXStart - CHUNK_SIZE, oldYStart, mSceneManager, perlin, _simulator));
-			}
-			else if (pos.z > oldYEnd*scale.y * 2) {
-				chunks.push_back(currentChunk = new Chunk(oldXStart, oldYEnd, mSceneManager, perlin, _simulator));
-			}
-			else if (pos.z < oldYStart*scale.y * 2) {
-				chunks.push_back(currentChunk = new Chunk(oldXStart, oldYStart - CHUNK_SIZE, mSceneManager, perlin, _simulator));
+		//	if (pos.x > oldXEnd*scale.x * 2) {
+		//		chunks.push_back(currentChunk = new Chunk(oldXEnd, oldYStart, mSceneManager, perlin, _simulator));
+		//	}
+		//	else if (pos.x < oldXStart*scale.x * 2) {
+		//		chunks.push_back(currentChunk = new Chunk(oldXStart - CHUNK_SIZE, oldYStart, mSceneManager, perlin, _simulator));
+		//	}
+		//	else if (pos.z > oldYEnd*scale.y * 2) {
+		//		chunks.push_back(currentChunk = new Chunk(oldXStart, oldYEnd, mSceneManager, perlin, _simulator));
+		//	}
+		//	else if (pos.z < oldYStart*scale.y * 2) {
+		//		chunks.push_back(currentChunk = new Chunk(oldXStart, oldYStart - CHUNK_SIZE, mSceneManager, perlin, _simulator));
+		//	}
+		//}
+
+		// Determine closest x,y aligned to the chunk size grid
+		int x = (int)pos.x - ((int)pos.x % CHUNK_SIZE);
+		int z = (int)pos.z - ((int)pos.z % CHUNK_SIZE);
+
+		for (int i = (x - range); i < (x + range); i += CHUNK_SIZE) {
+			for (int j = (z - range); j < (z + range); j += CHUNK_SIZE) {
+				bool create = true;
+				for (int k = 0; k < chunks.size(); k++) {
+					// Chunk already exists
+					if ((chunks[k]->_xStart == i && chunks[k]->_yStart == j)) {
+						create = false;
+					}
+				}
+				if (create)
+					chunks.push_back(new Chunk(i, j, mSceneManager, perlin, _simulator));
 			}
 		}
 	}
@@ -440,6 +459,12 @@ void Application::setupLighting(void) {
 }
 
 void Application::createObjects(void) {
+	int xmax = 128;
+	int ymax = xmax;
+	int rndmax = 8;
+	float density = 1.5f; // 1 is very steep, 10 is pretty flat.
+
+	perlin = new Perlin(xmax, ymax, rndmax, density);
 
 	static Ogre::Entity* grassCube = nullptr;
 
@@ -447,39 +472,7 @@ void Application::createObjects(void) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 	}
 
-	bool threeD = false;
-	perlin = new Perlin();
-
-	if ( threeD ) {
-	//Perlin 3D
-		int xmax, ymax;
-		xmax = ymax = 256;
-		int zmax = 32;
-		Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
-		for(int i = 0; i < xmax; i++) {
-			for(int j = 0; j < ymax; j++) {
-				for ( int k = 0 ; k < zmax ; k++ ) {
-					float fi = (float)i/30.0f;
-					float fj = (float)j/30.0f;
-					float fk = (float)k/15.0f;
-
-					Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
-					int y = (int)((perlin->perlin(fi, fj, fk) * 100) - 10);
-					if ( y >= 0 ) {
-						Ogre::Vector3 pos(i*scale.x * 2, k*scale.y * 2, j*scale.z * 2);
-
-						StaticObject* so = new StaticObject(grassCube, scale, pos, _simulator);
-
-						sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-					}
-				}
-			}	
-		}
-		sg->build();
-	}
-	else {
-		chunks.push_back(currentChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator));
-	}
+	chunks.push_back(currentChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator));
 }
 /* 
 * End Initialization Methods

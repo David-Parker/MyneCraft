@@ -9,7 +9,7 @@
 static Ogre::Entity* grassCube = nullptr;
 static Ogre::Entity* snowCube = nullptr;
 
-#define CHUNK_SIZE 64
+#define CHUNK_SIZE 8
 class Chunk {
 private:
 	Ogre::StaticGeometry* _sg;
