@@ -75,6 +75,7 @@ public:
 	int height;
 
 	double fps = 300.0;
+	int fieldOfView = 10000;
 
 	bool begin = false;
 	bool mRunning = true;

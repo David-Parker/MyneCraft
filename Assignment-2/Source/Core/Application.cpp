@@ -131,18 +131,20 @@ bool Application::update(const FrameEvent &evt) {
 		float fx = (pos.x / 100) - (CHUNK_SIZE / 2);
 		float fz = (pos.z / 100) - (CHUNK_SIZE / 2);
 
-		for ( int i = -1 ; i <= 1 ; i++ ) {
-			for ( int j = -1 ; j <= 1 ; j++ ) {
+		int numChunks = (fieldOfView*1.5 / (100*CHUNK_SIZE));
+
+		for(int i = -numChunks; i <= numChunks; i++) {
+			for(int j = -numChunks; j <= numChunks; j++) {
+
 				int x = ((int)fx - ((int)fx % CHUNK_SIZE));
 				int z = ((int)fz - ((int)fz % CHUNK_SIZE));
 
 				x += i*CHUNK_SIZE;
-				z += j*CHUNK_SIZE;
+		 		z += j*CHUNK_SIZE;
 
 				std::stringstream str;
 				str << "Chunks_" << x/CHUNK_SIZE << "_" << z/CHUNK_SIZE;
 				std::string name(str.str());
-				std::cout << name << std::endl;
 				
 				if(!chunks[name]) {
 					chunks[name] = new Chunk(name, x, z, mSceneManager, perlin, _simulator);
@@ -412,7 +414,7 @@ void Application::setupCameras(void) {
 	camMan->setAutoAspectRatio(true);
 	camMan->setPosition(0,300,0);
 	camMan->lookAt(0,120,1800);
-	camMan->setFarClipDistance(20000.0f);
+	camMan->setFarClipDistance(fieldOfView);
 
 	// Add viewport and cameras
 	mRenderWindow->addViewport(camMan);
