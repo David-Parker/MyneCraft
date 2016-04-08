@@ -133,6 +133,9 @@ bool Application::update(const FrameEvent &evt) {
 			int oldYEnd = currentChunk->_yEnd;
 			Ogre::Vector3 scale = currentChunk->_scale;
 
+			//Ensures (for now) that the same chunk is added to the static geometry many times.
+			sg->reset();
+
 			if (pos.x > oldXEnd*scale.x * 2) {
 				chunks.push_back(currentChunk = new Chunk(sg, oldXEnd, oldYStart, mSceneManager, perlin, _simulator));
 			}
