@@ -50,9 +50,9 @@ void Application::init()
 
 		setupLighting();
 
-		createObjects();
-
 		sg = mSceneManager->createStaticGeometry("CubeArea");
+
+		createObjects();
 
 		// testPerlinGeneration();
 
@@ -460,7 +460,7 @@ void Application::createObjects(void) {
 		//Perlin 2D
 		for (int i = 0; i < xmax; i += CHUNK_SIZE) {
 			for (int j = 0; j < ymax; j += CHUNK_SIZE) {
-				chunks.push_back(new Chunk(i, i + CHUNK_SIZE, j, j + CHUNK_SIZE, mSceneManager, perlin, _simulator));
+				chunks.push_back(new Chunk(sg, i, i + CHUNK_SIZE, j, j + CHUNK_SIZE, mSceneManager, perlin, _simulator));
 			}
 		}
 	}
