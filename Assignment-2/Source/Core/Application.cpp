@@ -126,6 +126,32 @@ bool Application::update(const FrameEvent &evt) {
 		mRunning = false;
 	}
 
+	Ogre::Vector3 pos = camMan->getPosition();
+
+	Chunk* newChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator);
+
+	// if(!chunks[0]->pointInChunk(pos.x, pos.z)) {
+	// 	int oldXStart = chunks[0]->_xStart;
+	// 	int oldXEnd = chunks[0]->_xEnd;
+	// 	int oldYStart = chunks[0]->_yStart;
+	// 	int oldYEnd = chunks[0]->_yEnd;
+	// 	Ogre::Vector3 scale = chunks[0]->_scale;
+
+	// 	if(pos.x > oldXEnd*scale.x*2) {
+	// 		chunks.push_back(new Chunk(64, 64, mSceneManager, perlin, _simulator));
+	// 		// Chunk* newChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator);
+	// 	}
+	// 	// else if(pos.x < oldXEnd*scale.x*2) {
+	// 	// 	Chunk* newChunk = new Chunk(oldXStart - CHUNK_SIZE, oldYStart, mSceneManager, perlin, _simulator);
+	// 	// }
+	// 	// else if(pos.y > oldYEnd*scale.y*2) {
+	// 	// 	Chunk* newChunk = new Chunk(oldXStart, oldYEnd, mSceneManager, perlin, _simulator);
+	// 	// }
+	// 	// else if(pos.y < oldYEnd*scale.y*2) {
+	// 	// 	Chunk* newChunk = new Chunk(oldXStart, oldYStart - CHUNK_SIZE, mSceneManager, perlin, _simulator);
+	// 	// }
+	// }
+
 	
 	// _simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
 
@@ -417,42 +443,22 @@ void Application::setupLighting(void) {
 
 void Application::createObjects(void) {
 
-	int xmax = 1024;
+	int xmax = 64;
 	int ymax = xmax;
 	int rndmax = 8;
 	float density = 1.5f; // 1 is very steep, 10 is pretty flat.
 	perlin = new Perlin(xmax, ymax, rndmax, density);
 
-	// Static Geometries will eventually become Chunks
-	// Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
+	chunks.push_back(new Chunk(0, 0, mSceneManager, perlin, _simulator));
+	chunks.push_back(new Chunk(0, 0, mSceneManager, perlin, _simulator));
+	chunks.push_back(new Chunk(0, 0, mSceneManager, perlin, _simulator));
 
-	for (int i = 0; i < xmax; i += CHUNK_SIZE) {
-		for (int j = 0; j < ymax; j += CHUNK_SIZE) {
-			chunks.push_back(new Chunk(i, i + CHUNK_SIZE, j, j + CHUNK_SIZE, mSceneManager, perlin, _simulator));
-		}
-	}
 
-	// for(int i = 0; i < xmax; i++) {
-	// 	for(int j = 0; j < ymax; j++) {
-	// 		float fi = (float)i / (float)100.0f;
-	// 		float fj = (float)j / (float)100.0f;
-
-	// 		Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
-
-	// 		int y = (int)((perlin->getPerlin(fi, fj)) * 100);
-	// 		Ogre::Vector3 pos(i*scale.x * 2.01, y*scale.y * 2, j*scale.z * 2);
-
-	// 		StaticObject* so;
-
-	// 		if(y >= 15)
-	// 			so = new StaticObject(snowCube, scale, pos, _simulator);
-	// 		else
-	// 			so = new StaticObject(grassCube, scale, pos, _simulator);
-
-	// 		sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-	// 	}	
+	// for (int i = 0; i < xmax; i += CHUNK_SIZE) {
+	// 	for (int j = 0; j < ymax; j += CHUNK_SIZE) {
+	// 		chunks.push_back(new Chunk(i, j, mSceneManager, perlin, _simulator));
+	// 	}
 	// }
-	// sg->build();
 }
 /* 
 * End Initialization Methods

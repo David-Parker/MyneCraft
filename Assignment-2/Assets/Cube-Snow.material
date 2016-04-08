@@ -13,7 +13,6 @@ material Snow-Cube-Top
             specular 0.5 0.5 0.5 1.0 12.5
             emissive 0.6 0.6 0.6 1.0
 
-            lighting on
             alpha_to_coverage off
             colour_write on
             cull_hardware clockwise
@@ -55,7 +54,7 @@ material Snow-Cube-Dirt
             ambient 0.800000011920929 0.800000011920929 0.800000011920929 1.0
             diffuse 0.6400000190734865 0.6400000190734865 0.6400000190734865 1.0
             specular 0.5 0.5 0.5 1.0 12.5
-            emissive 0.0 0.0 0.0 1.0
+            emissive 0.6 0.6 0.6 1.0
 
             alpha_to_coverage off
             colour_write on
