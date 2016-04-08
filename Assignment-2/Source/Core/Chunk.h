@@ -9,14 +9,15 @@
 static Ogre::Entity* grassCube = nullptr;
 static Ogre::Entity* snowCube = nullptr;
 
-#define CHUNK_SIZE 8
+#define CHUNK_SIZE 128
 class Chunk {
 private:
 	Ogre::StaticGeometry* _sg;
 	std::vector<StaticObject *> staticObjects;
+	std::string _name;
 
 public:
-	Chunk(int, int, Ogre::SceneManager*, Perlin*, Simulator*);
+	Chunk(std::string, int, int, Ogre::SceneManager*, Perlin*, Simulator*);
 	bool pointInChunk(float x, float y);
 	Ogre::Vector3 _scale;
 	int _xStart = 0;

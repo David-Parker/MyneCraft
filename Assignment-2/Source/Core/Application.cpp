@@ -127,44 +127,29 @@ bool Application::update(const FrameEvent &evt) {
 	static int range = CHUNK_SIZE * 1;
 
 	try {
-		//if (!currentChunk->pointInChunk(pos.x, pos.z)) {
-		//	int oldXStart = currentChunk->_xStart;
-		//	int oldXEnd = currentChunk->_xEnd;
-		//	int oldYStart = currentChunk->_yStart;
-		//	int oldYEnd = currentChunk->_yEnd;
-		//	Ogre::Vector3 scale = currentChunk->_scale;
-
-		//	if (pos.x > oldXEnd*scale.x * 2) {
-		//		chunks.push_back(currentChunk = new Chunk(oldXEnd, oldYStart, mSceneManager, perlin, _simulator));
-		//	}
-		//	else if (pos.x < oldXStart*scale.x * 2) {
-		//		chunks.push_back(currentChunk = new Chunk(oldXStart - CHUNK_SIZE, oldYStart, mSceneManager, perlin, _simulator));
-		//	}
-		//	else if (pos.z > oldYEnd*scale.y * 2) {
-		//		chunks.push_back(currentChunk = new Chunk(oldXStart, oldYEnd, mSceneManager, perlin, _simulator));
-		//	}
-		//	else if (pos.z < oldYStart*scale.y * 2) {
-		//		chunks.push_back(currentChunk = new Chunk(oldXStart, oldYStart - CHUNK_SIZE, mSceneManager, perlin, _simulator));
-		//	}
-		//}
-
 		// Determine closest x,y aligned to the chunk size grid
-		int x = (int)pos.x - ((int)pos.x % CHUNK_SIZE);
-		int z = (int)pos.z - ((int)pos.z % CHUNK_SIZE);
+		float fx = (pos.x / 100) - (CHUNK_SIZE / 2);
+		float fz = (pos.z / 100) - (CHUNK_SIZE / 2);
 
-		for (int i = (x - range); i < (x + range); i += CHUNK_SIZE) {
-			for (int j = (z - range); j < (z + range); j += CHUNK_SIZE) {
-				bool create = true;
-				for (int k = 0; k < chunks.size(); k++) {
-					// Chunk already exists
-					if ((chunks[k]->_xStart == i && chunks[k]->_yStart == j)) {
-						create = false;
-					}
+		for ( int i = -1 ; i <= 1 ; i++ ) {
+			for ( int j = -1 ; j <= 1 ; j++ ) {
+				int x = ((int)fx - ((int)fx % CHUNK_SIZE));
+				int z = ((int)fz - ((int)fz % CHUNK_SIZE));
+
+				x += i*CHUNK_SIZE;
+				z += j*CHUNK_SIZE;
+
+				std::stringstream str;
+				str << "Chunks_" << x/CHUNK_SIZE << "_" << z/CHUNK_SIZE;
+				std::string name(str.str());
+				std::cout << name << std::endl;
+				
+				if(!chunks[name]) {
+					chunks[name] = new Chunk(name, x, z, mSceneManager, perlin, _simulator);
 				}
-				if (create)
-					chunks.push_back(new Chunk(i, j, mSceneManager, perlin, _simulator));
 			}
 		}
+
 	}
 	catch (Exception e) {
 
@@ -472,7 +457,7 @@ void Application::createObjects(void) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 	}
 
-	chunks.push_back(currentChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator));
+	// chunks.push_back(currentChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator));
 }
 /* 
 * End Initialization Methods

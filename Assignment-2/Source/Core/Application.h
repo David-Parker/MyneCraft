@@ -67,7 +67,7 @@ public:
 
 	Perlin* perlin;
 
-	std::vector<Chunk*> chunks;
+	std::unordered_map<std::string, Chunk*> chunks;
 	Chunk* currentChunk = nullptr;
 
 	int points;
