@@ -253,8 +253,8 @@ void Application::createChildEntity(std::string name, std::string mesh, Ogre::Sc
 Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim) {
 	float fi = (float)x/(float)100.0f;
 	float fj = (float)z/(float)100.0f;
-
-	y = (int)((perlin->getPerlin(fi, fj))*100);
+	y = 0;
+	//y = (int)((perlin->getPerlin(fi, 0, fj))*100);
 	createRootEntity(nme, meshName, x*scale.x*2, y*scale.y*2, z*scale.z*2);
 	Ogre::SceneNode* sn = mSceneManager->getSceneNode(nme);
 	Ogre::Entity* ent = SceneHelper::getEntity(mSceneManager, nme, 0);
@@ -443,20 +443,47 @@ void Application::setupLighting(void) {
 
 void Application::createObjects(void) {
 
-	int xmax = 64;
+	static Ogre::Entity* grassCube = nullptr;
+
+	if(grassCube == nullptr) {
+		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
+	}
+
+	int xmax = 128;
 	int ymax = xmax;
-	int rndmax = 8;
-	float density = 1.5f; // 1 is very steep, 10 is pretty flat.
-	perlin = new Perlin(xmax, ymax, rndmax, density);
+	bool threeD = false;
+	perlin = new Perlin();
 
-	chunks.push_back(currentChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator));
+	if ( threeD ) {
+	//Perlin 3D
+		xmax = ymax = 256;
+		int zmax = 32;
+		Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
+		for(int i = 0; i < xmax; i++) {
+			for(int j = 0; j < ymax; j++) {
+				for ( int k = 0 ; k < zmax ; k++ ) {
+					float fi = (float)i/30.0f;
+					float fj = (float)j/30.0f;
+					float fk = (float)k/15.0f;
 
+					Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
+					int y = (int)((perlin->perlin(fi, fj, fk) * 100) - 10);
+					if ( y >= 0 ) {
+						Ogre::Vector3 pos(i*scale.x * 2, k*scale.y * 2, j*scale.z * 2);
 
-	// for (int i = 0; i < xmax; i += CHUNK_SIZE) {
-	// 	for (int j = 0; j < ymax; j += CHUNK_SIZE) {
-	// 		chunks.push_back(new Chunk(i, j, mSceneManager, perlin, _simulator));
-	// 	}
-	// }
+						StaticObject* so = new StaticObject(grassCube, scale, pos, _simulator);
+
+						sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+					}
+				}
+			}	
+		}
+		sg->build();
+	}
+	else {
+		//Perlin 2D
+		chunks.push_back(currentChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator));
+	}
 }
 /* 
 * End Initialization Methods

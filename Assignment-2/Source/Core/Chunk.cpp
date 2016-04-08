@@ -10,6 +10,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, Perlin* 
 
 	_xEnd = xStart + CHUNK_SIZE;
 	_yEnd = yStart + CHUNK_SIZE;
+
+	float steepness = 75.0f;
 	
 	sg = mSceneManager->createStaticGeometry(name);
 
@@ -23,10 +25,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, Perlin* 
 			float fi = (float)i / (float)100.0f;
 			float fj = (float)j / (float)100.0f;
 
-
-			int y = (int)((perlin->getPerlin(fi, fj)) * 100);
-			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
-
+			int y = (int)((perlin->perlin(fi, fj, 0)) * steepness);
+			Ogre::Vector3 pos(i*scale.x * 2.01, y*scale.y * 2, j*scale.z * 2);
 			StaticObject* so;
 
 			if(y >= 15)

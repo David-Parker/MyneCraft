@@ -1,66 +1,107 @@
 #include "Perlin.h"
 
-/* PsuedoCode taken from https://en.wikipedia.org/wiki/Perlin_noise */
-
-Perlin::Perlin(int xMx, int yMx, int rndMx, float dnsty) : xMax(xMx), yMax(yMx), randomMax(rndMx), density(dnsty), size(xMx*yMx) {
-	size = xMax * yMax;
-	std::vector<std::vector<std::vector<float>>> tmp(xMax, std::vector<std::vector<float>>(yMax, std::vector<float>(2,0)));
-	gradient = tmp;
-	density = (density > 0.0f ? density : 0.1f);
-	generateGradientTrivial();
+Perlin::Perlin() {
+	repeat = -1;
+	std::vector<int> tmp(std::vector<int>(512));
+	p = tmp;
+	for(int x=0;x<512;x++) {
+		p[x] = permutation[x%256];
+	}
 }
-void Perlin::generateGradientTrivial() {
-	static float moTWO = randomMax/2;
-	for ( int i = 0 ; i < xMax ; i++ ) {
-		for ( int j = 0 ; j < yMax ; j++ ) {
-			gradient[i][j][0] = float(rand()%randomMax)/moTWO; 
-			gradient[i][j][1] = float(rand()%randomMax)/moTWO;
-		}
+
+float Perlin::OctavePerlin(float x, float y, float z, int octaves, float persistence) {
+	float total = 0;
+	float frequency = 1;
+	float amplitude = 1;
+	float maxValue = 0;			// Used for normalizing result to 0.0 - 1.0
+	for(int i=0;i<octaves;i++) {
+		total += perlin(x * frequency, y * frequency, z * frequency) * amplitude;
+		
+		maxValue += amplitude;
+		
+		amplitude *= persistence;
+		frequency *= 2;
 	}
 	
-}
-// Function to linearly interpolate between a0 and a1
-// Weight w should be in the range [0.0, 1.0]
-float Perlin::lerp(float a0, float a1, float w) {
-	return (1.0 - w)*a0 + w*a1;
+	return total/maxValue;
 }
 
- // Computes the dot product of the distance and gradient vectors.
-float Perlin::dotGridGradient(int ix, int iy, float x, float y) {
-	// Compute the distance vector
-	float dx = x - (float)ix;
-	float dy = y - (float)iy;
 
-	// Compute the dot-product
-	return (dx*gradient[iy][ix][0] + dy*gradient[iy][ix][1]);
+float Perlin::perlin(float x, float y, float z) {
+	if(repeat > 0) {									// If we have any repeat on, change the coordinates to their "local" repetitions
+		x = (int)x%repeat;
+		y = (int)y%repeat;
+		z = (int)z%repeat;
+	}
+	
+	int xi = (int)x & 255;								// Calculate the "unit cube" that the point asked will be located in
+	int yi = (int)y & 255;								// The left bound is ( |_x_|,|_y_|,|_z_| ) and the right bound is that
+	int zi = (int)z & 255;								// plus 1.  Next we calculate the location (from 0.0 to 1.0) in that cube.
+	float xf = x-(int)x;								// We also fade the location to smooth the result.
+	float yf = y-(int)y;
+	float zf = z-(int)z;
+	float u = fade(xf);
+	float v = fade(yf);
+	float w = fade(zf);
+														
+	int aaa, aba, aab, abb, baa, bba, bab, bbb;
+	aaa = p[p[p[    xi ]+    yi ]+    zi ];
+	aba = p[p[p[    xi ]+inc(yi)]+    zi ];
+	aab = p[p[p[    xi ]+    yi ]+inc(zi)];
+	abb = p[p[p[    xi ]+inc(yi)]+inc(zi)];
+	baa = p[p[p[inc(xi)]+    yi ]+    zi ];
+	bba = p[p[p[inc(xi)]+inc(yi)]+    zi ];
+	bab = p[p[p[inc(xi)]+    yi ]+inc(zi)];
+	bbb = p[p[p[inc(xi)]+inc(yi)]+inc(zi)];
+
+	float x1, x2, y1, y2;
+	x1 = lerp(	grad (aaa, xf  , yf  , zf),				// The gradient function calculates the dot product between a pseudorandom
+				grad (baa, xf-1, yf  , zf),				// gradient vector and the vector from the input coordinate to the 8
+				u);										// surrounding points in its unit cube.
+	x2 = lerp(	grad (aba, xf  , yf-1, zf),				// This is all then lerped together as a sort of weighted average based on the faded (u,v,w)
+				grad (bba, xf-1, yf-1, zf),				// values we made earlier.
+		          u);
+	y1 = lerp(x1, x2, v);
+
+	x1 = lerp(	grad (aab, xf  , yf  , zf-1),
+				grad (bab, xf-1, yf  , zf-1),
+				u);
+	x2 = lerp(	grad (abb, xf  , yf-1, zf-1),
+	          	grad (bbb, xf-1, yf-1, zf-1),
+	          	u);
+	y2 = lerp (x1, x2, v);
+	
+	return lerp (y1, y2, w);
 }
 
-//float getAvg() { return avg; }
+int Perlin::inc(int num) {
+	num++;
+	if (repeat > 0) num %= repeat;
+	
+	return num;
+}
 
-// Compute Perlin noise at coordinates x, y
-float Perlin::getPerlin(float x, float y) {
-	x = x < 0 ? -x : x;
-	y = y < 0 ? -y : y;
-		
-	// Determine grid cell coordinates
-    int x0 = (x >= 0.0 ? (int)x : (int)x - 1);
-    int x1 = x0 + 1;
-    int y0 = (y >= 0.0 ? (int)y : (int)y - 1);
-    int y1 = y0 + 1;
+float Perlin::grad(int hash, float x, float y, float z) {
+	int h = hash & 15;									// Take the hashed value and take the first 4 bits of it (15 == 0b1111)
+	float u = h < 8 /* 0b1000 */ ? x : y;				// If the most significant bit (MSB) of the hash is 0 then set u = x.  Otherwise y.
+	
+	float v;											// In Ken Perlin's original implementation this was another conditional operator (?:).  I
+														// expanded it for readability.
+	
+	if(h < 4 /* 0b0100 */)								// If the first and second significant bits are 0 set v = y
+		v = y;
+	else if(h == 12 /* 0b1100 */ || h == 14 /* 0b1110*/)// If the first and second significant bits are 1 set v = x
+		v = x;
+	else 												// If the first and second significant bits are not equal (0/1, 1/0) set v = z
+		v = z;
+	
+	return ((h&1) == 0 ? u : -u)+((h&2) == 0 ? v : -v); // Use the last 2 bits to decide if u and v are positive or negative.  Then return their addition.
+}
 
-	// Determine interpolation weights
-    float sx = x - (float)x0;
-    float sy = y - (float)y0;
+float Perlin::fade(float t) {
+	return t * t * t * (t * (t * 6 - 15) + 10);
+}
 
-	// Interpolate between grid point gradients
-    float n0, n1, ix0, ix1, value;
-    n0 = dotGridGradient(x0, y0, x, y);
-    n1 = dotGridGradient(x1, y0, x, y);
-    ix0 = lerp(n0, n1, sx);
-    n0 = dotGridGradient(x0, y1, x, y);
-    n1 = dotGridGradient(x1, y1, x, y);
-    ix1 = lerp(n0, n1, sx);
-    value = lerp(ix0, ix1, sy);
- 
-     return value / density;
+float Perlin::lerp(float a, float b, float x) {
+	return a + x * (b - a);
 }
