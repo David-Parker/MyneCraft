@@ -14,11 +14,13 @@ class Chunk {
 private:
 	Ogre::StaticGeometry* _sg;
 	std::vector<StaticObject *> staticObjects;
-	int _xStart;
-	int _xEnd;
-	int _yStart;
-	int _yEnd;
 
 public:
-	Chunk(Ogre::StaticGeometry*, int, int, int, int, Ogre::SceneManager*, Perlin*, Simulator*);
+	Chunk(Ogre::StaticGeometry*, int, int, Ogre::SceneManager*, Perlin*, Simulator*);
+	bool pointInChunk(float x, float y);
+	Ogre::Vector3 _scale;
+	int _xStart = 0;
+	int _xEnd = 0;
+	int _yStart = 0;
+	int _yEnd = 0;
 };

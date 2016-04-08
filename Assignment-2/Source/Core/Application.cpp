@@ -54,8 +54,6 @@ void Application::init()
 
 		createObjects();
 
-		// testPerlinGeneration();
-
 	}
 	catch (Exception e) {
 		std::cout << "Exception Caught: " << e.what() << std::endl;
@@ -105,7 +103,6 @@ bool Application::frameRenderingQueued(const FrameEvent &evt)
 // Called once per predefined frame
 bool Application::update(const FrameEvent &evt) {
 
-
 	OIS::KeyCode lastKey = _oisManager->lastKeyPressed();
 	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
 	playerCam->setPosition(camMan->getPosition());
@@ -126,6 +123,35 @@ bool Application::update(const FrameEvent &evt) {
 		mRunning = false;
 	}
 
+	Ogre::Vector3 pos = camMan->getPosition();
+
+	try {
+		if (!currentChunk->pointInChunk(pos.x, pos.z) && !(pos.x < 0 || pos.z < 0)) {
+			int oldXStart = currentChunk->_xStart;
+			int oldXEnd = currentChunk->_xEnd;
+			int oldYStart = currentChunk->_yStart;
+			int oldYEnd = currentChunk->_yEnd;
+			Ogre::Vector3 scale = currentChunk->_scale;
+
+			if (pos.x > oldXEnd*scale.x * 2) {
+				chunks.push_back(currentChunk = new Chunk(sg, oldXEnd, oldYStart, mSceneManager, perlin, _simulator));
+			}
+			else if (pos.x < oldXStart*scale.x * 2) {
+				chunks.push_back(currentChunk = new Chunk(sg, oldXStart - CHUNK_SIZE, oldYStart, mSceneManager, perlin, _simulator));
+			}
+			else if (pos.z > oldYEnd*scale.y * 2) {
+				chunks.push_back(currentChunk = new Chunk(sg, oldXStart, oldYEnd, mSceneManager, perlin, _simulator));
+			}
+			else if (pos.z < oldYStart*scale.y * 2) {
+				chunks.push_back(currentChunk = new Chunk(sg, oldXStart, oldYStart - CHUNK_SIZE, mSceneManager, perlin, _simulator));
+			}
+			sg->destroy();
+			sg->build();
+		}
+	}
+	catch (Exception e) {
+
+	}
 	
 	// _simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
 
@@ -423,15 +449,12 @@ void Application::createObjects(void) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 	}
 
-	int xmax = 128;
-	int ymax = xmax;
 	bool threeD = false;
 	perlin = new Perlin();
 
-	// Static Geometries will eventually become Chunks
-
 	if ( threeD ) {
 	//Perlin 3D
+		int xmax, ymax;
 		xmax = ymax = 256;
 		int zmax = 32;
 		Ogre::StaticGeometry* sg = mSceneManager->createStaticGeometry("GrassArea");
@@ -457,12 +480,8 @@ void Application::createObjects(void) {
 		sg->build();
 	}
 	else {
-		//Perlin 2D
-		for (int i = 0; i < xmax; i += CHUNK_SIZE) {
-			for (int j = 0; j < ymax; j += CHUNK_SIZE) {
-				chunks.push_back(new Chunk(sg, i, i + CHUNK_SIZE, j, j + CHUNK_SIZE, mSceneManager, perlin, _simulator));
-			}
-		}
+		chunks.push_back(currentChunk = new Chunk(sg, 0, 0, mSceneManager, perlin, _simulator));
+		sg->build();
 	}
 }
 /* 

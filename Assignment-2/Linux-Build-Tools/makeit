@@ -3,4 +3,4 @@ cp ../Source/Core/*.cpp .
 cp ../Source/Interface/Linux/*.cpp .
 cp ../Source/Core/*.h .
 make clean
-make -j 8
+make -j 4

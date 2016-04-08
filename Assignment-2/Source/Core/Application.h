@@ -68,6 +68,7 @@ public:
 	Perlin* perlin;
 
 	std::vector<Chunk*> chunks;
+	Chunk* currentChunk = nullptr;
 
 	int points;
 	int width;
