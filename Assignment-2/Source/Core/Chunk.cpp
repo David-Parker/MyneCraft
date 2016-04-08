@@ -24,8 +24,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, Perlin* 
 			float fj = (float)j / (float)100.0f;
 
 
-			// int y = (int)((perlin->getPerlin(fi, fj)) * 100);
-			int y = 0;
+			int y = (int)((perlin->getPerlin(fi, fj)) * 100);
 			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
 
 			StaticObject* so;

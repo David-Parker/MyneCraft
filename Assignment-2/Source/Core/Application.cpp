@@ -105,7 +105,6 @@ bool Application::frameRenderingQueued(const FrameEvent &evt)
 // Called once per predefined frame
 bool Application::update(const FrameEvent &evt) {
 
-
 	OIS::KeyCode lastKey = _oisManager->lastKeyPressed();
 	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
 	playerCam->setPosition(camMan->getPosition());
@@ -128,30 +127,31 @@ bool Application::update(const FrameEvent &evt) {
 
 	Ogre::Vector3 pos = camMan->getPosition();
 
-	Chunk* newChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator);
+	try {
+		if (!currentChunk->pointInChunk(pos.x, pos.z)) {
+			int oldXStart = currentChunk->_xStart;
+			int oldXEnd = currentChunk->_xEnd;
+			int oldYStart = currentChunk->_yStart;
+			int oldYEnd = currentChunk->_yEnd;
+			Ogre::Vector3 scale = currentChunk->_scale;
 
-	// if(!chunks[0]->pointInChunk(pos.x, pos.z)) {
-	// 	int oldXStart = chunks[0]->_xStart;
-	// 	int oldXEnd = chunks[0]->_xEnd;
-	// 	int oldYStart = chunks[0]->_yStart;
-	// 	int oldYEnd = chunks[0]->_yEnd;
-	// 	Ogre::Vector3 scale = chunks[0]->_scale;
+			if (pos.x > oldXEnd*scale.x * 2) {
+				chunks.push_back(currentChunk = new Chunk(oldXEnd, oldYStart, mSceneManager, perlin, _simulator));
+			}
+			else if (pos.x < oldXStart*scale.x * 2) {
+				chunks.push_back(currentChunk = new Chunk(oldXStart - CHUNK_SIZE, oldYStart, mSceneManager, perlin, _simulator));
+			}
+			else if (pos.z > oldYEnd*scale.y * 2) {
+				chunks.push_back(currentChunk = new Chunk(oldXStart, oldYEnd, mSceneManager, perlin, _simulator));
+			}
+			else if (pos.z < oldYStart*scale.y * 2) {
+				chunks.push_back(currentChunk = new Chunk(oldXStart, oldYStart - CHUNK_SIZE, mSceneManager, perlin, _simulator));
+			}
+		}
+	}
+	catch (Exception e) {
 
-	// 	if(pos.x > oldXEnd*scale.x*2) {
-	// 		chunks.push_back(new Chunk(64, 64, mSceneManager, perlin, _simulator));
-	// 		// Chunk* newChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator);
-	// 	}
-	// 	// else if(pos.x < oldXEnd*scale.x*2) {
-	// 	// 	Chunk* newChunk = new Chunk(oldXStart - CHUNK_SIZE, oldYStart, mSceneManager, perlin, _simulator);
-	// 	// }
-	// 	// else if(pos.y > oldYEnd*scale.y*2) {
-	// 	// 	Chunk* newChunk = new Chunk(oldXStart, oldYEnd, mSceneManager, perlin, _simulator);
-	// 	// }
-	// 	// else if(pos.y < oldYEnd*scale.y*2) {
-	// 	// 	Chunk* newChunk = new Chunk(oldXStart, oldYStart - CHUNK_SIZE, mSceneManager, perlin, _simulator);
-	// 	// }
-	// }
-
+	}
 	
 	// _simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
 
@@ -449,9 +449,7 @@ void Application::createObjects(void) {
 	float density = 1.5f; // 1 is very steep, 10 is pretty flat.
 	perlin = new Perlin(xmax, ymax, rndmax, density);
 
-	chunks.push_back(new Chunk(0, 0, mSceneManager, perlin, _simulator));
-	chunks.push_back(new Chunk(0, 0, mSceneManager, perlin, _simulator));
-	chunks.push_back(new Chunk(0, 0, mSceneManager, perlin, _simulator));
+	chunks.push_back(currentChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator));
 
 
 	// for (int i = 0; i < xmax; i += CHUNK_SIZE) {
