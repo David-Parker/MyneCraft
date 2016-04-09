@@ -6,6 +6,7 @@ public:
 	~Cube() {}
 
 	void update();
+	void updateTransform();
 private:
 
 };

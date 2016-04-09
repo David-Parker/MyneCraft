@@ -25,10 +25,10 @@ class StaticObject {
 protected:
 	Simulator* _simulator;
 	btCollisionShape* _shape;
-	btRigidBody* _body;
 	btTransform _tr;
 	btVector3 _inertia;
 	CollisionContext* _context;
+	btCollisionObject* _collisionObject;
 
 	BulletContactCallback* _cCallBack;
 	btScalar _mass;
@@ -44,7 +44,7 @@ public:
 	Ogre::Vector3 _pos;
 	Ogre::Quaternion _orientation{};
 	StaticObject(Ogre::Entity* mesh, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator);
-	btRigidBody* getBody() { return _body; }
+	btCollisionObject* getBody() { return _collisionObject; }
 	void addToSimulator();
 	virtual void updateTransform();
 	void setVelocity(float x, float y, float z);

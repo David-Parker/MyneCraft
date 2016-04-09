@@ -125,14 +125,15 @@ bool Application::update(const FrameEvent &evt) {
 
 	Ogre::Vector3 pos = camMan->getPosition();
 	static int range = CHUNK_SIZE * 1;
+	static Chunk* currentChunk = nullptr;
 
 	try {
-		// Determine closest x,y aligned to the chunk size grid
-		float fx = (pos.x / 100) - (CHUNK_SIZE / 2);
-		float fz = (pos.z / 100) - (CHUNK_SIZE / 2);
 
-		int numChunks = (fieldOfView*1.3 / (100*CHUNK_SIZE));
+		float fx = (pos.x / CHUNK_SCALE_FULL) - (CHUNK_SIZE / 2);
+		float fz = (pos.z / CHUNK_SCALE_FULL) - (CHUNK_SIZE / 2);
+		int numChunks = (fieldOfView*1.3 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
 
+		// Check for new chunks in FOV proximity to create
 		for(int i = -numChunks; i <= numChunks; i++) {
 			for(int j = -numChunks; j <= numChunks; j++) {
 
@@ -151,12 +152,27 @@ bool Application::update(const FrameEvent &evt) {
 				}
 			}
 		}
+
+		int x = ((int)fx - ((int)fx % CHUNK_SIZE));
+		int z = ((int)fz - ((int)fz % CHUNK_SIZE));
+
+		// Add only the current chunk's static objects to the bullet simulation
+		Chunk* chunk = getChunk(x, z);
+		if (chunk != currentChunk) {
+			if (chunk != nullptr) {
+				chunk->addChunksToSimulator();
+				currentChunk = chunk;
+
+				// Generating cubes for testing purposes
+				GameObject* cube = createCube(chunk->getName(), GameObject::CUBE_OBJECT, "Cube-Snow.mesh", pos.x, pos.y + 1000, pos.z, Ogre::Vector3(50, 50, 50), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 1.0f, 0.0f, false, _simulator);
+			}
+		}	
 	}
 	catch (Exception e) {
 
 	}
-	
-	// _simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
+
+	_simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
 
 	return true;
 }
@@ -230,6 +246,7 @@ void Application::createRootEntity(std::string name, std::string mesh, int x, in
 	Ogre::SceneNode* ogreNode = mSceneManager->getRootSceneNode()->createChildSceneNode(name);
 	ogreNode->attachObject(ogreEntity);
 	ogreNode->setPosition(x, y, z);
+	ogreNode->setScale(50, 50, 50);
 }
 
 Ogre::Entity* Application::createRootEntity(std::string mesh, int x, int y, int z) {
@@ -239,7 +256,6 @@ Ogre::Entity* Application::createRootEntity(std::string mesh, int x, int y, int 
 	Ogre::SceneNode* ogreNode = mSceneManager->getRootSceneNode()->createChildSceneNode();
 	ogreNode->attachObject(ogreEntity);
 	ogreNode->setPosition(x, y, z);
-	ogreNode->setScale(50,50,50);
 
 	return ogreEntity;
 }
@@ -254,11 +270,7 @@ void Application::createChildEntity(std::string name, std::string mesh, Ogre::Sc
 }
 
 Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim) {
-	float fi = (float)x/(float)100.0f;
-	float fj = (float)z/(float)100.0f;
-	y = 0;
-	//y = (int)((perlin->getPerlin(fi, 0, fj))*100);
-	createRootEntity(nme, meshName, x*scale.x*2, y*scale.y*2, z*scale.z*2);
+	createRootEntity(nme, meshName, x, y, z);
 	Ogre::SceneNode* sn = mSceneManager->getSceneNode(nme);
 	Ogre::Entity* ent = SceneHelper::getEntity(mSceneManager, nme, 0);
 	const btTransform pos;
@@ -558,4 +570,13 @@ void Application::resetNetManager() {
 		delete netManager;
 		netManager = new NetManager();
 	} 
+}
+
+Chunk* Application::getChunk(int x, int z) {
+	std::stringstream str;
+	str << "Chunks_" << x / CHUNK_SIZE << "_" << z / CHUNK_SIZE;
+	std::string name(str.str());
+
+	if (chunks[name]) return chunks[name];
+	else return nullptr;
 }

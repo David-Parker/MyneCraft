@@ -1,9 +1,9 @@
 #include "Chunk.h"
 
 
-Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart) {
+Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart), _simulator(sim) {
 
-	Ogre::Vector3 scale(50, 50, 50);
+	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
 	_scale = scale;
 
 	_xEnd = xStart + CHUNK_SIZE;
@@ -32,7 +32,7 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 			else
 				so = new StaticObject(grassCube, scale, pos, sim);
 
-			//so->addToSimulator();
+			_staticObjects.push_back(so);
 
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
@@ -45,4 +45,12 @@ bool Chunk::pointInChunk(float x, float y) {
 	int roundY = (int) y;
 
 	return (roundX >= _xStart*_scale.x*2 && roundX <= _xEnd*_scale.x*2) && (roundY >= _yStart*_scale.y*2 && roundY <= _yEnd*_scale.y*2);
+}
+
+void Chunk::addChunksToSimulator() {
+	// Remove the old static objects currently in the simulator
+	_simulator->removeStaticObjects();
+	for (auto& var : _staticObjects) {
+		var->addToSimulator();
+	}
 }

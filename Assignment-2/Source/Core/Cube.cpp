@@ -13,3 +13,13 @@ void Cube::update() {
 		
 	}
 }
+
+void Cube::updateTransform() {
+	Ogre::Vector3 pos = rootNode->getPosition();
+	tr.setOrigin(btVector3(pos.x, pos.y, pos.z));
+
+	Ogre::Quaternion qt = rootNode->getOrientation();
+	tr.setRotation(btQuaternion(qt.x, qt.y, qt.z, qt.w));
+
+	motionState->updateTransform(tr);
+}

@@ -76,7 +76,7 @@ public:
 	int height;
 
 	double fps = 120.0;
-	int fieldOfView = 10000;
+	int fieldOfView = 5000;
 
 	bool begin = false;
 	bool mRunning = true;
@@ -107,4 +107,6 @@ public:
 	void hideGui();
 	void showGui();
 	void resetNetManager();
+
+	Chunk* getChunk(int, int);
 };
