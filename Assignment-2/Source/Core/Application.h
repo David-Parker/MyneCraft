@@ -35,6 +35,7 @@
 #include "Cube.h"
 #include "StaticObject.h"
 #include "Chunk.h"
+#include "Player.h"
 
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
@@ -51,8 +52,9 @@ public:
 	Ogre::RenderWindow * mRenderWindow;
 	Ogre::SceneManager * mSceneManager;
 	OgreBites::SdkCameraMan * cameraMan;
-	Ogre::Timer* t1;
 	Ogre::Camera* playerCam;
+	Ogre::Timer* t1;
+	Player* player;
 
 	NetManager* netManager = nullptr;
 
@@ -85,6 +87,7 @@ public:
 	void createRootEntity(std::string name, std::string mesh, int x, int y, int z);
 	Ogre::Entity* createRootEntity(std::string mesh, int x, int y, int z);
 	void createChildEntity(std::string name, std::string mesh, Ogre::SceneNode* sceneNode, int x, int y, int z);
+
 	Cube* createCube(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim);
 	bool update(const Ogre::FrameEvent &evt);
 	bool handleGUI(const Ogre::FrameEvent &evt);

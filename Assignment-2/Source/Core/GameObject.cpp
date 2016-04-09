@@ -113,9 +113,8 @@ void GameObject::addToSimulator() {
 	if (kinematic) {
 		std::cout << "Kinematic\n"; 
 		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+		body->setActivationState(DISABLE_DEACTIVATION);
 	}
-
-	body->setActivationState(DISABLE_DEACTIVATION);
 
 	context = new CollisionContext();
 	cCallBack = new BulletContactCallback(*body, *context);

@@ -41,9 +41,9 @@ void Application::init()
 		netManager = new NetManager();
 		setupCEGUI();
 
-		setupCameras();
-
 		setupGM();
+
+		setupCameras();
 
 		ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
@@ -105,8 +105,8 @@ bool Application::update(const FrameEvent &evt) {
 
 	OIS::KeyCode lastKey = _oisManager->lastKeyPressed();
 	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
-	playerCam->setPosition(camMan->getPosition());
-	playerCam->lookAt(Ogre::Vector3(0,0,0));
+	/*playerCam->setPosition(camMan->getPosition());*/
+	//playerCam->lookAt(player->_body->getNode()->getPosition());
 
 	if (lastKey == OIS::KC_M) {
 		gameManager->mute();
@@ -159,19 +159,33 @@ bool Application::update(const FrameEvent &evt) {
 		// Add only the current chunk's static objects to the bullet simulation
 		Chunk* chunk = getChunk(x, z);
 		if (chunk != currentChunk) {
-			if (chunk != nullptr) {
-				chunk->addChunksToSimulator();
-				currentChunk = chunk;
+			// Remove the old static objects currently in the simulator
+			_simulator->removeStaticObjects();
+			for (int i = -1; i <= 1; i++) {
+				for (int j = -1; j <= 1; j++) {
+					int x = ((int)fx - ((int)fx % CHUNK_SIZE));
+					int z = ((int)fz - ((int)fz % CHUNK_SIZE));
 
-				// Generating cubes for testing purposes
-				GameObject* cube = createCube(chunk->getName(), GameObject::CUBE_OBJECT, "Cube-Snow.mesh", pos.x, pos.y + 1000, pos.z, Ogre::Vector3(50, 50, 50), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 1.0f, 0.0f, false, _simulator);
+					x += i*CHUNK_SIZE;
+					z += j*CHUNK_SIZE;
+
+					std::stringstream str;
+					str << "Chunks_" << x / CHUNK_SIZE << "_" << z / CHUNK_SIZE;
+					std::string name(str.str());
+
+					if (chunks[name]) {
+						chunks[name]->addChunksToSimulator();
+					}
+				}
 			}
+			currentChunk = chunk;
 		}	
 	}
 	catch (Exception e) {
 
 	}
 
+	player->update(lastKey);
 	_simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
 
 	return true;
@@ -276,6 +290,8 @@ Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre:
 	const btTransform pos;
 	OgreMotionState* ms = new OgreMotionState(pos, sn);
 	sn->setScale(scale.x, scale.y, scale.z);
+
+	//sn->setVisible(false);
 
 	sn->pitch(pitch);
 	sn->yaw(yaw);
@@ -415,13 +431,7 @@ void Application::setupCEGUI(void) {
 void Application::setupCameras(void) {
 
 	Ogre::Camera* camMan = mSceneManager->createCamera("Camera Man");
-	playerCam = mSceneManager->createCamera("Player Cam");
-
-	playerCam->setAutoAspectRatio(true);
-	playerCam->setPosition(0,5000,0);
-	playerCam->lookAt(0,0,0);
-	playerCam->setNearClipDistance(1.0f);
-	playerCam->setFarClipDistance(10.0f);
+	playerCam = camMan;
 
 	camMan->setAutoAspectRatio(true);
 	camMan->setPosition(0,300,0);
@@ -433,7 +443,6 @@ void Application::setupCameras(void) {
 
 	cameras = std::vector<Ogre::Camera*>();
 	cameras.push_back(camMan);
-	cameras.push_back(playerCam);
 
 	cameraMan = new OgreBites::SdkCameraMan(camMan);
 	_oisManager->setupCameraMan(cameraMan);
@@ -470,6 +479,9 @@ void Application::createObjects(void) {
 	if(grassCube == nullptr) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 	}
+
+	GameObject* playerObj = createCube("Player", GameObject::CUBE_OBJECT, "Cube-Snow.mesh", 0, 500, 0, Ogre::Vector3(50, 50, 50), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.1f, 5.0f, false, _simulator);
+	player = new Player(playerCam, playerObj);
 }
 /* 
 * End Initialization Methods

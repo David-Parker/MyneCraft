@@ -2,7 +2,7 @@
 #include "MultiPlatformHelper.h"
 
 StaticObject::StaticObject(Ogre::Entity* mesh, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator) :
-		_geom(mesh), _scale(scale), _pos(pos), _simulator(simulator), _mass(0.0f), _friction(0.0f), _restitution(1.0f)
+		_geom(mesh), _scale(scale), _pos(pos), _simulator(simulator), _mass(0.0f), _friction(1.0f), _restitution(0.1f)
 {
 	auto var = mesh->getBoundingBox();
 	auto size = var.getSize();

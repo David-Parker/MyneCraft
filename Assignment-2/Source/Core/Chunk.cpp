@@ -48,8 +48,6 @@ bool Chunk::pointInChunk(float x, float y) {
 }
 
 void Chunk::addChunksToSimulator() {
-	// Remove the old static objects currently in the simulator
-	_simulator->removeStaticObjects();
 	for (auto& var : _staticObjects) {
 		var->addToSimulator();
 	}

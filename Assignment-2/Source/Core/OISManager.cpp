@@ -194,7 +194,7 @@ OIS::Keyboard* OISManager::getKeyboard( void ) {
 
  
 bool OISManager::keyPressed( const OIS::KeyEvent &e ) {
-    if(cameraMan) cameraMan->injectKeyDown(e);
+    //if(cameraMan) cameraMan->injectKeyDown(e);
     mKeyPressed = e.key;
 
 #ifdef _DEBUG
