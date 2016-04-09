@@ -197,9 +197,11 @@ bool OISManager::keyPressed( const OIS::KeyEvent &e ) {
     if(cameraMan) cameraMan->injectKeyDown(e);
     mKeyPressed = e.key;
 
+#ifdef _DEBUG
     CEGUI::GUIContext& cxt = CEGUI::System::getSingleton().getDefaultGUIContext();
     cxt.injectKeyDown((CEGUI::Key::Scan)e.key);
     cxt.injectChar((CEGUI::Key::Scan)e.text);
+#endif
 
     return true;
 }
@@ -223,23 +225,29 @@ bool OISManager::mouseMoved( const OIS::MouseEvent &e ) {
     mouseXAxis = (e.state.X.abs) - e.state.width/2;
     mouseYAxis = (e.state.Y.abs) - e.state.height/2;
 
+#ifdef _DEBUG
     CEGUI::System &sys = CEGUI::System::getSingleton();
     sys.getDefaultGUIContext().injectMousePosition(e.state.X.abs, e.state.Y.abs);
     // Scroll wheel.
     if (e.state.Z.rel)
         sys.getDefaultGUIContext().injectMouseWheelChange(e.state.Z.rel / 120.0f);
+#endif
 
     return true;
 }
  
 bool OISManager::mousePressed( const OIS::MouseEvent &e, OIS::MouseButtonID id ) {
+#ifdef _DEBUG
     CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertButton(id));
+#endif
     if(cameraMan) cameraMan->injectMouseDown(e, id);
     return true;
 }
  
 bool OISManager::mouseReleased( const OIS::MouseEvent &e, OIS::MouseButtonID id ) {
+#ifdef _DEBUG
     CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertButton(id));
+#endif
     if(cameraMan) cameraMan->injectMouseUp(e, id);
     return true;
 }

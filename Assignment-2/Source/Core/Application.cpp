@@ -17,7 +17,6 @@
 
 using namespace Ogre;
 
-
 Application::Application()
 {
 }
@@ -63,11 +62,12 @@ void Application::init()
 /* 
 * Update Methods 
 */
-bool Application::frameRenderingQueued(const FrameEvent &evt)
-{
+bool Application::frameRenderingQueued(const FrameEvent &evt) {
 
 	static float dTime = t1->getMilliseconds();
+#ifdef _DEBUG
 	CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
+#endif
 
 	if (!mRunning)
 	{
@@ -131,7 +131,7 @@ bool Application::update(const FrameEvent &evt) {
 		float fx = (pos.x / 100) - (CHUNK_SIZE / 2);
 		float fz = (pos.z / 100) - (CHUNK_SIZE / 2);
 
-		int numChunks = (fieldOfView*1.5 / (100*CHUNK_SIZE));
+		int numChunks = (fieldOfView*1.3 / (100*CHUNK_SIZE));
 
 		for(int i = -numChunks; i <= numChunks; i++) {
 			for(int j = -numChunks; j <= numChunks; j++) {
@@ -151,7 +151,6 @@ bool Application::update(const FrameEvent &evt) {
 				}
 			}
 		}
-
 	}
 	catch (Exception e) {
 
@@ -374,7 +373,7 @@ void Application::setupOIS(void) {
 }
 
 void Application::setupCEGUI(void) {
-
+#ifdef _DEBUG
 	mRenderer = &CEGUI::OgreRenderer::bootstrapSystem(*mRenderWindow);
 	CEGUI::ImageManager::setImagesetDefaultResourceGroup("Imagesets");
 	CEGUI::Font::setDefaultResourceGroup("Fonts");
@@ -397,6 +396,7 @@ void Application::setupCEGUI(void) {
 	sheet->addChild(quitButton);
 
 	quitButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::Quit, this));
+#endif
 
 }
 
@@ -458,8 +458,6 @@ void Application::createObjects(void) {
 	if(grassCube == nullptr) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 	}
-
-	// chunks.push_back(currentChunk = new Chunk(0, 0, mSceneManager, perlin, _simulator));
 }
 /* 
 * End Initialization Methods

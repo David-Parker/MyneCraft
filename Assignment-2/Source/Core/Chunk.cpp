@@ -1,9 +1,9 @@
 #include "Chunk.h"
 
 
-Chunk::Chunk(std::string name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart) {
+Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart) {
 
-	Ogre::Vector3 scale = Ogre::Vector3(50, 50, 50);
+	Ogre::Vector3 scale(50, 50, 50);
 	_scale = scale;
 
 	_xEnd = xStart + CHUNK_SIZE;
@@ -13,7 +13,7 @@ Chunk::Chunk(std::string name, int xStart, int yStart, Ogre::SceneManager* mScen
 
 	_sg = mSceneManager->createStaticGeometry(_name);
 
-	if (grassCube == nullptr & snowCube == nullptr) {
+	if (grassCube == nullptr && snowCube == nullptr) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 		snowCube = mSceneManager->createEntity("Cube-Snow.mesh");	
 	}
@@ -25,14 +25,18 @@ Chunk::Chunk(std::string name, int xStart, int yStart, Ogre::SceneManager* mScen
 
 			int y = (int)((perlin->getPerlin(fi, fj)) * steepness);
 			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
+			StaticObject* so;
 
 			if(y >= 15)
-				_sg->addEntity(snowCube, pos, Ogre::Quaternion::IDENTITY, scale);
+				so = new StaticObject(snowCube, scale, pos, sim);
 			else
-				_sg->addEntity(grassCube, pos, Ogre::Quaternion::IDENTITY, scale);
+				so = new StaticObject(grassCube, scale, pos, sim);
+
+			//so->addToSimulator();
+
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
 	}
-
 	_sg->build();
 }
 

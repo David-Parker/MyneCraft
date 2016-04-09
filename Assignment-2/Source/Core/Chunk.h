@@ -17,7 +17,7 @@ private:
 	std::string _name;
 
 public:
-	Chunk(std::string, int, int, Ogre::SceneManager*, Perlin*, Simulator*);
+	Chunk(const std::string&, int, int, Ogre::SceneManager*, Perlin*, Simulator*);
 	bool pointInChunk(float x, float y);
 	Ogre::Vector3 _scale;
 	int _xStart = 0;

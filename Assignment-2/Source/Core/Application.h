@@ -36,6 +36,7 @@
 #include "StaticObject.h"
 #include "Chunk.h"
 
+
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
 {
 public:
@@ -74,7 +75,7 @@ public:
 	int width;
 	int height;
 
-	double fps = 300.0;
+	double fps = 120.0;
 	int fieldOfView = 10000;
 
 	bool begin = false;
