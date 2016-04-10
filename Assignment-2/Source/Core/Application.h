@@ -77,7 +77,7 @@ public:
 	int width;
 	int height;
 
-	double fps = 120.0;
+	double fps = 300.0;
 	int fieldOfView = 5000;
 
 	bool begin = false;

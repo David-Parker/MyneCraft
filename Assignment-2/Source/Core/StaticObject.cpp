@@ -2,7 +2,7 @@
 #include "MultiPlatformHelper.h"
 
 StaticObject::StaticObject(Ogre::Entity* mesh, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator) :
-		_geom(mesh), _scale(scale), _pos(pos), _simulator(simulator), _mass(1.0f), _friction(100.0f), _restitution(0.0f)
+		_geom(mesh), _scale(scale), _pos(pos), _simulator(simulator), _mass(1.0f), _friction(0.0f), _restitution(0.0f)
 {
 	auto var = mesh->getBoundingBox();
 	auto size = var.getSize();
@@ -30,4 +30,8 @@ void StaticObject::addToSimulator() {
 void StaticObject::updateTransform() {
 	_tr.setOrigin(btVector3(_pos.x, _pos.y, _pos.z));
 	_tr.setRotation(btQuaternion(_orientation.x, _orientation.y, _orientation.z, _orientation.w));
+}
+
+void StaticObject::cleanUpBody() {
+	delete _collisionObject;
 }

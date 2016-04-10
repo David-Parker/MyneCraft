@@ -1,13 +1,11 @@
 #include "Player.h"
 
 Player::Player(Ogre::Camera* camera, GameObject* body) : _body(body), _playerCam(camera) {
-	_body->getNode()->setVisible(false);
+	//_body->getNode()->setVisible(false);
 }
 
 void Player::update(OISManager* ois) {
 	static int speed = 2500;
-
-	_playerCam->setPosition(_body->getNode()->getPosition() + Ogre::Vector3(0, 200, 0));
 
 	Ogre::Vector3 movePos = _playerCam->getDirection();
 	movePos = Ogre::Vector3(movePos.x, 0, movePos.z);
@@ -34,11 +32,20 @@ void Player::update(OISManager* ois) {
 		_body->setVelocity(strafePos.x*-speed, currentY, strafePos.z*-speed);
 		moved = true;
 	}
-	if (ois->isKeyDown(OIS::KC_SPACE)) {
-		_body->applyImpulse(btVector3(0, 1, 0) * 500, btVector3(0, 0, 0));
+	if (ois->isKeyDown(OIS::KC_SPACE) && _body->canJump) {
+		_body->applyImpulse(btVector3(0, 1, 0) * 700, btVector3(0, 0, 0));
 		moved = true;
+		_body->canJump = false;
+	}
+	if (ois->isKeyDown(OIS::KC_LSHIFT)) {
+		speed = 5000;
+	}
+	else {
+		speed = 2500;
 	}
 	if (!moved) {
 		_body->setVelocity(0, _body->getBody()->getLinearVelocity().y(), 0);
 	}
+
+	_playerCam->setPosition(_body->getNode()->getPosition() + Ogre::Vector3(0, 200, 0));
 }

@@ -133,12 +133,15 @@ bool Application::update(const FrameEvent &evt) {
 		float fz = (pos.z / CHUNK_SCALE_FULL) - (CHUNK_SIZE / 2);
 		int numChunks = (fieldOfView*1.3 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
 
+		int currX = ((int)fx - ((int)fx % CHUNK_SIZE));
+		int currZ = ((int)fz - ((int)fz % CHUNK_SIZE));
+
 		// Check for new chunks in FOV proximity to create
 		for(int i = -numChunks; i <= numChunks; i++) {
 			for(int j = -numChunks; j <= numChunks; j++) {
 
-				int x = ((int)fx - ((int)fx % CHUNK_SIZE));
-				int z = ((int)fz - ((int)fz % CHUNK_SIZE));
+				int x = currX;
+				int z = currZ;
 
 				x += i*CHUNK_SIZE;
 		 		z += j*CHUNK_SIZE;
@@ -153,18 +156,15 @@ bool Application::update(const FrameEvent &evt) {
 			}
 		}
 
-		int x = ((int)fx - ((int)fx % CHUNK_SIZE));
-		int z = ((int)fz - ((int)fz % CHUNK_SIZE));
-
 		// Add only the current chunk's static objects to the bullet simulation
-		Chunk* chunk = getChunk(x, z);
+		Chunk* chunk = getChunk(currX, currZ);
 		if (chunk != currentChunk) {
 			// Remove the old static objects currently in the simulator
 			_simulator->removeStaticObjects();
 			for (int i = -1; i <= 1; i++) {
 				for (int j = -1; j <= 1; j++) {
-					int x = ((int)fx - ((int)fx % CHUNK_SIZE));
-					int z = ((int)fz - ((int)fz % CHUNK_SIZE));
+					int x = currX;
+					int z = currZ;
 
 					x += i*CHUNK_SIZE;
 					z += j*CHUNK_SIZE;
@@ -480,7 +480,7 @@ void Application::createObjects(void) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 	}
 
-	GameObject* playerObj = createCube("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2000, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 1000.0f, false, _simulator);
+	GameObject* playerObj = createCube("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 700, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj);
 }
 /* 

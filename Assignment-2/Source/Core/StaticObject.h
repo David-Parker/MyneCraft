@@ -49,6 +49,7 @@ public:
 	virtual void updateTransform();
 	void setVelocity(float x, float y, float z);
 	void setOrientation(Ogre::Quaternion qt);
+	void cleanUpBody();
 
 	virtual void update();
 };
