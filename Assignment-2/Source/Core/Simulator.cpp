@@ -10,7 +10,7 @@ Simulator::Simulator() : objList(), collisionShapes(), objListStatic() {
   //overlappingPairCache = new bt32BitAxisSweep3(btVector3(-15000,-15000,-15000), btVector3(15000, 15000, 15000));
   solver = new btSequentialImpulseConstraintSolver(); 
   dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration); 
-  dynamicsWorld->setGravity(btVector3(0.0, -6000.0f, 0.0));
+  dynamicsWorld->setGravity(btVector3(0.0, -9000.0f, 0.0));
   //Add collision shapes to reuse among rigid bodies
 }
 

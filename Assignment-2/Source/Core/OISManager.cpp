@@ -206,6 +206,10 @@ bool OISManager::keyPressed( const OIS::KeyEvent &e ) {
     return true;
 }
 
+bool OISManager::isKeyDown(OIS::KeyCode key) {
+	return mKeyboard->isKeyDown(key);
+}
+
 OIS::KeyCode OISManager::lastKeyPressed() {
     OIS::KeyCode ret = mKeyPressed;
     mKeyPressed = OIS::KC_UNASSIGNED;
@@ -213,6 +217,7 @@ OIS::KeyCode OISManager::lastKeyPressed() {
 }
 
 bool OISManager::keyReleased( const OIS::KeyEvent &e ) {
+	mKeyPressed = OIS::KC_UNASSIGNED;
     if(cameraMan) cameraMan->injectKeyUp(e);
     return true;
 }

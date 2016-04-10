@@ -8,5 +8,5 @@ public:
 	GameObject* _body;
 	Ogre::SceneManager* _sceneManager;
 
-	void update(OIS::KeyCode);
+	void update(OISManager*);
 };

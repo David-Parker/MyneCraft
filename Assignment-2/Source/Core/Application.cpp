@@ -103,7 +103,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 // Called once per predefined frame
 bool Application::update(const FrameEvent &evt) {
 
-	OIS::KeyCode lastKey = _oisManager->lastKeyPressed();
+	OIS::KeyCode lastKey = _oisManager->getKeyPressed();
 	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
 	/*playerCam->setPosition(camMan->getPosition());*/
 	//playerCam->lookAt(player->_body->getNode()->getPosition());
@@ -184,9 +184,9 @@ bool Application::update(const FrameEvent &evt) {
 	catch (Exception e) {
 
 	}
-
-	player->update(lastKey);
 	_simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
+
+	player->update(_oisManager);
 
 	return true;
 }
@@ -480,7 +480,7 @@ void Application::createObjects(void) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 	}
 
-	GameObject* playerObj = createCube("Player", GameObject::CUBE_OBJECT, "Cube-Snow.mesh", 0, 500, 0, Ogre::Vector3(50, 50, 50), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.1f, 5.0f, false, _simulator);
+	GameObject* playerObj = createCube("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2000, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 1000.0f, false, _simulator);
 	player = new Player(playerCam, playerObj);
 }
 /* 

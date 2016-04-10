@@ -34,6 +34,8 @@ public:
     void removeAllMouseListeners( void );
  
     void setWindowExtents( int width, int height );
+
+	bool isKeyDown(OIS::KeyCode key);
  
     OIS::Mouse*    getMouse( void );
     OIS::Keyboard* getKeyboard( void );
@@ -41,8 +43,6 @@ public:
     OgreBites::SdkCameraMan * cameraMan;
  
     static OISManager* getSingletonPtr( void );
-    
-
 
     int getMouseXAxis();
     int getMouseYAxis();
