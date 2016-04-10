@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player(Ogre::Camera* camera, GameObject* body) : _body(body), _playerCam(camera) {
-	//_body->getNode()->setVisible(false);
+	_body->getNode()->setVisible(false);
 }
 
 void Player::update(OISManager* ois) {
