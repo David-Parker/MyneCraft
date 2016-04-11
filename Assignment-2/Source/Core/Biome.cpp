@@ -10,9 +10,7 @@ bool Biome::inBiome(int x, int y) {
 }
 
 Ogre::Entity* Biome::getCubeEntity(int x, int y) {
-	int dx = centerX - abs(x);
-	int dy = centerY - abs(y);
-	int dSq = (dx * dx) + (dy * dy);
+	int dSq = ((centerX - x) * (centerX - x)) + ((centerY - y) * (centerY - y));
 	float rSQoN = radius * radius / 9;
 	int rnd = rand()%20;
 	if ( dSq < 2 * rSQoN ) {
@@ -30,7 +28,7 @@ Ogre::Entity* Biome::getCubeEntity(int x, int y) {
 	else if ( dSq < 8 * rSQoN && rnd < 4 ) {
 		return mSceneManager->createEntity("Cube-Snow.mesh");	
 	}
-	else if ( rnd < 1 ) {
+	else if ( dSq < 9 * rSQoN && rnd < 1 ) {
 		return mSceneManager->createEntity("Cube-Snow.mesh");	
 	}
 	else {

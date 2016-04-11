@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "StaticObject.h"
+#include "Biome.h"
 #include "Perlin.h"
 
 static Ogre::Entity* grassCube = nullptr;
@@ -20,7 +21,7 @@ private:
 	Simulator* _simulator;
 
 public:
-	Chunk(const std::string&, int, int, Ogre::SceneManager*, Perlin*, Simulator*);
+	Chunk(const std::string&, int, int, Ogre::SceneManager*, Biome*, Perlin*, Simulator*);
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
 	std::string getName() { return _name; }
