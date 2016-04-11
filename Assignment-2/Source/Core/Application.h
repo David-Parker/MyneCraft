@@ -35,6 +35,7 @@
 #include "PlayerObject.h"
 #include "StaticObject.h"
 #include "Chunk.h"
+#include "Biome.h"
 #include "Player.h"
 
 
@@ -54,6 +55,7 @@ public:
 	OgreBites::SdkCameraMan * cameraMan;
 	Ogre::Camera* playerCam;
 	Ogre::Timer* t1;
+	Biome* biome;
 	Player* player;
 
 	NetManager* netManager = nullptr;

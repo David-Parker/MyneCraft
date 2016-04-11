@@ -1,7 +1,7 @@
 #include "Chunk.h"
 
 
-Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart), _simulator(sim) {
+Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, Biome* biome, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart), _simulator(sim) {
 
 	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
 	_scale = scale;
@@ -18,6 +18,8 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 		snowCube = mSceneManager->createEntity("Cube-Snow.mesh");	
 	}
 
+	bool inBiome = biome->inBiome(_xStart, _yStart);
+
 	for (int i = xStart; i < _xEnd; ++i) {
 		for (int j = yStart; j < _yEnd; ++j) {
 			float fi = (float)i / (float)100.0f;
@@ -29,6 +31,8 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 
 			if(y >= 15)
 				so = new StaticObject(snowCube, scale, pos, sim);
+			else if ( inBiome )
+				so = new StaticObject(biome->getCubeEntity(i, j), scale, pos, sim);
 			else
 				so = new StaticObject(grassCube, scale, pos, sim);
 
