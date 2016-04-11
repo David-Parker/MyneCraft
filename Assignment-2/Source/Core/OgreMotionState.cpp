@@ -5,7 +5,10 @@ OgreMotionState::OgreMotionState(const btTransform &initialpos, Ogre::SceneNode*
 	mPos1 = initialpos;
 }
 
-OgreMotionState::~OgreMotionState() {}
+OgreMotionState::~OgreMotionState() {
+	std::cout << "~OgreMotionState()" << std::endl;
+	delete mVisibleobj;
+}
 
 	//Provides flexibility in terms of object visibility
 void OgreMotionState::setNode(Ogre::SceneNode* node) {

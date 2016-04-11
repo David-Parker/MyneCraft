@@ -73,6 +73,7 @@ public:
 	Perlin* perlin;
 
 	std::unordered_map<std::string, Chunk*> chunks;
+	std::unordered_map<std::string, Chunk*> prevChunks;
 	Chunk* currentChunk = nullptr;
 
 	int points;
@@ -80,7 +81,7 @@ public:
 	int height;
 
 	double fps = 300.0;
-	int fieldOfView = 5000;
+	int fieldOfView = 10000;
 
 	bool begin = false;
 	bool mRunning = true;

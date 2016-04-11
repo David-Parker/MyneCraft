@@ -22,6 +22,7 @@ private:
 
 public:
 	Chunk(const std::string&, int, int, Ogre::SceneManager*, Biome*, Perlin*, Simulator*);
+	~Chunk();
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
 	std::string getName() { return _name; }
