@@ -71,8 +71,7 @@ public:
 	Ogre::StaticGeometry* sg;
 
 	Perlin* perlin;
-
-	std::unordered_map<std::string, Chunk*> chunks;
+	
 	std::unordered_map<std::string, Chunk*> prevChunks;
 	Chunk* currentChunk = nullptr;
 
@@ -114,5 +113,5 @@ public:
 	void showGui();
 	void resetNetManager();
 
-	Chunk* getChunk(int, int);
+	Chunk* getChunk(std::unordered_map<std::string, Chunk*>& chunks,int, int);
 };

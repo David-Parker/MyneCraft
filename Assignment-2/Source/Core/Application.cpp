@@ -136,7 +136,7 @@ bool Application::update(const FrameEvent &evt) {
 		int currX = ((int)fx - ((int)fx % CHUNK_SIZE));
 		int currZ = ((int)fz - ((int)fz % CHUNK_SIZE));
 
-		chunks.clear();
+		std::unordered_map<std::string, Chunk*> chunks;
 
 		// Check for new chunks in FOV proximity to create
 		for(int i = -numChunks; i <= numChunks; i++) {
@@ -153,11 +153,6 @@ bool Application::update(const FrameEvent &evt) {
 				std::string name(str.str());
 
 				// Object persists
-
-				// else {
-				// 	if(!chunks[name]) {
-				// 	chunks[name] = new Chunk(name, x, z, mSceneManager, biome, perlin, _simulator);
-				// }
 				if(prevChunks[name]) {
 					chunks[name] = prevChunks[name];
 				}
@@ -173,13 +168,14 @@ bool Application::update(const FrameEvent &evt) {
 			}
 		}
 
-		prevChunks = chunks;
+		prevChunks.swap(chunks);
 
 		// Add only the current chunk's static objects to the bullet simulation
-		Chunk* chunk = getChunk(currX, currZ);
+		Chunk* chunk = getChunk(chunks, currX, currZ);
 		if (chunk != currentChunk) {
 			// Remove the old static objects currently in the simulator
 			_simulator->removeStaticObjects();
+
 			for (int i = -1; i <= 1; i++) {
 				for (int j = -1; j <= 1; j++) {
 					int x = currX;
@@ -199,9 +195,10 @@ bool Application::update(const FrameEvent &evt) {
 			}
 			currentChunk = chunk;
 		}	
+
 	}
 	catch (Exception e) {
-
+		std::cout << e.what() << std::endl;
 	}
 	_simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
 
@@ -605,7 +602,7 @@ void Application::resetNetManager() {
 	} 
 }
 
-Chunk* Application::getChunk(int x, int z) {
+Chunk* Application::getChunk(std::unordered_map<std::string, Chunk*>& chunks, int x, int z) {
 	std::stringstream str;
 	str << "Chunks_" << x / CHUNK_SIZE << "_" << z / CHUNK_SIZE;
 	std::string name(str.str());

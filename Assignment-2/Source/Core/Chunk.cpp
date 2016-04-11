@@ -1,7 +1,7 @@
 #include "Chunk.h"
 
 
-Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, Biome* biome, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart), _simulator(sim) {
+Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, Biome* biome, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
 
 	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
 	_scale = scale;
@@ -9,14 +9,9 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 	_xEnd = xStart + CHUNK_SIZE;
 	_yEnd = yStart + CHUNK_SIZE;
 
-	float steepness = 100.0f;
+	float steepness = 90.0f;
 
 	_sg = mSceneManager->createStaticGeometry(_name);
-
-	if (grassCube == nullptr && snowCube == nullptr) {
-		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
-		snowCube = mSceneManager->createEntity("Cube-Snow.mesh");	
-	}
 
 	bool inBiome = biome->inBiome(_xStart, _yStart);
 
@@ -32,9 +27,9 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 			if ( inBiome )
 				so = new StaticObject(biome->getCubeEntity(i, j), scale, pos, sim);
 			else if(y >= 15)
-				so = new StaticObject(snowCube, scale, pos, sim);
+				so = new StaticObject(biome->getType(Biome::SNOW), scale, pos, sim);
 			else
-				so = new StaticObject(grassCube, scale, pos, sim);
+				so = new StaticObject(biome->getType(Biome::GRASS), scale, pos, sim);
 
 			_staticObjects.push_back(so);
 
@@ -48,10 +43,8 @@ Chunk::~Chunk() {
 	for(auto& var : _staticObjects) {
 		delete var;
 	}
-	std::cout << "~Chunk()" << std::endl;
 	_staticObjects.clear();
-	_sg->destroy();
-	delete _sg;
+	_mSceneManager->destroyStaticGeometry(_sg);
 }
 
 bool Chunk::pointInChunk(float x, float y) {

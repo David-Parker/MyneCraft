@@ -7,9 +7,6 @@
 #include "Biome.h"
 #include "Perlin.h"
 
-static Ogre::Entity* grassCube = nullptr;
-static Ogre::Entity* snowCube = nullptr;
-
 #define CHUNK_SIZE 16
 #define CHUNK_SCALE 50
 #define CHUNK_SCALE_FULL 100
@@ -19,6 +16,7 @@ private:
 	std::vector<StaticObject*> _staticObjects;
 	std::string _name;
 	Simulator* _simulator;
+	Ogre::SceneManager* _mSceneManager;
 
 public:
 	Chunk(const std::string&, int, int, Ogre::SceneManager*, Biome*, Perlin*, Simulator*);

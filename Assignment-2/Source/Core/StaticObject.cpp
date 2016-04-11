@@ -13,7 +13,7 @@ StaticObject::StaticObject(Ogre::Entity* mesh, Ogre::Vector3 scale, Ogre::Vector
 }
 
 StaticObject::~StaticObject() {
-	std::cout << "~StaticObject()" << std::endl;
+	cleanUpBody();
 	delete _shape;
 	delete _motionState;
 }

@@ -5,7 +5,7 @@ GameObject(nme, tp, scnMgr, ssm, node, ent, ms, sim, mss, rest, frict, scal, kin
 	auto var = ent->getBoundingBox();
 	auto size = var.getSize();
 
-	shape = new btSphereShape(15);
+	shape = new btSphereShape(25);
 }
 
 void PlayerObject::update() {

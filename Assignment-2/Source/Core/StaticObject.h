@@ -27,7 +27,7 @@ protected:
 	btCollisionShape* _shape;
 	btTransform _tr;
 	btVector3 _inertia;
-	btCollisionObject* _collisionObject;
+	btCollisionObject* _collisionObject = nullptr;
 
 	btScalar _mass;
 	btScalar _restitution;
