@@ -44,6 +44,16 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 	_sg->build();
 }
 
+Chunk::~Chunk() {
+	for(auto& var : _staticObjects) {
+		delete var;
+	}
+	std::cout << "~Chunk()" << std::endl;
+	_staticObjects.clear();
+	_sg->destroy();
+	delete _sg;
+}
+
 bool Chunk::pointInChunk(float x, float y) {
 	int roundX = (int) x;
 	int roundY = (int) y;

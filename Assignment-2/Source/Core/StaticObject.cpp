@@ -12,6 +12,12 @@ StaticObject::StaticObject(Ogre::Entity* mesh, Ogre::Vector3 scale, Ogre::Vector
 	_motionState = new btDefaultMotionState();
 }
 
+StaticObject::~StaticObject() {
+	std::cout << "~StaticObject()" << std::endl;
+	delete _shape;
+	delete _motionState;
+}
+
 void StaticObject::update() {}
 
 void StaticObject::addToSimulator() {
@@ -33,5 +39,8 @@ void StaticObject::updateTransform() {
 }
 
 void StaticObject::cleanUpBody() {
-	delete _collisionObject;
+	if(_collisionObject != nullptr) {
+		delete _collisionObject;
+		_collisionObject = nullptr;	
+	}
 }

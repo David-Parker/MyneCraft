@@ -27,10 +27,8 @@ protected:
 	btCollisionShape* _shape;
 	btTransform _tr;
 	btVector3 _inertia;
-	CollisionContext* _context;
 	btCollisionObject* _collisionObject;
 
-	BulletContactCallback* _cCallBack;
 	btScalar _mass;
 	btScalar _restitution;
 	btScalar _friction;
@@ -44,6 +42,7 @@ public:
 	Ogre::Vector3 _pos;
 	Ogre::Quaternion _orientation{};
 	StaticObject(Ogre::Entity* mesh, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator);
+	~StaticObject();
 	btCollisionObject* getBody() { return _collisionObject; }
 	void addToSimulator();
 	virtual void updateTransform();

@@ -136,6 +136,8 @@ bool Application::update(const FrameEvent &evt) {
 		int currX = ((int)fx - ((int)fx % CHUNK_SIZE));
 		int currZ = ((int)fz - ((int)fz % CHUNK_SIZE));
 
+		chunks.clear();
+
 		// Check for new chunks in FOV proximity to create
 		for(int i = -numChunks; i <= numChunks; i++) {
 			for(int j = -numChunks; j <= numChunks; j++) {
@@ -149,12 +151,29 @@ bool Application::update(const FrameEvent &evt) {
 				std::stringstream str;
 				str << "Chunks_" << x/CHUNK_SIZE << "_" << z/CHUNK_SIZE;
 				std::string name(str.str());
-				
-				if(!chunks[name]) {
+
+				// Object persists
+
+				// else {
+				// 	if(!chunks[name]) {
+				// 	chunks[name] = new Chunk(name, x, z, mSceneManager, biome, perlin, _simulator);
+				// }
+				if(prevChunks[name]) {
+					chunks[name] = prevChunks[name];
+				}
+				else if(!chunks[name]) {
 					chunks[name] = new Chunk(name, x, z, mSceneManager, biome, perlin, _simulator);
 				}
 			}
 		}
+
+		for(auto& var : prevChunks) {
+			if(!chunks[var.first]) {
+				delete var.second;
+			}
+		}
+
+		prevChunks = chunks;
 
 		// Add only the current chunk's static objects to the bullet simulation
 		Chunk* chunk = getChunk(currX, currZ);
