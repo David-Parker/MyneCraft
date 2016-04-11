@@ -32,7 +32,7 @@
 #include "GameManager.h"
 #include "OISManager.h"
 #include "Simulator.h"
-#include "Cube.h"
+#include "PlayerObject.h"
 #include "StaticObject.h"
 #include "Chunk.h"
 #include "Player.h"
@@ -88,7 +88,7 @@ public:
 	Ogre::Entity* createRootEntity(std::string mesh, int x, int y, int z);
 	void createChildEntity(std::string name, std::string mesh, Ogre::SceneNode* sceneNode, int x, int y, int z);
 
-	Cube* createCube(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim);
+	PlayerObject* createPlayerObject(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim);
 	bool update(const Ogre::FrameEvent &evt);
 	bool handleGUI(const Ogre::FrameEvent &evt);
 	bool updateServer(const Ogre::FrameEvent &evt);

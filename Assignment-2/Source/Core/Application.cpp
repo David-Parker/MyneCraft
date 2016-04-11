@@ -283,7 +283,7 @@ void Application::createChildEntity(std::string name, std::string mesh, Ogre::Sc
 	ogreNode->setPosition(x, y, z);
 }
 
-Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim) {
+PlayerObject* Application::createPlayerObject(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim) {
 	createRootEntity(nme, meshName, x, y, z);
 	Ogre::SceneNode* sn = mSceneManager->getSceneNode(nme);
 	Ogre::Entity* ent = SceneHelper::getEntity(mSceneManager, nme, 0);
@@ -291,13 +291,11 @@ Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre:
 	OgreMotionState* ms = new OgreMotionState(pos, sn);
 	sn->setScale(scale.x, scale.y, scale.z);
 
-	//sn->setVisible(false);
-
 	sn->pitch(pitch);
 	sn->yaw(yaw);
 	sn->roll(roll);
 
-	Cube* obj = new Cube(nme, tp, mSceneManager, ssm, sn, ent, ms, mySim, mss, rest, frict, scale, kinematic);
+	PlayerObject* obj = new PlayerObject(nme, tp, mSceneManager, ssm, sn, ent, ms, mySim, mss, rest, frict, scale, kinematic);
 	obj->addToSimulator();
 
 	return obj;
@@ -467,6 +465,8 @@ void Application::setupLighting(void) {
 }
 
 void Application::createObjects(void) {
+	mSceneManager->setSkyDome(true, "Examples/CloudySky", 5, 8);
+
 	int xmax = 128;
 	int ymax = xmax;
 	int rndmax = 8;
@@ -480,7 +480,7 @@ void Application::createObjects(void) {
 		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
 	}
 
-	GameObject* playerObj = createCube("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 700, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
+	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 700, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj);
 }
 /* 
