@@ -29,10 +29,10 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
 			StaticObject* so;
 
-			if(y >= 15)
-				so = new StaticObject(snowCube, scale, pos, sim);
-			else if ( inBiome )
+			if ( inBiome )
 				so = new StaticObject(biome->getCubeEntity(i, j), scale, pos, sim);
+			else if(y >= 15)
+				so = new StaticObject(snowCube, scale, pos, sim);
 			else
 				so = new StaticObject(grassCube, scale, pos, sim);
 
