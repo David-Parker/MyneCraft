@@ -7,6 +7,7 @@ Biome::Biome(Ogre::SceneManager* smgr, BiomeType type, int x, int y, int r) : mS
 	sandCube = mSceneManager->createEntity("Cube-Sand.mesh");
 	woodCube = mSceneManager->createEntity("Cube-Wood.mesh");
 	leafCube = mSceneManager->createEntity("Cube-Leaves.mesh");
+	cactusCube = mSceneManager->createEntity("Cube-Cactus.mesh");
 }
 
 
@@ -14,7 +15,7 @@ bool Biome::inBiome(int x, int y) {
 	return (abs(x - centerX) < radius || abs(y - centerY) < radius);
 }
 
-Ogre::Entity* Biome::getCubeEntity(int x, int y, int h) {
+Ogre::Entity* Biome::getCubeEntity(int x, int y, int h, BiomeType* type) {
 	int dSq = ((centerX - x) * (centerX - x)) + ((centerY - y) * (centerY - y));
 	float rSQoN = radius * radius / 9;
 	int rnd = rand()%20;
@@ -23,12 +24,18 @@ Ogre::Entity* Biome::getCubeEntity(int x, int y, int h) {
 			|| (dSq < 6 * rSQoN && rnd < 14)
 			|| (dSq < 7 * rSQoN && rnd < 9)
 			|| (dSq < 8 * rSQoN && rnd < 4)
-			|| (dSq < 9 * rSQoN && rnd < 1) )
+			|| (dSq < 9 * rSQoN && rnd < 1) ) {
+		*type = biomeType;
 		return getEntity(biomeType);
-	else if ( h >= 15 && dSq > 6 * rSQoN )
+	}
+	else if ( h >= 15 && dSq > 6 * rSQoN ) {
+		*type = SNOW;
 		return getEntity(SNOW);
-	else 
+	}
+	else {
+		*type = GRASS;
 		return getEntity(GRASS);
+	}
 }
 
 Ogre::Entity* Biome::getTreeEntity(BiomeType type) {
@@ -44,5 +51,6 @@ Ogre::Entity* Biome::getEntity(BiomeType type) {
 		case SAND: return sandCube;
 		case WOOD: return woodCube;
 		case LEAF: return leafCube;
+		case CACTUS: return cactusCube;
 	}
 }

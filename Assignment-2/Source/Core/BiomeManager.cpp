@@ -10,7 +10,7 @@ BiomeManager::BiomeManager(Ogre::SceneManager* smgr) : mSceneManager(smgr) {
 
 Biome* BiomeManager::inBiome(int x, int y) {
 	std::string nme = getBiomeName(x, y);
-	std::cout << nme << std::endl;
+
 	if ( biomeGrid[nme] )
 		return biomeGrid[nme];
 	else {

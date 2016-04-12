@@ -19,7 +19,7 @@ private:
 	Ogre::SceneManager* _mSceneManager;
 	Biome* _biome;
 
-	void createTree(const Ogre::Vector3& pos);
+	void createTree(const Ogre::Vector3&, Biome::BiomeType);
 
 public:
 	Chunk(const std::string&, int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*);
