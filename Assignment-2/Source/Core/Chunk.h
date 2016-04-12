@@ -34,7 +34,7 @@ public:
 	int _yEnd = 0;
 };
 
-inline static std::string getName(int x, int z) {
+inline static std::string getChunkName(int x, int z) {
 	char buf[64];
 	sprintf(buf, "Chunk_%d_%d", x / CHUNK_SIZE, z / CHUNK_SIZE);
 	return std::string(buf);

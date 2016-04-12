@@ -3,16 +3,19 @@
 #include <vector>
 #include <math.h>
 #include <Ogre.h>
+#include <unordered_map>
+
 #include "Biome.h"
 #include "StaticObject.h"
+
 
 static Ogre::Entity* grassTree = nullptr;
 static Ogre::Entity* snowTree = nullptr;
 static Ogre::Entity* sandTree = nullptr;
 
-static int biomeSeparation = 1500;
-static int minBiomeRadius = 400;
-static int biomeRadiusVariance = 400;
+static int biomeGridSize = 1500;
+static int minBiomeRadius = 500;
+static int biomeRadiusVariance = 300;
 
 class BiomeManager {
 public:
@@ -25,6 +28,8 @@ public:
 
 protected:
 	Biome* createBiome(Biome::BiomeType, int, int, int);
+	std::string getBiomeName(int, int);
+	std::unordered_map<std::string, Biome*> biomeGrid;
 	std::vector<Biome*> worldBiomes;
 	Ogre::SceneManager* mSceneManager;
 	Ogre::Entity* grassMesh;

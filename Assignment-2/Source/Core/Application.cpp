@@ -146,7 +146,7 @@ bool Application::update(const FrameEvent &evt) {
 				x += i*CHUNK_SIZE;
 		 		z += j*CHUNK_SIZE;
 
-				std::string name = getName(x, z);
+				std::string name = getChunkName(x, z);
 
 				// Object persists
 				if(prevChunks[name]) {
@@ -180,7 +180,7 @@ bool Application::update(const FrameEvent &evt) {
 					x += i*CHUNK_SIZE;
 					z += j*CHUNK_SIZE;
 
-					std::string name = getName(x, z);
+					std::string name = getChunkName(x, z);
 
 					if (chunks[name]) {
 						chunks[name]->addChunksToSimulator();
@@ -593,7 +593,7 @@ void Application::resetNetManager() {
 }
 
 Chunk* Application::getChunk(std::unordered_map<std::string, Chunk*>& chunks, int x, int z) {
-	std::string name = getName(x, z);
+	std::string name = getChunkName(x, z);
 
 	if (chunks[name]) return chunks[name];
 	else return nullptr;
