@@ -157,7 +157,7 @@ bool Application::update(const FrameEvent &evt) {
 					chunks[name] = prevChunks[name];
 				}
 				else if(!chunks[name]) {
-					chunks[name] = new Chunk(name, x, z, mSceneManager, biome, perlin, _simulator);
+					chunks[name] = new Chunk(name, x, z, mSceneManager, biomeManager, perlin, _simulator);
 				}
 			}
 		}
@@ -490,13 +490,7 @@ void Application::createObjects(void) {
 
 	perlin = new Perlin(xmax, ymax, rndmax, density);
 
-	static Ogre::Entity* grassCube = nullptr;
-
-	if(grassCube == nullptr) {
-		grassCube = mSceneManager->createEntity("Cube-Grass.mesh");
-	}
-
-	biome = new Biome(mSceneManager, Biome::SAND, 500, 500, 400);
+	biomeManager = new BiomeManager(mSceneManager);
 
 	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 700, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj);

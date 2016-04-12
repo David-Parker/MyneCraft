@@ -1,7 +1,7 @@
 #include "Chunk.h"
 
 
-Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, Biome* biome, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
+Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeManager* biomeMgr, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
 
 	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
 	_scale = scale;
@@ -13,7 +13,7 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 
 	_sg = mSceneManager->createStaticGeometry(_name);
 
-	bool inBiome = biome->inBiome(_xStart, _yStart);
+	Biome* curBiome = biomeMgr->inBiome(_xStart, _yStart);
 
 	for (int i = xStart; i < _xEnd; ++i) {
 		for (int j = yStart; j < _yEnd; ++j) {
@@ -24,12 +24,12 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
 			StaticObject* so;
 
-			if ( inBiome )
-				so = new StaticObject(biome->getCubeEntity(i, j), scale, pos, sim);
+			if ( curBiome != nullptr )
+				so = new StaticObject(curBiome->getCubeEntity(i, j, y), scale, pos, sim);
 			else if(y >= 15)
-				so = new StaticObject(biome->getType(Biome::SNOW), scale, pos, sim);
+				so = new StaticObject(biomeMgr->getSnowTerrain(), scale, pos, sim);
 			else
-				so = new StaticObject(biome->getType(Biome::GRASS), scale, pos, sim);
+				so = new StaticObject(biomeMgr->getGrassTerrain(), scale, pos, sim);
 
 			_staticObjects.push_back(so);
 
