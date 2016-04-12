@@ -2,8 +2,8 @@
 
 BiomeManager::BiomeManager(Ogre::SceneManager* smgr) : mSceneManager(smgr) {
 	worldBiomes.push_back(createBiome(Biome::SAND, 500, 500, 400));
-	grassMesh = worldBiomes.at(0)->getType(Biome::GRASS);
-	snowMesh = worldBiomes.at(0)->getType(Biome::SNOW);
+	grassMesh = worldBiomes.at(0)->getEntity(Biome::GRASS);
+	snowMesh = worldBiomes.at(0)->getEntity(Biome::SNOW);
 }
 
 

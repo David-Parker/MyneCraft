@@ -2,7 +2,6 @@
 #include <random>
 #include <math.h>
 #include <Ogre.h>
-#include "StaticObject.h"
 
 static Ogre::Entity* grassCube = nullptr;
 static Ogre::Entity* snowCube = nullptr;
@@ -17,7 +16,8 @@ public:
 
 	bool inBiome(int, int);
 	Ogre::Entity* getCubeEntity(int, int, int);
-	Ogre::Entity* getType(BiomeType);
+	Ogre::Entity* getEntity(BiomeType);
+	BiomeType getType() { return biomeType; }
 
 protected:
 	Ogre::SceneManager* mSceneManager;

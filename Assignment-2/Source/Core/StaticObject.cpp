@@ -10,6 +10,14 @@ StaticObject::StaticObject(Ogre::Entity* mesh, Ogre::Vector3 scale, Ogre::Vector
 	_inertia.setZero();
 	_shape = new btBoxShape(btVector3((var.getSize().x*scale.x) / 2, (var.getSize().y*scale.y) / 2, (var.getSize().z*scale.z) / 2));
 	_motionState = new btDefaultMotionState();
+
+	std::string type = mesh->getMesh()->getName();
+
+	// TODO refactor Chunk to pass in the type instead of name checking the mesh name
+	if (type == "Cube-Grass.mesh") _cubeType = Biome::GRASS;
+	else if (type == "Cube-Snow.mesh") _cubeType = Biome::SNOW;
+	else if (type == "Cube-Sand.mesh") _cubeType = Biome::SAND;
+
 }
 
 StaticObject::~StaticObject() {

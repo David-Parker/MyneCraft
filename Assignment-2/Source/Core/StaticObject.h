@@ -19,6 +19,7 @@
 #include <OgreWindowEventUtilities.h>
 #include <OgreRenderTargetListener.h>
 #include <OgreParticleSystem.h>
+#include "Biome.h"
 
 /* Static object is as the name implies, cannot be moved or translated but exists without a scenenode for fast allocation */
 class StaticObject {
@@ -41,6 +42,7 @@ public:
 	Ogre::Vector3 _scale;
 	Ogre::Vector3 _pos;
 	Ogre::Quaternion _orientation{};
+	Biome::BiomeType _cubeType;
 	StaticObject(Ogre::Entity* mesh, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator);
 	~StaticObject();
 	btCollisionObject* getBody() { return _collisionObject; }

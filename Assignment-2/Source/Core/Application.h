@@ -80,7 +80,12 @@ public:
 	int height;
 
 	double fps = 300.0;
+#ifdef _WIN32
+	int fieldOfView = 5000;
+#endif
+#ifdef __linux__
 	int fieldOfView = 10000;
+#endif
 
 	bool begin = false;
 	bool mRunning = true;

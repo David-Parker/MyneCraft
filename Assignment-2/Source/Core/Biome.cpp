@@ -22,14 +22,14 @@ Ogre::Entity* Biome::getCubeEntity(int x, int y, int h) {
 			|| (dSq < 7 * rSQoN && rnd < 9)
 			|| (dSq < 8 * rSQoN && rnd < 4)
 			|| (dSq < 9 * rSQoN && rnd < 1) )
-		return getType(biomeType);
+		return getEntity(biomeType);
 	else if ( h >= 15 && dSq < 7 * rSQoN )
-		return getType(SNOW);
+		return getEntity(SNOW);
 	else 
-		return getType(GRASS);	
+		return getEntity(GRASS);	
 }
 
-Ogre::Entity* Biome::getType(BiomeType type) {
+Ogre::Entity* Biome::getEntity(BiomeType type) {
 	switch ( type ) {
 		case GRASS: return grassCube;
 		case SNOW: return snowCube;
