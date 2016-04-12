@@ -29,6 +29,12 @@ Ogre::Entity* Biome::getCubeEntity(int x, int y, int h) {
 		return getEntity(GRASS);	
 }
 
+Ogre::Entity* Biome::getTreeEntity(BiomeType type) {
+	switch ( type ) {
+		default: return nullptr;
+	}
+}
+
 Ogre::Entity* Biome::getEntity(BiomeType type) {
 	switch ( type ) {
 		case GRASS: return grassCube;

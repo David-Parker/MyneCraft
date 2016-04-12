@@ -27,10 +27,11 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 			if ( curBiome != nullptr )
 				so = new StaticObject(curBiome->getCubeEntity(i, j, y), scale, pos, sim);
 			else if(y >= 15)
-				so = new StaticObject(biomeMgr->getSnowTerrain(), scale, pos, sim);
+				so = new StaticObject(biomeMgr->getTerrain(Biome::SNOW), scale, pos, sim);
 			else
-				so = new StaticObject(biomeMgr->getGrassTerrain(), scale, pos, sim);
+				so = new StaticObject(biomeMgr->getTerrain(Biome::SNOW), scale, pos, sim);
 
+			//This will soon be replaced by biomeMgr->getTree( **biomeType** )
 			if (tree == 5 && so->_cubeType != Biome::SAND) {
 				createTree(pos);
 			}
