@@ -84,7 +84,7 @@ public:
 	int fieldOfView = 5000;
 #endif
 #ifdef __linux__
-	int fieldOfView = 10000;
+	int fieldOfView = 20000;
 #endif
 
 	bool begin = false;

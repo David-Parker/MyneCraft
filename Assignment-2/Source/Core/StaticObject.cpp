@@ -17,6 +17,8 @@ StaticObject::StaticObject(Ogre::Entity* mesh, Ogre::Vector3 scale, Ogre::Vector
 	if (type == "Cube-Grass.mesh") _cubeType = Biome::GRASS;
 	else if (type == "Cube-Snow.mesh") _cubeType = Biome::SNOW;
 	else if (type == "Cube-Sand.mesh") _cubeType = Biome::SAND;
+	else if (type == "Cube-Wood.mesh") _cubeType = Biome::WOOD;
+	else if (type == "Cube-Leaves.mesh") _cubeType = Biome::LEAF;
 
 }
 

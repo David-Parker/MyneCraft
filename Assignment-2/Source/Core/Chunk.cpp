@@ -79,7 +79,7 @@ void Chunk::createTree(const Ogre::Vector3& pos) {
 	// Trunk
 	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
 	for (int i = 1; i <= 3; i++) {
-		StaticObject* treeLimb = new StaticObject(_biome->getEntity(Biome::SNOW), scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator);
+		StaticObject* treeLimb = new StaticObject(_biome->getEntity(Biome::WOOD), scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator);
 		_staticObjects.push_back(treeLimb);
 		_sg->addEntity(treeLimb->_geom, treeLimb->_pos, treeLimb->_orientation, treeLimb->_scale);
 	}
@@ -89,7 +89,7 @@ void Chunk::createTree(const Ogre::Vector3& pos) {
 		for (int j = 0; j < breadth; j++) {
 			for (int k = 0; k < breadth; k++) {
 				if (leaves[i][j][k]) {
-					StaticObject* treeLimb = new StaticObject(_biome->getEntity(Biome::GRASS), scale, pos + Ogre::Vector3((i - 2)*CHUNK_SCALE_FULL, (j + breadth - 1)*CHUNK_SCALE_FULL, (k - 2)*CHUNK_SCALE_FULL), _simulator);
+					StaticObject* treeLimb = new StaticObject(_biome->getEntity(Biome::LEAF), scale, pos + Ogre::Vector3((i - 2)*CHUNK_SCALE_FULL, (j + breadth - 1)*CHUNK_SCALE_FULL, (k - 2)*CHUNK_SCALE_FULL), _simulator);
 					_staticObjects.push_back(treeLimb);
 					_sg->addEntity(treeLimb->_geom, treeLimb->_pos, treeLimb->_orientation, treeLimb->_scale);
 				}

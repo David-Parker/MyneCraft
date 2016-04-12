@@ -129,7 +129,7 @@ bool Application::update(const FrameEvent &evt) {
 
 		float fx = (pos.x / CHUNK_SCALE_FULL) - (CHUNK_SIZE / 2);
 		float fz = (pos.z / CHUNK_SCALE_FULL) - (CHUNK_SIZE / 2);
-		int numChunks = (fieldOfView*1.3 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
+		int numChunks = (fieldOfView*1.2 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
 
 		int currX = ((int)fx - ((int)fx % CHUNK_SIZE));
 		int currZ = ((int)fz - ((int)fz % CHUNK_SIZE));
