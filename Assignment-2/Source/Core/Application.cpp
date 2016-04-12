@@ -146,9 +146,7 @@ bool Application::update(const FrameEvent &evt) {
 				x += i*CHUNK_SIZE;
 		 		z += j*CHUNK_SIZE;
 
-				char buf[64];
-				sprintf(buf, "Chunk_%d,_%d", x / CHUNK_SIZE, z / CHUNK_SIZE);
-				std::string name(buf);
+				std::string name = getName(x, z);
 
 				// Object persists
 				if(prevChunks[name]) {
@@ -182,9 +180,7 @@ bool Application::update(const FrameEvent &evt) {
 					x += i*CHUNK_SIZE;
 					z += j*CHUNK_SIZE;
 
-					char buf[64];
-					sprintf(buf, "Chunk_%d,_%d", x / CHUNK_SIZE, z / CHUNK_SIZE);
-					std::string name(buf);
+					std::string name = getName(x, z);
 
 					if (chunks[name]) {
 						chunks[name]->addChunksToSimulator();
@@ -595,9 +591,7 @@ void Application::resetNetManager() {
 }
 
 Chunk* Application::getChunk(std::unordered_map<std::string, Chunk*>& chunks, int x, int z) {
-	std::stringstream str;
-	str << "Chunks_" << x / CHUNK_SIZE << "_" << z / CHUNK_SIZE;
-	std::string name(str.str());
+	std::string name = getName(x, z);
 
 	if (chunks[name]) return chunks[name];
 	else return nullptr;
