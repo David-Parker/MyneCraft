@@ -193,6 +193,8 @@ bool Application::update(const FrameEvent &evt) {
 	}
 	catch (Exception e) {
 		std::cout << e.what() << std::endl;
+		std::cout << currentChunk->getName() << std::endl;
+		exit(0);
 	}
 	_simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
 

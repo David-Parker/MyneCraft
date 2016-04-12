@@ -7,7 +7,7 @@
 #include "BiomeManager.h"
 #include "Perlin.h"
 
-#define CHUNK_SIZE 16
+#define CHUNK_SIZE 24
 #define CHUNK_SCALE 50
 #define CHUNK_SCALE_FULL 100
 class Chunk {

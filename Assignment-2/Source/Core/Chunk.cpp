@@ -20,7 +20,7 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 			float fj = (float)j / (float)100.0f;
 
 			int y = (int)((perlin->getPerlin(fi, fj)) * steepness);
-			int tree = rand() % 200;
+			int tree = rand() % 400;
 			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
 			StaticObject* so;
 
@@ -43,6 +43,8 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
 	}
+
+	_sg->setRegionDimensions(Ogre::Vector3(3000, 300, 3000));
 	_sg->build();
 }
 
@@ -72,9 +74,9 @@ void Chunk::createTree(const Ogre::Vector3& pos) {
 	static const int breadth = 5;
 	// Describes the shape of the leaves, think of each 5x5 grid as another layer
 	bool leaves[breadth][breadth][breadth] = {	{ { 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 } },
-												{ { 0, 1, 1, 1, 0 }, { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 }, { 0, 1, 1, 1, 0 } },
-												{ { 0, 1, 1, 1, 0 }, { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 }, { 0, 1, 1, 1, 0 } },
-												{ { 0, 1, 1, 1, 0 }, { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 }, { 1, 1, 1, 1, 1 }, { 0, 1, 1, 1, 0 } },
+												{ { 0, 1, 1, 1, 0 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 }, { 0, 1, 1, 1, 0 } },
+												{ { 0, 1, 0, 1, 0 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 }, { 0, 1, 1, 1, 0 } },
+												{ { 0, 1, 1, 1, 0 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 }, { 0, 1, 1, 1, 0 } },
 												{ { 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 } } };
 	// Trunk
 	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);

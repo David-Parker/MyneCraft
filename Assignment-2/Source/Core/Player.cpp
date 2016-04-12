@@ -33,7 +33,7 @@ void Player::update(OISManager* ois) {
 		moved = true;
 	}
 	if (ois->isKeyDown(OIS::KC_SPACE) && _body->canJump) {
-		_body->applyImpulse(btVector3(0, 1, 0) * 700, btVector3(0, 0, 0));
+		_body->applyImpulse(btVector3(0, 1, 0) * 700 , btVector3(0, 0, 0));
 		moved = true;
 		_body->canJump = false;
 	}

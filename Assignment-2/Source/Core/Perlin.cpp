@@ -64,5 +64,8 @@ float Perlin::getPerlin(float x, float y) {
 	ix1 = lerp(n0, n1, sx);
 	value = lerp(ix0, ix1, sy);
 
-	return value / density;
+	float ret = value / density;
+
+	if(ret > 100.0) return 100.0; // we hit the edge of the explorable universe and the perlin values get undefined
+	else return ret;
 }
