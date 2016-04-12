@@ -23,7 +23,7 @@ Ogre::Entity* Biome::getCubeEntity(int x, int y, int h) {
 			|| (dSq < 8 * rSQoN && rnd < 4)
 			|| (dSq < 9 * rSQoN && rnd < 1) )
 		return getEntity(biomeType);
-	else if ( h >= 15 && dSq < 7 * rSQoN )
+	else if ( h >= 15 && dSq > 6 * rSQoN )
 		return getEntity(SNOW);
 	else 
 		return getEntity(GRASS);	
