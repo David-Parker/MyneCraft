@@ -44,7 +44,7 @@ void Player::update(OISManager* ois) {
 		speed = 2500;
 	}
 	if (!moved) {
-		_body->setVelocity(0, _body->getBody()->getLinearVelocity().y(), 0);
+		_body->setVelocity(0, currentY, 0);
 	}
 
 	_playerCam->setPosition(_body->getNode()->getPosition() + Ogre::Vector3(0, 200, 0));

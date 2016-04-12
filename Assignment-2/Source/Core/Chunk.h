@@ -17,6 +17,9 @@ private:
 	std::string _name;
 	Simulator* _simulator;
 	Ogre::SceneManager* _mSceneManager;
+	Biome* _biome;
+
+	void createTree(const Ogre::Vector3& pos);
 
 public:
 	Chunk(const std::string&, int, int, Ogre::SceneManager*, Biome*, Perlin*, Simulator*);
