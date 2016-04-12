@@ -14,21 +14,20 @@ material _missing_material_
     }
 }
 
-// Cube-Grass genrated by blender2ogre 0.6.0
+// Cube-Cactus genrated by blender2ogre 0.6.0
 
-material Cube-Grass 
+material Cube-Cactus 
 {
     receive_shadows off
 
     technique
     {
-        pass Cube-Grass
+        pass Cube-Cactus
         {
-	        lighting on
             ambient 0.800000011920929 0.800000011920929 0.800000011920929 1.0
             diffuse 0.6400000190734865 0.6400000190734865 0.6400000190734865 1.0
             specular 0.5 0.5 0.5 1.0 12.5
-            emissive 0.5 0.5 0.4 1.0
+            emissive 0.5 0.5 0.5 1.0
 
             alpha_to_coverage off
             colour_write on
@@ -40,7 +39,6 @@ material Cube-Grass
             light_clip_planes off
             light_scissor off
             lighting on
-            mesh_exporter <bpy_struct, MaterialProperties("")>
             normalise_normals off
             polygon_mode solid
             scene_blend one zero
@@ -50,7 +48,7 @@ material Cube-Grass
 
             texture_unit 
             {
-                texture myncraft.png
+                texture cactus.png
                 tex_address_mode wrap
                 scale 1.0 1.0
                 colour_op modulate
