@@ -105,8 +105,6 @@ bool Application::update(const FrameEvent &evt) {
 
 	OIS::KeyCode lastKey = _oisManager->getKeyPressed();
 	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
-	/*playerCam->setPosition(camMan->getPosition());*/
-	//playerCam->lookAt(player->_body->getNode()->getPosition());
 
 	if (lastKey == OIS::KC_M) {
 		gameManager->mute();
@@ -148,9 +146,9 @@ bool Application::update(const FrameEvent &evt) {
 				x += i*CHUNK_SIZE;
 		 		z += j*CHUNK_SIZE;
 
-				std::stringstream str;
-				str << "Chunks_" << x/CHUNK_SIZE << "_" << z/CHUNK_SIZE;
-				std::string name(str.str());
+				char buf[64];
+				sprintf(buf, "Chunk_%d,_%d", x / CHUNK_SIZE, z / CHUNK_SIZE);
+				std::string name(buf);
 
 				// Object persists
 				if(prevChunks[name]) {
@@ -184,9 +182,9 @@ bool Application::update(const FrameEvent &evt) {
 					x += i*CHUNK_SIZE;
 					z += j*CHUNK_SIZE;
 
-					std::stringstream str;
-					str << "Chunks_" << x / CHUNK_SIZE << "_" << z / CHUNK_SIZE;
-					std::string name(str.str());
+					char buf[64];
+					sprintf(buf, "Chunk_%d,_%d", x / CHUNK_SIZE, z / CHUNK_SIZE);
+					std::string name(buf);
 
 					if (chunks[name]) {
 						chunks[name]->addChunksToSimulator();
