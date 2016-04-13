@@ -80,7 +80,7 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 	static const int firBreadth = 7;
 
 	if ( type == Biome::GRASS && rand()%400 != 5 ) return;
-	if ( type == Biome::SNOW && rand()%1000 != 5 ) return;
+	if ( type == Biome::SNOW && rand()%3000 != 5 ) return;
 	if ( type == Biome::SAND && rand()%2000 != 5 ) return;
 
 	// Describes the shape of the leaves, think of each 5x5 grid as another layer

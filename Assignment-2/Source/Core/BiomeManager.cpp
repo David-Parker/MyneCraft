@@ -9,31 +9,23 @@ BiomeManager::BiomeManager(Ogre::SceneManager* smgr) : mSceneManager(smgr) {
 
 
 Biome* BiomeManager::inBiome(int x, int y) {
-	std::string nme = getBiomeName(x, y);
+	std::pair<int, int> pair = std::pair<int, int>(x/biomeGridSize, y/biomeGridSize);
 
-	if ( biomeGrid[nme] )
-		return biomeGrid[nme];
+	if ( biomeGrid[pair] )
+		return biomeGrid[pair];
 	else {
-		if ( true ) { //rand()%2 == 0 ) {
+		if ( true ) {
 			int cX = rand()%400 - 200 + ((int)(x/biomeGridSize))*biomeGridSize + biomeGridSize/2;
 			int cY = rand()%400 - 200 + ((int)(y/biomeGridSize))*biomeGridSize + biomeGridSize/2;
 			int rad = rand()%biomeRadiusVariance + minBiomeRadius;
-			biomeGrid[nme] = createBiome((Biome::BiomeType)(rand()%2+1), cX, cY, rad);
-			return biomeGrid[nme];
+			biomeGrid[pair] = createBiome((Biome::BiomeType)(rand()%2+1), cX, cY, rad);
+			return biomeGrid[pair];
 		}
-		else
-			return nullptr;
 	}
 }
 
 Biome* BiomeManager::createBiome(Biome::BiomeType type, int x, int y, int r) {
 	return new Biome(mSceneManager, type, x, y, r);
-}
-
-std::string BiomeManager::getBiomeName(int x, int z) {
-	char buf[64];
-	sprintf(buf, "Biome_%d_%d", x / biomeGridSize, z / biomeGridSize);
-	return std::string(buf);
 }
 
 Ogre::Entity* BiomeManager::getTerrain(Biome::BiomeType type) {
