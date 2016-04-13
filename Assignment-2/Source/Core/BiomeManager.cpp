@@ -1,7 +1,7 @@
 #include "BiomeManager.h"
 
 BiomeManager::BiomeManager(Ogre::SceneManager* smgr) : mSceneManager(smgr) {
-	worldBiomes.push_back(createBiome(Biome::SAND, 500, 500, 400));
+	worldBiomes.push_back(createBiome(Biome::SAND, 0, 0, 0));
 	grassMesh = worldBiomes.at(0)->getEntity(Biome::GRASS);
 	snowMesh = worldBiomes.at(0)->getEntity(Biome::SNOW);
 	sandMesh = worldBiomes.at(0)->getEntity(Biome::SAND);
@@ -11,12 +11,27 @@ BiomeManager::BiomeManager(Ogre::SceneManager* smgr) : mSceneManager(smgr) {
 Biome* BiomeManager::inBiome(int x, int y) {
 	std::pair<int, int> pair = std::pair<int, int>(x/biomeGridSize, y/biomeGridSize);
 
+	pair.first = x < 0 ? -(pair.first+1) : pair.first;
+	pair.second = y < 0 ? -(pair.second+1) : pair.second;
+
 	if ( biomeGrid[pair] )
 		return biomeGrid[pair];
 	else {
 		if ( true ) {
-			int cX = (rand()%400) - 200 + ((int)(x/biomeGridSize))*biomeGridSize + biomeGridSize/2;
-			int cY = (rand()%400) - 200 + ((int)(y/biomeGridSize))*biomeGridSize + biomeGridSize/2;
+			int cX = pair.first * biomeGridSize;
+			int cY = pair.second * biomeGridSize;
+			if ( cX >= 0 ) {
+				cX += biomeGridSize/2;
+			}
+			else {
+				cX += biomeGridSize/2;
+			}
+			if ( cY >= 0 ) {
+				cY += biomeGridSize/2;
+			}
+			else {
+				cY += biomeGridSize/2;
+			}
 			int rad = rand()%biomeRadiusVariance + minBiomeRadius;
 			int rndType = rand()%2+1;
 			biomeGrid[pair] = createBiome((Biome::BiomeType)(rndType), cX, cY, rad);
