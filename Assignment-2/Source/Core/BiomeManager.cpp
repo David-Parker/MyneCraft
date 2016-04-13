@@ -14,7 +14,7 @@ Biome* BiomeManager::inBiome(int x, int y) {
 	if ( biomeGrid[nme] )
 		return biomeGrid[nme];
 	else {
-		if ( rand()%2 == 0 ) {
+		if ( true ) { //rand()%2 == 0 ) {
 			int cX = rand()%400 - 200 + ((int)(x/biomeGridSize))*biomeGridSize + biomeGridSize/2;
 			int cY = rand()%400 - 200 + ((int)(y/biomeGridSize))*biomeGridSize + biomeGridSize/2;
 			int rad = rand()%biomeRadiusVariance + minBiomeRadius;

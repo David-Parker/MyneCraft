@@ -70,8 +70,11 @@ void Chunk::addChunksToSimulator() {
 void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 
 	static const int breadth = 5;
+	static const int firHeight = 5;
+	static const int firBreadth = 7;
 
 	if ( type == Biome::GRASS && rand()%400 != 5 ) return;
+	if ( type == Biome::SNOW && rand()%1000 != 5 ) return;
 	if ( type == Biome::SAND && rand()%2000 != 5 ) return;
 
 	// Describes the shape of the leaves, think of each 5x5 grid as another layer
@@ -80,6 +83,14 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 												{ { 0, 1, 0, 1, 0 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 }, { 0, 1, 1, 1, 0 } },
 												{ { 0, 1, 1, 1, 0 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 }, { 1, 0, 0, 0, 1 }, { 0, 1, 1, 1, 0 } },
 												{ { 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 } } };
+
+	bool firTree[firBreadth][firHeight][firBreadth] = {		{ { 0, 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 } },
+															{ { 0, 1, 1, 1, 1, 1, 0 }, { 0, 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 } },
+															{ { 1, 1, 1, 0, 1, 1, 1 }, { 0, 1, 1, 0, 1, 1, 0 }, { 0, 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 } },
+															{ { 1, 1, 0, 0, 0, 1, 1 }, { 1, 1, 0, 0, 0, 1, 1 }, { 0, 1, 1, 0, 1, 1, 0 }, { 0, 0, 1, 0, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 } },
+															{ { 1, 1, 1, 0, 1, 1, 1 }, { 0, 1, 1, 0, 1, 1, 0 }, { 0, 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 } },
+															{ { 0, 1, 1, 1, 1, 1, 0 }, { 0, 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 } },
+															{ { 0, 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 } } };
 	
 	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
 
@@ -106,6 +117,24 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 			}
 			break;
 		case Biome::SNOW:
+			//Fir Tree
+			for (int i = 0; i < firBreadth; i++) {
+				for (int j = 0; j < firHeight; j++) {
+					for (int k = 0; k < firBreadth; k++) {
+						if (firTree[i][j][k]) {
+							StaticObject* firBlock = new StaticObject(_biome->getEntity(Biome::ICE), Biome::ICE, scale, pos + Ogre::Vector3((i - 3)*CHUNK_SCALE_FULL, (2*j+3)*CHUNK_SCALE_FULL, (k - 3)*CHUNK_SCALE_FULL), _simulator);
+							_staticObjects.push_back(firBlock);
+							_sg->addEntity(firBlock->_geom, firBlock->_pos, firBlock->_orientation, firBlock->_scale);
+						}
+					}
+				}
+			}
+			//Trunk
+			for (int i = 0 ; i <= firHeight*2 ; i++ ) {
+				StaticObject* firBlock = new StaticObject(_biome->getEntity(Biome::WOOD), Biome::WOOD, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator);
+				_staticObjects.push_back(firBlock);
+				_sg->addEntity(firBlock->_geom, firBlock->_pos, firBlock->_orientation, firBlock->_scale);
+			}
 			break;
 		case Biome::SAND:
 			//Cactus
