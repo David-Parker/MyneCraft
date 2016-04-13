@@ -15,7 +15,8 @@ static Ogre::Entity* grassTree = nullptr;
 static Ogre::Entity* snowTree = nullptr;
 static Ogre::Entity* sandTree = nullptr;
 
-static int biomeGridSize = 1500;
+static int biomeGridSize = 1600;
+static int positionVariance = 200;
 static int minBiomeRadius = 500;
 static int biomeRadiusVariance = 200;
 

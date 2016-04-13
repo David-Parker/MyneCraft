@@ -13,7 +13,7 @@ Biome::Biome(Ogre::SceneManager* smgr, BiomeType type, int x, int y, int r) : mS
 
 
 bool Biome::inBiome(int x, int y) {
-	return (abs(x - centerX) < radius || abs(y - centerY) < radius);
+	return (abs((x < 0 ? -x : x) - (centerX < 0 ? -centerX : centerX)) < radius || abs((y < 0 ? -y : y) - (centerY < 0 ? -centerY : centerY)) < radius);
 }
 
 Ogre::Entity* Biome::getCubeEntity(int x, int y, int h, BiomeType& type) {
