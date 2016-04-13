@@ -19,7 +19,7 @@ public:
 	~Biome(void);
 
 	bool inBiome(int, int);
-	Ogre::Entity* getCubeEntity(int, int, int, BiomeType*);
+	Ogre::Entity* getCubeEntity(int, int, int, BiomeType&);
 	Ogre::Entity* getTreeEntity(BiomeType type);
 	Ogre::Entity* getEntity(BiomeType);
 	BiomeType getType() { return biomeType; }

@@ -16,7 +16,7 @@ bool Biome::inBiome(int x, int y) {
 	return (abs(x - centerX) < radius || abs(y - centerY) < radius);
 }
 
-Ogre::Entity* Biome::getCubeEntity(int x, int y, int h, BiomeType* type) {
+Ogre::Entity* Biome::getCubeEntity(int x, int y, int h, BiomeType& type) {
 	int dSq = ((centerX - x) * (centerX - x)) + ((centerY - y) * (centerY - y));
 	float rSQoN = radius * radius / 9;
 	int rnd = rand()%20;
@@ -26,15 +26,15 @@ Ogre::Entity* Biome::getCubeEntity(int x, int y, int h, BiomeType* type) {
 			|| (dSq < 7 * rSQoN && rnd < 9)
 			|| (dSq < 8 * rSQoN && rnd < 4)
 			|| (dSq < 9 * rSQoN && rnd < 1) ) {
-		*type = biomeType;
+		type = biomeType;
 		return getEntity(biomeType);
 	}
 	else if ( h >= 15 && dSq > 6 * rSQoN ) {
-		*type = SNOW;
+		type = SNOW;
 		return getEntity(SNOW);
 	}
 	else {
-		*type = GRASS;
+		type = GRASS;
 		return getEntity(GRASS);
 	}
 }

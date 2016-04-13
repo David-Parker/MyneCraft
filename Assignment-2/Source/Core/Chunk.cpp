@@ -26,13 +26,19 @@ Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager
 			Biome::BiomeType tempType;
 
 			if(y >= 15 && curBiome != nullptr ) {
-				if ( curBiome->getType() != Biome::SAND )
-					so = new StaticObject(curBiome->getCubeEntity(i, j, y, &tempType), tempType, scale, pos, sim);
+				if (curBiome->getType() != Biome::SAND) {
+					Ogre::Entity* type = curBiome->getCubeEntity(i, j, y, tempType);
+					so = new StaticObject(type, tempType, scale, pos, sim);
+				}
 			}
-			if ( curBiome != nullptr )
-				so = new StaticObject(curBiome->getCubeEntity(i, j, y, &tempType), tempType, scale, pos, sim);
-			else
+			if (curBiome != nullptr) {
+				Ogre::Entity* type = curBiome->getCubeEntity(i, j, y, tempType);
+				so = new StaticObject(type, tempType, scale, pos, sim);
+			}
+				
+			else {
 				so = new StaticObject(biomeMgr->getTerrain(Biome::GRASS), Biome::GRASS, scale, pos, sim);
+			}
 
 			createTree(pos, so->_cubeType);
 
