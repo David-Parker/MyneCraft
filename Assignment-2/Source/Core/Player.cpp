@@ -38,7 +38,7 @@ void Player::update(OISManager* ois) {
 		_body->canJump = false;
 	}
 	if (ois->isKeyDown(OIS::KC_LSHIFT)) {
-		speed = 15000;
+		speed = 5000;
 	}
 	else {
 		speed = 2500;

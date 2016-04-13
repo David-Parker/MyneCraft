@@ -15,10 +15,11 @@ Biome* BiomeManager::inBiome(int x, int y) {
 		return biomeGrid[pair];
 	else {
 		if ( true ) {
-			int cX = rand()%400 - 200 + ((int)(x/biomeGridSize))*biomeGridSize + biomeGridSize/2;
-			int cY = rand()%400 - 200 + ((int)(y/biomeGridSize))*biomeGridSize + biomeGridSize/2;
+			int cX = (rand()%400) - 200 + ((int)(x/biomeGridSize))*biomeGridSize + biomeGridSize/2;
+			int cY = (rand()%400) - 200 + ((int)(y/biomeGridSize))*biomeGridSize + biomeGridSize/2;
 			int rad = rand()%biomeRadiusVariance + minBiomeRadius;
-			biomeGrid[pair] = createBiome((Biome::BiomeType)(rand()%2+1), cX, cY, rad);
+			int rndType = rand()%2+1;
+			biomeGrid[pair] = createBiome((Biome::BiomeType)(rndType), cX, cY, rad);
 			return biomeGrid[pair];
 		}
 	}
