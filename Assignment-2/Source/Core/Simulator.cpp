@@ -28,29 +28,11 @@ void Simulator::addObject (StaticObject* o) {
 void Simulator::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, const Ogre::Real fixedTimestep) {
 	dynamicsWorld->stepSimulation(elapsedTime, maxSubSteps, fixedTimestep);
 
-	// Compare each object to every other
-	for (auto& outer : objList) {
-		// Clear the all previous hits
-		outer->cCallBack->ctxt.hit = false;
-		for (auto& inner : objList) {
-			if (outer == inner) continue;
-			// Compare if a contact is happening between these two gameobjects
-			dynamicsWorld->contactPairTest(outer->getBody(), inner->getBody(), *(outer->cCallBack));
-			outer->update();
-			outer->cCallBack->ctxt.hit = false;
-		}
+	for(auto& var : objList) {
+		dynamicsWorld->contactTest(var->getBody(), *(var->cCallBack));
+		var->update();
+		var->cCallBack->ctxt.hit = false;
 	}
-
-	// Compare objects to static objects
-	for (auto& outer : objList) {
-		outer->cCallBack->ctxt.hit = false;
-		for (auto& inner : objListStatic) {
-			dynamicsWorld->contactPairTest(outer->getBody(), inner->getBody(), *(outer->cCallBack));
-			outer->update();
-			outer->cCallBack->ctxt.hit = false;
-		}
-	}
-	// TODO refactor collision check for optimization and add iteration of objListStatic
 }
 
 void Simulator::removeStaticObjects() {

@@ -1,6 +1,8 @@
 #include "Chunk.h"
 
-Chunk::Chunk(const std::string& name, int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeManager* biomeMgr, Perlin* perlin, Simulator* sim) : _name(name), _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
+Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeManager* biomeMgr, Perlin* perlin, Simulator* sim) : _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
+
+	_name = getChunkName(xStart, yStart);
 
 	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
 	_scale = scale;

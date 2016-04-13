@@ -2,12 +2,13 @@
 #include <Ogre.h>
 
 #include <vector>
+#include <utility>
 
 #include "StaticObject.h"
 #include "BiomeManager.h"
 #include "Perlin.h"
 
-#define CHUNK_SIZE 24
+#define CHUNK_SIZE 16
 #define CHUNK_SCALE 50
 #define CHUNK_SCALE_FULL 100
 class Chunk {
@@ -22,7 +23,7 @@ private:
 	void createTree(const Ogre::Vector3&, Biome::BiomeType);
 
 public:
-	Chunk(const std::string&, int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*);
+	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*);
 	~Chunk();
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();

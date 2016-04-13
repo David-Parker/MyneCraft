@@ -129,12 +129,12 @@ bool Application::update(const FrameEvent &evt) {
 
 		float fx = (pos.x / CHUNK_SCALE_FULL) - (CHUNK_SIZE / 2);
 		float fz = (pos.z / CHUNK_SCALE_FULL) - (CHUNK_SIZE / 2);
-		int numChunks = (fieldOfView*1.2 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
+		int numChunks = (fieldOfView*1.1 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
 
 		int currX = ((int)fx - ((int)fx % CHUNK_SIZE));
 		int currZ = ((int)fz - ((int)fz % CHUNK_SIZE));
 
-		std::unordered_map<std::string, Chunk*> chunks;
+		std::unordered_map<std::pair<int,int>, Chunk*> chunks;
 
 		// Check for new chunks in FOV proximity to create
 		for(int i = -numChunks; i <= numChunks; i++) {
@@ -146,14 +146,16 @@ bool Application::update(const FrameEvent &evt) {
 				x += i*CHUNK_SIZE;
 		 		z += j*CHUNK_SIZE;
 
-				std::string name = getChunkName(x, z);
+		 		std::pair<int, int> name(x ,z);
+
+				// std::string name = getChunkName(x, z);
 
 				// Object persists
 				if(prevChunks[name]) {
 					chunks[name] = prevChunks[name];
 				}
 				else if(!chunks[name]) {
-					chunks[name] = new Chunk(name, x, z, mSceneManager, biomeManager, perlin, _simulator);
+					chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator);
 				}
 			}
 		}
@@ -180,7 +182,8 @@ bool Application::update(const FrameEvent &evt) {
 					x += i*CHUNK_SIZE;
 					z += j*CHUNK_SIZE;
 
-					std::string name = getChunkName(x, z);
+					// std::string name = getChunkName(x, z);
+					std::pair<int, int> name(x ,z);
 
 					if (chunks[name]) {
 						chunks[name]->addChunksToSimulator();
@@ -592,8 +595,8 @@ void Application::resetNetManager() {
 	} 
 }
 
-Chunk* Application::getChunk(std::unordered_map<std::string, Chunk*>& chunks, int x, int z) {
-	std::string name = getChunkName(x, z);
+Chunk* Application::getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int x, int z) {
+	std::pair<int, int> name(x,z);
 
 	if (chunks[name]) return chunks[name];
 	else return nullptr;

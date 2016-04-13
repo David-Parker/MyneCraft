@@ -26,6 +26,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <vector>
+#include <utility>
 
 #include "Perlin.h"
 #include "NetManager.h"
@@ -37,6 +38,27 @@
 #include "Chunk.h"
 #include "BiomeManager.h"
 #include "Player.h"
+
+template <class T>
+inline void hash_combine(std::size_t & seed, const T & v)
+{
+  std::hash<T> hasher;
+  seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+namespace std
+{
+  template<typename S, typename T> struct hash<pair<S, T>>
+  {
+    inline size_t operator()(const pair<S, T> & v) const
+    {
+      size_t seed = 0;
+      ::hash_combine(seed, v.first);
+      ::hash_combine(seed, v.second);
+      return seed;
+    }
+  };
+}
 
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
@@ -72,7 +94,7 @@ public:
 
 	Perlin* perlin;
 	
-	std::unordered_map<std::string, Chunk*> prevChunks;
+	std::unordered_map<std::pair<int,int>, Chunk*> prevChunks;
 	Chunk* currentChunk = nullptr;
 
 	int points;
@@ -118,5 +140,6 @@ public:
 	void showGui();
 	void resetNetManager();
 
-	Chunk* getChunk(std::unordered_map<std::string, Chunk*>& chunks,int, int);
+	Chunk* getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& chunks,int, int);
 };
+
