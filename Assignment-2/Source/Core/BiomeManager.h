@@ -3,12 +3,34 @@
 #include <vector>
 #include <math.h>
 #include <utility>
-#include <map>
+#include <unordered_map>
 
 #include <Ogre.h>
 
 #include "Biome.h"
 #include "StaticObject.h"
+
+// TODO Put in its own file
+template <class T>
+inline void hash_combine(std::size_t & seed, const T & v)
+{
+  std::hash<T> hasher;
+  seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+namespace std
+{
+  template<typename S, typename T> struct hash<pair<S, T>>
+  {
+    inline size_t operator()(const pair<S, T> & v) const
+    {
+      size_t seed = 0;
+      ::hash_combine(seed, v.first);
+      ::hash_combine(seed, v.second);
+      return seed;
+    }
+  };
+}
 
 
 static Ogre::Entity* grassTree = nullptr;
@@ -32,7 +54,7 @@ public:
 protected:
 	Biome* createBiome(Biome::BiomeType, int, int, int);
 	std::string getBiomeName(int, int);
-	std::map<std::pair<int, int>, Biome*> biomeGrid;
+	std::unordered_map<std::pair<int, int>, Biome*> biomeGrid;
 	std::vector<Biome*> worldBiomes;
 	Ogre::SceneManager* mSceneManager;
 	Ogre::Entity* grassMesh;
