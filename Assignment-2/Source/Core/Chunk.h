@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <utility>
+#include <list>
 
 #include "StaticObject.h"
 #include "BiomeManager.h"
@@ -14,7 +15,7 @@
 class Chunk {
 private:
 	Ogre::StaticGeometry* _sg;
-	std::vector<StaticObject*> _staticObjects;
+	std::list<StaticObject*> _staticObjects;
 	std::string _name;
 	Simulator* _simulator;
 	Ogre::SceneManager* _mSceneManager;
