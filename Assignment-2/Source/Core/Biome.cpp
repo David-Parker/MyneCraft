@@ -6,6 +6,7 @@ Biome::Biome(Ogre::SceneManager* smgr, BiomeType type, int x, int y, int r) : mS
 	snowCube = mSceneManager->createEntity("Cube-Snow.mesh");
 	iceCube = mSceneManager->createEntity("Cube-Ice.mesh");
 	sandCube = mSceneManager->createEntity("Cube-Sand.mesh");
+	rockCube = mSceneManager->createEntity("Cube-Rock.mesh");
 	woodCube = mSceneManager->createEntity("Cube-Wood.mesh");
 	leafCube = mSceneManager->createEntity("Cube-Leaves.mesh");
 	cactusCube = mSceneManager->createEntity("Cube-Cactus.mesh");
@@ -39,18 +40,13 @@ Ogre::Entity* Biome::getCubeEntity(int x, int y, int h, BiomeType& type) {
 	}
 }
 
-Ogre::Entity* Biome::getTreeEntity(BiomeType type) {
-	switch ( type ) {
-		default: return nullptr;
-	}
-}
-
 Ogre::Entity* Biome::getEntity(BiomeType type) {
 	switch ( type ) {
 		case GRASS: return grassCube;
 		case SNOW: return snowCube;
 		case ICE: return iceCube;
 		case SAND: return sandCube;
+		case ROCK: return rockCube;
 		case WOOD: return woodCube;
 		case LEAF: return leafCube;
 		case CACTUS: return cactusCube;

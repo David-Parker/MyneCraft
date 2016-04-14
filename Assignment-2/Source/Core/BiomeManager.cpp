@@ -5,27 +5,26 @@ BiomeManager::BiomeManager(Ogre::SceneManager* smgr) : mSceneManager(smgr) {
 	grassMesh = worldBiomes.at(0)->getEntity(Biome::GRASS);
 	snowMesh = worldBiomes.at(0)->getEntity(Biome::SNOW);
 	sandMesh = worldBiomes.at(0)->getEntity(Biome::SAND);
+	rockMesh = worldBiomes.at(0)->getEntity(Biome::ROCK);
 }
 
 
 Biome* BiomeManager::inBiome(int x, int y) {
 	std::pair<int, int> pair = std::pair<int, int>(x/biomeGridSize, y/biomeGridSize);
 
-	pair.first = x < 0 ? -(pair.first+1) : pair.first;
-	pair.second = y < 0 ? -(pair.second+1) : pair.second;
+	pair.first = x < 0 ? pair.first-1 : pair.first;
+	pair.second = y < 0 ? pair.second-1 : pair.second;
 
 	if ( biomeGrid[pair] )
 		return biomeGrid[pair];
 	else {
-		if ( true ) {
-			int cX = pair.first * biomeGridSize + biomeGridSize/2 + (rand()%positionVariance) - positionVariance/2;
-			int cY = pair.second * biomeGridSize + biomeGridSize/2 + (rand()%positionVariance) - positionVariance/2;
-			int rad = rand()%biomeRadiusVariance + minBiomeRadius;
-			int rndType = rand()%2+1;
-			
-			biomeGrid[pair] = createBiome((Biome::BiomeType)(rndType), cX, cY, rad);
-			return biomeGrid[pair];
-		}
+		int cX = pair.first * biomeGridSize + biomeGridSize/2 + (rand()%positionVariance) - positionVariance/2;
+		int cY = pair.second * biomeGridSize + biomeGridSize/2 + (rand()%positionVariance) - positionVariance/2;
+		int rad = rand()%biomeRadiusVariance + minBiomeRadius;
+		int rndType = rand()%3;
+		
+		biomeGrid[pair] = createBiome((Biome::BiomeType)(rndType), cX, cY, rad);
+		return biomeGrid[pair];
 	}
 }
 
@@ -38,15 +37,7 @@ Ogre::Entity* BiomeManager::getTerrain(Biome::BiomeType type) {
 		case Biome::GRASS: return grassMesh;
 		case Biome::SNOW: return snowMesh;
 		case Biome::SAND: return sandMesh;
-	}
-	return nullptr;
-}
-
-Ogre::Entity* BiomeManager::getTreeEntity(Biome::BiomeType type) {
-	switch ( type ) {
-		case Biome::GRASS: return grassTree;
-		case Biome::SNOW: return snowTree;
-		case Biome::SAND: return sandTree;
+		case Biome::ROCK: return rockMesh;
 	}
 	return nullptr;
 }

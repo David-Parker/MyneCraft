@@ -32,15 +32,10 @@ namespace std
   };
 }
 
-
-static Ogre::Entity* grassTree = nullptr;
-static Ogre::Entity* snowTree = nullptr;
-static Ogre::Entity* sandTree = nullptr;
-
-static int biomeGridSize = 1600;
-static int positionVariance = 200;
-static int minBiomeRadius = 500;
-static int biomeRadiusVariance = 200;
+static int biomeGridSize = 1500;
+static int positionVariance = 100;
+static int minBiomeRadius = 600;
+static int biomeRadiusVariance = 100;
 
 class BiomeManager {
 public:
@@ -49,7 +44,6 @@ public:
 
 	Biome* inBiome(int, int);
 	Ogre::Entity* getTerrain(Biome::BiomeType);
-	Ogre::Entity* getTreeEntity(Biome::BiomeType);
 
 protected:
 	Biome* createBiome(Biome::BiomeType, int, int, int);
@@ -60,4 +54,5 @@ protected:
 	Ogre::Entity* grassMesh;
 	Ogre::Entity* snowMesh;
 	Ogre::Entity* sandMesh;
+	Ogre::Entity* rockMesh;
 };
