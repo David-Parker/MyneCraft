@@ -8,7 +8,7 @@ material Cube-Rock
     {
         pass Cube-Rock
         {
-            emissive 1.0 1.0 1.0 1.0
+            emissive 0.6 0.6 0.6 0.6
 
             alpha_to_coverage off
             colour_write on
