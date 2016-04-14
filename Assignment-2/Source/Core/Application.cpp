@@ -163,6 +163,7 @@ bool Application::update(const FrameEvent &evt) {
 		for(auto& var : prevChunks) {
 			if(!chunks[var.first]) {
 				delete var.second;
+				var.second = nullptr;
 			}
 		}
 
@@ -193,7 +194,16 @@ bool Application::update(const FrameEvent &evt) {
 			currentChunk = chunk;
 		}	
 
+		// Hide the block we're sitting on
+		if(chunk != nullptr) {
+			StaticObject* block = chunk->getBlock(pos.x, pos.z);
+
+			if(block != nullptr) {
+				// std::cout << "X: " << block->_pos.x << " Z: " << block->_pos.z << std::endl;
+			}
+		}
 	}
+
 	catch (Exception e) {
 		std::cout << e.what() << std::endl;
 		std::cout << currentChunk->getName() << std::endl;

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <utility>
-#include <list>
+#include <unordered_map>
 
 #include "StaticObject.h"
 #include "BiomeManager.h"
@@ -15,7 +15,7 @@
 class Chunk {
 private:
 	Ogre::StaticGeometry* _sg;
-	std::list<StaticObject*> _staticObjects;
+	std::unordered_map<std::pair<int,int>, StaticObject*> _staticObjects;
 	std::string _name;
 	Simulator* _simulator;
 	Ogre::SceneManager* _mSceneManager;
@@ -28,6 +28,7 @@ public:
 	~Chunk();
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
+	StaticObject* getBlock(float x, float z);
 	std::string getName() { return _name; }
 	Ogre::Vector3 _scale;
 	int _xStart = 0;
