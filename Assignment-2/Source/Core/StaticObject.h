@@ -54,5 +54,12 @@ public:
 	void setOrientation(Ogre::Quaternion qt);
 	void cleanUpBody();
 
+	StaticObject* top = nullptr;
+	StaticObject* bottom = nullptr;
+	StaticObject* left = nullptr;
+	StaticObject* right = nullptr;
+	StaticObject* front = nullptr;
+	StaticObject* back = nullptr;
+
 	virtual void update();
 };

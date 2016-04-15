@@ -1,7 +1,7 @@
 #include "Chunk.h"
 #include "MultiPlatformHelper.h"
 
-Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeManager* biomeMgr, Perlin* perlin, Simulator* sim) : _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
+Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeManager* biomeMgr, Perlin* perlin, Simulator* sim) : _biomeMgr(biomeMgr), _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
 
 	_name = getChunkName(xStart, yStart);
 
@@ -18,7 +18,9 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 	Biome* curBiome = biomeMgr->inBiome(_xStart, _yStart);
 
 	for (int i = xStart; i < _xEnd; ++i) {
+
 		for (int j = yStart; j < _yEnd; ++j) {
+
 			float fi = (float)i / (float)100.0f;
 			float fj = (float)j / (float)100.0f;
 
@@ -54,6 +56,81 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 	_sg->setRegionDimensions(Ogre::Vector3(3000, 300, 3000));
 	_sg->build();
+}
+
+void Chunk::generateNeighborPointers() {
+	for (int i = _xStart; i < _xEnd; ++i) {
+		for (int j = _yStart; j < _yEnd; ++j) {
+		std::pair<int, int> currIndex(i*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
+		StaticObject* curr = _staticObjects[currIndex];
+		if(curr == nullptr) assert(!"Static object must exist");
+
+			if(i == 0) {
+			// Back pointer
+				std::pair<int, int> index((i+1)*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
+				StaticObject* obj = _staticObjects[index];
+				// if(obj == nullptr) assert(!"Static object must exist");
+
+				curr->back = obj;
+			}
+			if(j == 0) {
+			// Right pointer
+				std::pair<int, int> index((i)*CHUNK_SCALE_FULL, (j+1)*CHUNK_SCALE_FULL);
+				StaticObject* obj = _staticObjects[index];
+				// if(obj == nullptr) assert(!"Static object must exist");
+
+				curr->right = obj;
+			}
+			if(i == _xEnd - 1) {
+			// Front pointer
+				std::pair<int, int> index((i-1)*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
+				StaticObject* obj = _staticObjects[index];
+				// if(obj == nullptr) assert(!"Static object must exist");
+
+				curr->front = obj;
+			}
+			if(j == _yEnd - 1) {
+			// Left pointer
+				std::pair<int, int> index((i)*CHUNK_SCALE_FULL, (j-1)*CHUNK_SCALE_FULL);
+				StaticObject* obj = _staticObjects[index];
+				// if(obj == nullptr) assert(!"Static object must exist");
+
+				curr->left = obj;
+			}
+			// Inner cube
+			if( (i > 0 && i < _xEnd - 1) && (j > 0 && j < _yEnd - 1) ) {
+				// All neighbors
+				// back pointer
+				std::pair<int, int> backindex((i+1)*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
+				StaticObject* backobj = _staticObjects[backindex];
+				// if(backobj == nullptr) assert(!"Static object must exist");
+
+				curr->back = backobj;
+
+				// Right pointer
+				std::pair<int, int> rightindex((i)*CHUNK_SCALE_FULL, (j+1)*CHUNK_SCALE_FULL);
+				StaticObject* rightobj = _staticObjects[rightindex];
+				// if(rightobj == nullptr) assert(!"Static object must exist");
+
+				curr->right = rightobj;
+
+				// front pointer
+				std::pair<int, int> frontindex((i-1)*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
+				StaticObject* frontobj = _staticObjects[frontindex];
+				// if(frontobj == nullptr) assert(!"Static object must exist");
+
+				curr->front = frontobj;
+
+				// Left pointer
+				std::pair<int, int> leftindex((i)*CHUNK_SCALE_FULL, (j-1)*CHUNK_SCALE_FULL);
+				StaticObject* leftobj = _staticObjects[leftindex];
+				// if(leftobj == nullptr) assert(!"Static object must exist");
+
+				curr->left = leftobj;
+
+			}
+		}
+	}
 }
 
 Chunk::~Chunk() {
@@ -94,6 +171,15 @@ void Chunk::removeBlock(StaticObject* obj) {
 		if (so.second == nullptr) continue;
 		_sg->addEntity(so.second->_geom, so.second->_pos, so.second->_orientation, so.second->_scale);
 	}
+
+	if(obj->bottom == nullptr) {
+		Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
+		Ogre::Vector3 pos(obj->_pos.x, obj->_pos.y - CHUNK_SCALE_FULL, obj->_pos.z);
+		StaticObject* so = new StaticObject(_biomeMgr->getTerrain(Biome::GRASS), Biome::GRASS, scale, pos, _simulator);
+		_staticObjects[index] = so;
+		_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+	}
+
 	_sg->build();
 }
 

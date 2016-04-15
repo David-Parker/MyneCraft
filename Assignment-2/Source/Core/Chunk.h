@@ -20,6 +20,7 @@ private:
 	Simulator* _simulator;
 	Ogre::SceneManager* _mSceneManager;
 	Biome* _biome;
+	BiomeManager* _biomeMgr;
 
 	void createTree(const Ogre::Vector3&, Biome::BiomeType);
 
@@ -31,11 +32,13 @@ public:
 	StaticObject* getBlock(float x, float z);
 	void removeBlock(StaticObject* obj);
 	std::string getName() { return _name; }
+	void generateNeighborPointers();
 	Ogre::Vector3 _scale;
 	int _xStart = 0;
 	int _xEnd = 0;
 	int _yStart = 0;
 	int _yEnd = 0;
+	bool modified = false;
 };
 
 inline static std::string getChunkName(int x, int z) {

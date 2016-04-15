@@ -194,8 +194,8 @@ bool Application::update(const FrameEvent &evt) {
 
 				chunk = getChunk(chunks, currX, currZ);
 
-				for(int i = -numChunks; i <= numChunks; i++) {
-					for(int j = -numChunks; j <= numChunks; j++) {
+				for(int i = -1; i <= 1; i++) {
+					for(int j = -1; j <= 1; j++) {
 
 						int x = currX;
 						int z = currZ;
@@ -216,6 +216,10 @@ bool Application::update(const FrameEvent &evt) {
 									std::stringstream str;
 									// str << "X: " << block->_pos.x << " Z: " << block->_pos.z << std::endl;
 									// MultiPlatformHelper::print(str.str());
+									if(!chunk->modified) {
+										chunk->generateNeighborPointers();
+										chunk->modified = true;
+									}
 									chunk->removeBlock(block);
 									recomputeColliders(chunks, currX, currZ);
 								}
@@ -225,7 +229,8 @@ bool Application::update(const FrameEvent &evt) {
 						}
 					}
 				}
-			}	
+			}
+			_oisManager->mouseClicked = false;	
 		}
 	}
 
