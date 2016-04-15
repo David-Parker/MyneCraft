@@ -245,6 +245,7 @@ bool OISManager::mousePressed( const OIS::MouseEvent &e, OIS::MouseButtonID id )
 #ifdef _DEBUG
     CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertButton(id));
 #endif
+    mouseClicked  = true;
     if(cameraMan) cameraMan->injectMouseDown(e, id);
     return true;
 }
@@ -253,6 +254,7 @@ bool OISManager::mouseReleased( const OIS::MouseEvent &e, OIS::MouseButtonID id 
 #ifdef _DEBUG
     CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertButton(id));
 #endif
+    mouseClicked  = false;
     if(cameraMan) cameraMan->injectMouseUp(e, id);
     return true;
 }

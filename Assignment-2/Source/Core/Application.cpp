@@ -170,25 +170,7 @@ bool Application::update(const FrameEvent &evt) {
 		// Add only the current chunk's static objects to the bullet simulation
 		Chunk* chunk = getChunk(chunks, currX, currZ);
 		if (chunk != currentChunk) {
-			// Remove the old static objects currently in the simulator
-			_simulator->removeStaticObjects();
-
-			for (int i = -1; i <= 1; i++) {
-				for (int j = -1; j <= 1; j++) {
-					int x = currX;
-					int z = currZ;
-
-					x += i*CHUNK_SIZE;
-					z += j*CHUNK_SIZE;
-
-					// std::string name = getChunkName(x, z);
-					std::pair<int, int> name(x ,z);
-
-					if (chunks[name]) {
-						chunks[name]->addChunksToSimulator();
-					}
-				}
-			}
+			recomputeColliders(chunks, currX, currZ);
 			currentChunk = chunk;
 		}	
 
@@ -199,31 +181,52 @@ bool Application::update(const FrameEvent &evt) {
 			currZ -= CHUNK_SIZE;
 		}
 
-		Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
-		btVector3 start(pos.x, pos.y, pos.z);
-		btVector3 end = start + btVector3(norm.x, norm.y, norm.z) * 10;
-		btVector3 hitPos;
+		if(_oisManager->mouseClicked) {
+			Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
+			btVector3 start(pos.x, pos.y, pos.z);
+			btVector3 end = start + btVector3(norm.x, norm.y, norm.z) * 1000;
+			btVector3 hitPos;
 
-		if (_simulator->rayHit(start, end, hitPos)) {
-			std::stringstream str;
-			str << "X: " << hitPos.x() << " Z: " << hitPos.z() << std::endl;
-			MultiPlatformHelper::print(str.str());
+			if (_simulator->rayHit(start, end, hitPos)) {
+				std::stringstream str;
+				// str << "X: " << hitPos.x() << " Z: " << hitPos.z() << std::endl;
+				MultiPlatformHelper::print(str.str());
+
+				chunk = getChunk(chunks, currX, currZ);
+
+				for(int i = -numChunks; i <= numChunks; i++) {
+					for(int j = -numChunks; j <= numChunks; j++) {
+
+						int x = currX;
+						int z = currZ;
+
+						x += i*CHUNK_SIZE;
+				 		z += j*CHUNK_SIZE;
+
+				 		std::pair<int, int> name(x ,z);
+
+						// Object persists
+						if(chunks[name]) {
+							chunk = chunks[name];
+							// Hide the block we're sitting on
+							if(chunk != nullptr) {
+								StaticObject* block = chunk->getBlock(hitPos.x(), hitPos.z());
+
+								if(block != nullptr) {
+									std::stringstream str;
+									// str << "X: " << block->_pos.x << " Z: " << block->_pos.z << std::endl;
+									// MultiPlatformHelper::print(str.str());
+									chunk->removeBlock(block);
+									recomputeColliders(chunks, currX, currZ);
+								}
+								// else MultiPlatformHelper::print("Block null\n");
+							}
+							// else MultiPlatformHelper::print("Chunk null\n");
+						}
+					}
+				}
+			}	
 		}
-
-		//chunk = getChunk(chunks, currX, currZ);
-		//// Hide the block we're sitting on
-		//if(chunk != nullptr) {
-		//	StaticObject* block = chunk->getBlock(pos.x, pos.z);
-
-		//	if(block != nullptr) {
-		//		std::stringstream str;
-		//		str << "X: " << block->_pos.x << " Z: " << block->_pos.z << std::endl;
-		//		MultiPlatformHelper::print(str.str());
-		//		chunk->removeBlock(block);
-		//	}
-		//	else MultiPlatformHelper::print("Block null\n");
-		//}
-		//else MultiPlatformHelper::print("Chunk null\n");
 	}
 
 	catch (Exception e) {
@@ -632,4 +635,26 @@ Chunk* Application::getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& ch
 
 	if (chunks[name]) return chunks[name];
 	else return nullptr;
+}
+
+void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int currX, int currZ) {
+// Remove the old static objects currently in the simulator
+	_simulator->removeStaticObjects();
+
+	for (int i = -1; i <= 1; i++) {
+		for (int j = -1; j <= 1; j++) {
+			int x = currX;
+			int z = currZ;
+
+			x += i*CHUNK_SIZE;
+			z += j*CHUNK_SIZE;
+
+			// std::string name = getChunkName(x, z);
+			std::pair<int, int> name(x ,z);
+
+			if (chunks[name]) {
+				chunks[name]->addChunksToSimulator();
+			}
+		}
+	}
 }

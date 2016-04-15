@@ -120,5 +120,6 @@ public:
 	void resetNetManager();
 
 	Chunk* getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& chunks,int, int);
+	void recomputeColliders(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int, int);
 };
 

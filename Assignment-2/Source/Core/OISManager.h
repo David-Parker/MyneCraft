@@ -49,6 +49,8 @@ public:
     OIS::KeyCode getKeyPressed();
     OIS::KeyCode lastKeyPressed();
 
+    bool mouseClicked = false;
+
 private:
     OISManager( void );
     OISManager( const OISManager& ) { }
