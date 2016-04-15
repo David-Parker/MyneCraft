@@ -29,6 +29,7 @@ public:
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
 	StaticObject* getBlock(float x, float z);
+	void removeBlock(StaticObject* obj);
 	std::string getName() { return _name; }
 	Ogre::Vector3 _scale;
 	int _xStart = 0;

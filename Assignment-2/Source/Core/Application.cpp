@@ -127,8 +127,8 @@ bool Application::update(const FrameEvent &evt) {
 
 	try {
 
-		float fx = (pos.x / CHUNK_SCALE_FULL) - (CHUNK_SIZE / 2);
-		float fz = (pos.z / CHUNK_SCALE_FULL) - (CHUNK_SIZE / 2);
+		float fx = (pos.x / CHUNK_SCALE_FULL);
+		float fz = (pos.z / CHUNK_SCALE_FULL);
 		int numChunks = (fieldOfView*1.1 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
 
 		int currX = ((int)fx - ((int)fx % CHUNK_SIZE));
@@ -147,8 +147,6 @@ bool Application::update(const FrameEvent &evt) {
 		 		z += j*CHUNK_SIZE;
 
 		 		std::pair<int, int> name(x ,z);
-
-				// std::string name = getChunkName(x, z);
 
 				// Object persists
 				if(prevChunks[name]) {
@@ -194,14 +192,27 @@ bool Application::update(const FrameEvent &evt) {
 			currentChunk = chunk;
 		}	
 
+		if (pos.x < 0) {
+			currX -= CHUNK_SIZE;
+		}
+		if (pos.z < 0) {
+			currZ -= CHUNK_SIZE;
+		}
+
+		chunk = getChunk(chunks, currX, currZ);
 		// Hide the block we're sitting on
 		if(chunk != nullptr) {
 			StaticObject* block = chunk->getBlock(pos.x, pos.z);
 
 			if(block != nullptr) {
-				// std::cout << "X: " << block->_pos.x << " Z: " << block->_pos.z << std::endl;
+				std::stringstream str;
+				str << "X: " << block->_pos.x << " Z: " << block->_pos.z << std::endl;
+				MultiPlatformHelper::print(str.str());
+				chunk->removeBlock(block);
 			}
+			else MultiPlatformHelper::print("Block null\n");
 		}
+		else MultiPlatformHelper::print("Chunk null\n");
 	}
 
 	catch (Exception e) {
