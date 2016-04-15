@@ -199,20 +199,31 @@ bool Application::update(const FrameEvent &evt) {
 			currZ -= CHUNK_SIZE;
 		}
 
-		chunk = getChunk(chunks, currX, currZ);
-		// Hide the block we're sitting on
-		if(chunk != nullptr) {
-			StaticObject* block = chunk->getBlock(pos.x, pos.z);
+		Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
+		btVector3 start(pos.x, pos.y, pos.z);
+		btVector3 end = start + btVector3(norm.x, norm.y, norm.z) * 10;
+		btVector3 hitPos;
 
-			if(block != nullptr) {
-				std::stringstream str;
-				str << "X: " << block->_pos.x << " Z: " << block->_pos.z << std::endl;
-				MultiPlatformHelper::print(str.str());
-				chunk->removeBlock(block);
-			}
-			else MultiPlatformHelper::print("Block null\n");
+		if (_simulator->rayHit(start, end, hitPos)) {
+			std::stringstream str;
+			str << "X: " << hitPos.x() << " Z: " << hitPos.z() << std::endl;
+			MultiPlatformHelper::print(str.str());
 		}
-		else MultiPlatformHelper::print("Chunk null\n");
+
+		//chunk = getChunk(chunks, currX, currZ);
+		//// Hide the block we're sitting on
+		//if(chunk != nullptr) {
+		//	StaticObject* block = chunk->getBlock(pos.x, pos.z);
+
+		//	if(block != nullptr) {
+		//		std::stringstream str;
+		//		str << "X: " << block->_pos.x << " Z: " << block->_pos.z << std::endl;
+		//		MultiPlatformHelper::print(str.str());
+		//		chunk->removeBlock(block);
+		//	}
+		//	else MultiPlatformHelper::print("Block null\n");
+		//}
+		//else MultiPlatformHelper::print("Chunk null\n");
 	}
 
 	catch (Exception e) {

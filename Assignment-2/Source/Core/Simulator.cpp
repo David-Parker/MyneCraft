@@ -42,3 +42,16 @@ void Simulator::removeStaticObjects() {
 	}
 	objListStatic.clear();
 }
+
+bool Simulator::rayHit(const btVector3& start, const btVector3& end, btVector3& hitPos) {
+	btCollisionWorld::ClosestRayResultCallback RayCallback(start, end);
+
+	dynamicsWorld->rayTest(start, end, RayCallback);
+
+	if (RayCallback.hasHit()) {
+		hitPos = RayCallback.m_hitPointWorld;
+		return true;
+	}
+
+	return false;
+}
