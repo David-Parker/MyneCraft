@@ -10,7 +10,6 @@ material Cube-Rock
         {
             ambient 0.800000011920929 0.800000011920929 0.800000011920929 1.0
             diffuse 0.6400000190734865 0.6400000190734865 0.6400000190734865 1.0
-            specular 0.5 0.5 0.5 1.0 12.5
 
             alpha_to_coverage off
             colour_write on
@@ -31,7 +30,7 @@ material Cube-Rock
 
             texture_unit 
             {
-                texture cobblestone.jpg
+                texture cobblestone.jpg 2d 1
                 tex_address_mode wrap
                 scale 1.0 1.0
                 colour_op modulate

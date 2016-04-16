@@ -29,7 +29,7 @@ material Cube-Snow
 
             texture_unit 
             {
-                texture snow-map.png
+                texture snow-map.png 2d 0
                 tex_address_mode wrap
                 scale 1.0 1.0
                 colour_op modulate
