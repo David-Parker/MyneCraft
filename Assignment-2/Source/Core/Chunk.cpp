@@ -59,6 +59,15 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 }
 
 void Chunk::generateNeighborPointers() {
+	//for (auto& var : _staticObjects) {
+	//	// top
+	//	key topIndex = getKey(var.second->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+	//	// bottom
+	//}
+
+
+
+
 	//for (int i = _xStart; i < _xEnd; ++i) {
 	//	for (int j = _yStart; j < _yEnd; ++j) {
 	//	key currIndex(i*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);

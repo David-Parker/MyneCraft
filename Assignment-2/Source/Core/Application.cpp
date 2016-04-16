@@ -192,7 +192,11 @@ bool Application::update(const FrameEvent &evt) {
 			int iz = (int)hitPos.z();
 
 			ix = ix - (ix % CHUNK_SCALE_FULL);
-			iy = iy - (iy % CHUNK_SCALE_FULL);
+
+			if (iy >= 0)
+				iy = iy - (iy % CHUNK_SCALE_FULL);
+			else iy = iy - (iy % CHUNK_SCALE_FULL) - CHUNK_SCALE_FULL;
+
 			iz = iz - (iz % CHUNK_SCALE_FULL);
 
 			highlight->getNode()->setVisible(true);
