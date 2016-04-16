@@ -27,7 +27,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 			int y = (int)((perlin->getPerlin(fi, fj)) * steepness);
 
 			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
-			std::pair<int, int> index((int)pos.x, (int)pos.z);
+			key index = getKey(pos);
 			StaticObject* so;
 			Biome::BiomeType tempType;
 
@@ -61,13 +61,13 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 void Chunk::generateNeighborPointers() {
 	for (int i = _xStart; i < _xEnd; ++i) {
 		for (int j = _yStart; j < _yEnd; ++j) {
-		std::pair<int, int> currIndex(i*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
+		key currIndex(i*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
 		StaticObject* curr = _staticObjects[currIndex];
 		if(curr == nullptr) assert(!"Static object must exist");
 
 			if(i == 0) {
 			// Back pointer
-				std::pair<int, int> index((i+1)*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
+				key index = getKey((i+1)*CHUNK_SCALE_FULL, 0, j*CHUNK_SCALE_FULL);
 				StaticObject* obj = _staticObjects[index];
 				// if(obj == nullptr) assert(!"Static object must exist");
 
@@ -75,7 +75,7 @@ void Chunk::generateNeighborPointers() {
 			}
 			if(j == 0) {
 			// Right pointer
-				std::pair<int, int> index((i)*CHUNK_SCALE_FULL, (j+1)*CHUNK_SCALE_FULL);
+				key index = getKey((i)*CHUNK_SCALE_FULL, 0, (j+1)*CHUNK_SCALE_FULL);
 				StaticObject* obj = _staticObjects[index];
 				// if(obj == nullptr) assert(!"Static object must exist");
 
@@ -83,7 +83,7 @@ void Chunk::generateNeighborPointers() {
 			}
 			if(i == _xEnd - 1) {
 			// Front pointer
-				std::pair<int, int> index((i-1)*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
+				key index = getKey((i-1)*CHUNK_SCALE_FULL, 0, j*CHUNK_SCALE_FULL);
 				StaticObject* obj = _staticObjects[index];
 				// if(obj == nullptr) assert(!"Static object must exist");
 
@@ -91,7 +91,7 @@ void Chunk::generateNeighborPointers() {
 			}
 			if(j == _yEnd - 1) {
 			// Left pointer
-				std::pair<int, int> index((i)*CHUNK_SCALE_FULL, (j-1)*CHUNK_SCALE_FULL);
+				key index = getKey((i)*CHUNK_SCALE_FULL, 0, (j-1)*CHUNK_SCALE_FULL);
 				StaticObject* obj = _staticObjects[index];
 				// if(obj == nullptr) assert(!"Static object must exist");
 
@@ -101,28 +101,28 @@ void Chunk::generateNeighborPointers() {
 			if( (i > 0 && i < _xEnd - 1) && (j > 0 && j < _yEnd - 1) ) {
 				// All neighbors
 				// back pointer
-				std::pair<int, int> backindex((i+1)*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
+				key backindex = getKey((i+1)*CHUNK_SCALE_FULL, 0, j*CHUNK_SCALE_FULL);
 				StaticObject* backobj = _staticObjects[backindex];
 				// if(backobj == nullptr) assert(!"Static object must exist");
 
 				curr->back = backobj;
 
 				// Right pointer
-				std::pair<int, int> rightindex((i)*CHUNK_SCALE_FULL, (j+1)*CHUNK_SCALE_FULL);
+				key rightindex = getKey((i)*CHUNK_SCALE_FULL, 0, (j+1)*CHUNK_SCALE_FULL);
 				StaticObject* rightobj = _staticObjects[rightindex];
 				// if(rightobj == nullptr) assert(!"Static object must exist");
 
 				curr->right = rightobj;
 
 				// front pointer
-				std::pair<int, int> frontindex((i-1)*CHUNK_SCALE_FULL, j*CHUNK_SCALE_FULL);
+				key frontindex = getKey((i-1)*CHUNK_SCALE_FULL, 0, j*CHUNK_SCALE_FULL);
 				StaticObject* frontobj = _staticObjects[frontindex];
 				// if(frontobj == nullptr) assert(!"Static object must exist");
 
 				curr->front = frontobj;
 
 				// Left pointer
-				std::pair<int, int> leftindex((i)*CHUNK_SCALE_FULL, (j-1)*CHUNK_SCALE_FULL);
+				key leftindex = getKey((i)*CHUNK_SCALE_FULL, 0, (j-1)*CHUNK_SCALE_FULL);
 				StaticObject* leftobj = _staticObjects[leftindex];
 				// if(leftobj == nullptr) assert(!"Static object must exist");
 
@@ -158,7 +158,7 @@ void Chunk::addChunksToSimulator() {
 
 void Chunk::removeBlock(StaticObject* obj) {
 	if (obj == nullptr) assert(!"Block was null");
-	std::pair<int, int> index((int)obj->_pos.x, (int)obj->_pos.z);
+	key index = getKey(obj->_pos);
 	std::stringstream str;
 	str << "Rem X: " << obj->_pos.x << " Rem Z: " << obj->_pos.z << std::endl;
 
@@ -191,7 +191,7 @@ StaticObject* Chunk::getBlock(float x, float z) {
 	ix = ix - (ix % CHUNK_SCALE_FULL);
 	iz = iz - (iz % CHUNK_SCALE_FULL);
 
-	std::pair<int,int> index(ix,iz);
+	key index = getKey(ix,0,iz);
 
 	StaticObject* theObj = _staticObjects[index];
 
@@ -232,7 +232,7 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 			// Trunk
 			for (int i = 1; i <= 3; i++) {
 				StaticObject* treeLimb = new StaticObject(_biome->getEntity(Biome::WOOD), Biome::WOOD, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator);
-				std::pair<int, int> index((int)treeLimb->_pos.x, (int)treeLimb->_pos.z);
+				key index = getKey(treeLimb->_pos);
 				_staticObjects[index] = treeLimb;
 				_sg->addEntity(treeLimb->_geom, treeLimb->_pos, treeLimb->_orientation, treeLimb->_scale);
 			}
@@ -243,7 +243,7 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 					for (int k = 0; k < breadth; k++) {
 						if (leaves[i][j][k]) {
 							StaticObject* treeLimb = new StaticObject(_biome->getEntity(Biome::LEAF), Biome::LEAF, scale, pos + Ogre::Vector3((i - 2)*CHUNK_SCALE_FULL, (j + breadth - 1)*CHUNK_SCALE_FULL, (k - 2)*CHUNK_SCALE_FULL), _simulator);
-							std::pair<int, int> index((int)treeLimb->_pos.x, (int)treeLimb->_pos.z);
+							key index = getKey(treeLimb->_pos);
 							_staticObjects[index] = treeLimb;
 							_sg->addEntity(treeLimb->_geom, treeLimb->_pos, treeLimb->_orientation, treeLimb->_scale);
 						}
@@ -258,7 +258,7 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 					for (int k = 0; k < firBreadth; k++) {
 						if (firTree[i][j][k]) {
 							StaticObject* firBlock = new StaticObject(_biome->getEntity(Biome::ICE), Biome::ICE, scale, pos + Ogre::Vector3((i - 3)*CHUNK_SCALE_FULL, (2*j+3)*CHUNK_SCALE_FULL, (k - 3)*CHUNK_SCALE_FULL), _simulator);
-							std::pair<int, int> index((int)firBlock->_pos.x, (int)firBlock->_pos.z);
+							key index = getKey(firBlock->_pos);
 							_staticObjects[index] = firBlock;
 							_sg->addEntity(firBlock->_geom, firBlock->_pos, firBlock->_orientation, firBlock->_scale);
 						}
@@ -268,7 +268,7 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 			//Trunk
 			for (int i = 0 ; i <= firHeight*2 ; i++ ) {
 				StaticObject* firBlock = new StaticObject(_biome->getEntity(Biome::WOOD), Biome::WOOD, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator);
-				std::pair<int, int> index((int)firBlock->_pos.x, (int)firBlock->_pos.z);
+				key index = getKey(firBlock->_pos);
 				_staticObjects[index] = firBlock;
 				_sg->addEntity(firBlock->_geom, firBlock->_pos, firBlock->_orientation, firBlock->_scale);
 			}
@@ -277,59 +277,67 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 			//Cactus
 			for (int i = 1; i <= 10; i++) {
 				StaticObject* stalk = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator);
-				std::pair<int, int> index((int)stalk->_pos.x, (int)stalk->_pos.z);
+				key index = getKey(stalk->_pos);
 				_staticObjects[index] = stalk;
 				_sg->addEntity(stalk->_geom, stalk->_pos, stalk->_orientation, stalk->_scale);
 			}
 			//Arms
 			if ( rand()%2 ) {
 				StaticObject* armConnector1 = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(CHUNK_SCALE_FULL, 4*CHUNK_SCALE_FULL, 0), _simulator);
-				std::pair<int, int> index((int)armConnector1->_pos.x, (int)armConnector1->_pos.z);
+				key index = getKey(armConnector1->_pos);
 				_staticObjects[index] = armConnector1;
 				_sg->addEntity(armConnector1->_geom, armConnector1->_pos, armConnector1->_orientation, armConnector1->_scale);
 			
 				StaticObject* armConnector2 = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(-CHUNK_SCALE_FULL, 4*CHUNK_SCALE_FULL, 0), _simulator);
-				std::pair<int, int> index2((int)armConnector2->_pos.x, (int)armConnector2->_pos.z);
+				key index2 = getKey(armConnector2->_pos);
 				_staticObjects[index2] = armConnector2;
 				_sg->addEntity(armConnector2->_geom, armConnector2->_pos, armConnector2->_orientation, armConnector2->_scale);
 				
 				for (int i = 4; i <= 8; i++) {
 					StaticObject* armBlock = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(2*CHUNK_SCALE_FULL, i*CHUNK_SCALE_FULL, 0), _simulator);
-					std::pair<int, int> index((int)armBlock->_pos.x, (int)armBlock->_pos.z);
+					key index = getKey(armBlock->_pos);
 					_staticObjects[index] = armBlock;
 					_sg->addEntity(armBlock->_geom, armBlock->_pos, armBlock->_orientation, armBlock->_scale);
 				}
 				for (int i = 4; i <= 9; i++) {
 					StaticObject* armBlock = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(-2*CHUNK_SCALE_FULL, i*CHUNK_SCALE_FULL, 0), _simulator);
-					std::pair<int, int> index((int)armBlock->_pos.x, (int)armBlock->_pos.z);
+					key index = getKey(armBlock->_pos);
 					_staticObjects[index] = armBlock;
 					_sg->addEntity(armBlock->_geom, armBlock->_pos, armBlock->_orientation, armBlock->_scale);
 				}
 			}
 			else {
 				StaticObject* armConnector1 = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(0, 4*CHUNK_SCALE_FULL, CHUNK_SCALE_FULL), _simulator);
-				std::pair<int, int> index((int)armConnector1->_pos.x, (int)armConnector1->_pos.z);
+				key index = getKey(armConnector1->_pos);
 				_staticObjects[index] = armConnector1;
 				_sg->addEntity(armConnector1->_geom, armConnector1->_pos, armConnector1->_orientation, armConnector1->_scale);
 			
 				StaticObject* armConnector2 = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(0, 4*CHUNK_SCALE_FULL, -CHUNK_SCALE_FULL), _simulator);
-				std::pair<int, int> index2((int)armConnector2->_pos.x, (int)armConnector2->_pos.z);
+				key index2 = getKey(armConnector2->_pos);
 				_staticObjects[index2] = armConnector2;
 				_sg->addEntity(armConnector2->_geom, armConnector2->_pos, armConnector2->_orientation, armConnector2->_scale);
 				
 				for (int i = 4; i <= 8; i++) {
 					StaticObject* armBlock = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 2*CHUNK_SCALE_FULL), _simulator);
-					std::pair<int, int> index((int)armBlock->_pos.x, (int)armBlock->_pos.z);
+					key index = getKey(armBlock->_pos);
 					_staticObjects[index] = armBlock;
 					_sg->addEntity(armBlock->_geom, armBlock->_pos, armBlock->_orientation, armBlock->_scale);
 				}
 				for (int i = 4; i <= 9; i++) {
 					StaticObject* armBlock = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, -2*CHUNK_SCALE_FULL), _simulator);
-					std::pair<int, int> index((int)armBlock->_pos.x, (int)armBlock->_pos.z);
+					key index = getKey(armBlock->_pos);
 					_staticObjects[index] = armBlock;
 					_sg->addEntity(armBlock->_geom, armBlock->_pos, armBlock->_orientation, armBlock->_scale);
 				}
 			}
 			break;
 	}
+}
+
+Chunk::key Chunk::getKey(int x, int y, int z) {
+	return key(x,z);
+}
+
+Chunk::key Chunk::getKey(Ogre::Vector3& pos) {
+	return key((int)pos.x, (int)pos.z);
 }

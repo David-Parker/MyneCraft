@@ -14,8 +14,10 @@
 #define CHUNK_SCALE_FULL 100
 class Chunk {
 private:
+	typedef std::pair<int, int> key;
+
 	Ogre::StaticGeometry* _sg;
-	std::unordered_map<std::pair<int,int>, StaticObject*> _staticObjects;
+	std::unordered_map<key, StaticObject*> _staticObjects;
 	std::string _name;
 	Simulator* _simulator;
 	Ogre::SceneManager* _mSceneManager;
@@ -23,6 +25,8 @@ private:
 	BiomeManager* _biomeMgr;
 
 	void createTree(const Ogre::Vector3&, Biome::BiomeType);
+	key getKey(int x, int y, int z);
+	key getKey(Ogre::Vector3& pos);
 
 public:
 	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*);
