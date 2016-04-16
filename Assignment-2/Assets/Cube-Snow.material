@@ -1,13 +1,14 @@
 
 material Cube-Snow 
 {
-    receive_shadows off
+    receive_shadows on
 
     technique
     {
         pass Cube-Snow
         {
-            emissive 0.6 0.6 0.6 1.0
+            ambient 0.600000011920929 0.600000011920929 0.600000011920929 1.0
+            diffuse 0.8400000190734865 0.8400000190734865 0.8400000190734865 1.0
 
             alpha_to_coverage off
             colour_write on

@@ -12,12 +12,14 @@
 #define CHUNK_SIZE 16
 #define CHUNK_SCALE 50
 #define CHUNK_SCALE_FULL 100
+
+static StaticObject* air = nullptr;
+
 class Chunk {
 private:
 	typedef std::string key;
 
 	Ogre::StaticGeometry* _sg;
-	std::unordered_map<key, StaticObject*> _staticObjects;
 	std::string _name;
 	Simulator* _simulator;
 	Ogre::SceneManager* _mSceneManager;
@@ -28,15 +30,19 @@ private:
 	key getKey(int x, int y, int z);
 	key getKey(Ogre::Vector3& pos);
 
+	StaticObject* getObjFromChunks(const std::vector<Chunk*>& chunks, key index);
+
 public:
 	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*);
 	~Chunk();
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
 	StaticObject* getBlock(int x, int y, int z);
-	void removeBlock(StaticObject* obj);
+	void removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj);
 	std::string getName() { return _name; }
-	void generateNeighborPointers();
+
+	std::unordered_map<key, StaticObject*> _staticObjects;
+
 	Ogre::Vector3 _scale;
 	int _xStart = 0;
 	int _xEnd = 0;

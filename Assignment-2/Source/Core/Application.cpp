@@ -227,14 +227,27 @@ bool Application::update(const FrameEvent &evt) {
 								StaticObject* block = chunk->getBlock(ix, iy, iz);
 
 								if(block != nullptr) {
-									std::stringstream str;
-									// str << "X: " << block->_pos.x << " Z: " << block->_pos.z << std::endl;
-									// MultiPlatformHelper::print(str.str());
-									if(!chunk->modified) {
-										chunk->generateNeighborPointers();
-										chunk->modified = true;
-									}
-									chunk->removeBlock(block);
+									std::vector<Chunk*> chunklist;
+
+									std::pair<int, int> left(x - CHUNK_SIZE, z);
+									Chunk* leftChunk = chunks[left];
+
+									std::pair<int, int> right(x + CHUNK_SIZE, z);
+									Chunk* rightChunk = chunks[right];
+
+									std::pair<int, int> bottom(x, z - CHUNK_SIZE);
+									Chunk* bottomChunk = chunks[bottom];
+
+									std::pair<int, int> top(x, z + CHUNK_SIZE);
+									Chunk* topChunk = chunks[top];
+
+									chunklist.push_back(leftChunk);
+									chunklist.push_back(rightChunk);
+									chunklist.push_back(bottomChunk);
+									chunklist.push_back(topChunk);
+									chunklist.push_back(chunk);
+
+									chunk->removeBlock(chunklist, block);
 									recomputeColliders(chunks, currX, currZ);
 									break;
 								}
@@ -380,6 +393,7 @@ Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre:
 	Ogre::SceneNode* sn = mSceneManager->getSceneNode(nme);
 	Ogre::Entity* ent = SceneHelper::getEntity(mSceneManager, nme, 0);
 	ent->setMaterialName("highlight");
+	ent->setCastShadows(false);
 	const btTransform pos;
 	OgreMotionState* ms = new OgreMotionState(pos, sn);
 	sn->setScale(scale.x, scale.y, scale.z);
@@ -567,6 +581,19 @@ void Application::createObjects(void) {
 	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 1500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj);
 	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
+
+	mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
+
+	mSceneManager->setAmbientLight(Ogre::ColourValue(0.6, 0.6, 0.6));
+
+	Ogre::Light* directionalLight = mSceneManager->createLight("Sun");
+
+	directionalLight->setType(Ogre::Light::LightTypes::LT_DIRECTIONAL);
+	directionalLight->setCastShadows(true);
+	directionalLight->setDiffuseColour(Ogre::ColourValue(.6, .6, .6));
+	directionalLight->setSpecularColour(Ogre::ColourValue(.4, .4, .4));
+
+	directionalLight->setDirection(Ogre::Vector3(0, -1, .5));
 }
 /* 
 * End Initialization Methods

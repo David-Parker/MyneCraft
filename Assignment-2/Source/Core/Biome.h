@@ -14,7 +14,7 @@ static Ogre::Entity* cactusCube = nullptr;
 
 class Biome {
 public:
-	enum BiomeType{ SNOW, SAND, ROCK, GRASS, ICE, WOOD, LEAF, CACTUS, NUM_BIOMES };
+	enum BiomeType{ SNOW, SAND, ROCK, GRASS, ICE, WOOD, LEAF, CACTUS, AIR, NUM_BIOMES };
 
 	Biome(Ogre::SceneManager*, BiomeType, int, int, int);
 	~Biome(void);
