@@ -231,11 +231,11 @@ bool OISManager::mouseMoved( const OIS::MouseEvent &e ) {
     mouseYAxis = (e.state.Y.abs) - e.state.height/2;
 
 #ifdef _DEBUG
-    CEGUI::System &sys = CEGUI::System::getSingleton();
-    sys.getDefaultGUIContext().injectMousePosition(e.state.X.abs, e.state.Y.abs);
-    // Scroll wheel.
-    if (e.state.Z.rel)
-        sys.getDefaultGUIContext().injectMouseWheelChange(e.state.Z.rel / 120.0f);
+    //CEGUI::System &sys = CEGUI::System::getSingleton();
+    //sys.getDefaultGUIContext().injectMousePosition(e.state.X.abs, e.state.Y.abs);
+    //// Scroll wheel.
+    //if (e.state.Z.rel)
+    //    sys.getDefaultGUIContext().injectMouseWheelChange(e.state.Z.rel / 120.0f);
 #endif
 
     return true;

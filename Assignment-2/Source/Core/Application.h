@@ -38,6 +38,7 @@
 #include "Chunk.h"
 #include "BiomeManager.h"
 #include "Player.h"
+#include "Cube.h"
 
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
@@ -58,6 +59,7 @@ public:
 	Ogre::Timer* t1;
 	BiomeManager* biomeManager;
 	Player* player;
+	Cube* highlight;
 
 	NetManager* netManager = nullptr;
 
@@ -97,6 +99,7 @@ public:
 	void createChildEntity(std::string name, std::string mesh, Ogre::SceneNode* sceneNode, int x, int y, int z);
 
 	PlayerObject* createPlayerObject(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim);
+	Cube* createCube(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim);
 	bool update(const Ogre::FrameEvent &evt);
 	bool handleGUI(const Ogre::FrameEvent &evt);
 	bool updateServer(const Ogre::FrameEvent &evt);

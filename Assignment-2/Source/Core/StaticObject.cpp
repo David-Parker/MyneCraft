@@ -8,7 +8,7 @@ StaticObject::StaticObject(Ogre::Entity* mesh, Biome::BiomeType ot, Ogre::Vector
 	auto size = var.getSize();
 
 	_inertia.setZero();
-	_shape = new btBoxShape(btVector3((var.getSize().x*scale.x) / 2, (var.getSize().y*scale.y) / 2, (var.getSize().z*scale.z) / 2));
+	_shape = new btBoxShape(btVector3(50, 50, 50));
 	_motionState = new btDefaultMotionState();
 
 }

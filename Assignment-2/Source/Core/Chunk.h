@@ -14,7 +14,7 @@
 #define CHUNK_SCALE_FULL 100
 class Chunk {
 private:
-	typedef std::pair<int, int> key;
+	typedef std::string key;
 
 	Ogre::StaticGeometry* _sg;
 	std::unordered_map<key, StaticObject*> _staticObjects;
@@ -33,7 +33,7 @@ public:
 	~Chunk();
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
-	StaticObject* getBlock(float x, float z);
+	StaticObject* getBlock(int x, int y, int z);
 	void removeBlock(StaticObject* obj);
 	std::string getName() { return _name; }
 	void generateNeighborPointers();

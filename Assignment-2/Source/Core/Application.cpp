@@ -181,13 +181,24 @@ bool Application::update(const FrameEvent &evt) {
 			currZ -= CHUNK_SIZE;
 		}
 
-		if(_oisManager->mouseClicked) {
-			Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
-			btVector3 start(pos.x, pos.y, pos.z);
-			btVector3 end = start + btVector3(norm.x, norm.y, norm.z) * 1000;
-			btVector3 hitPos;
+		Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
+		btVector3 start(pos.x, pos.y, pos.z);
+		btVector3 end = start + btVector3(norm.x, norm.y, norm.z) * 1000;
+		btVector3 hitPos;
 
-			if (_simulator->rayHit(start, end, hitPos)) {
+		if (_simulator->rayHit(start, end, hitPos)) {
+			int ix = (int)hitPos.x();
+			int iy = (int)hitPos.y();
+			int iz = (int)hitPos.z();
+
+			ix = ix - (ix % CHUNK_SCALE_FULL);
+			iy = iy - (iy % CHUNK_SCALE_FULL);
+			iz = iz - (iz % CHUNK_SCALE_FULL);
+
+			highlight->getNode()->setVisible(true);
+			highlight->setPosition(ix, iy, iz);
+
+				if (_oisManager->mouseClicked) {
 				std::stringstream str;
 				// str << "X: " << hitPos.x() << " Z: " << hitPos.z() << std::endl;
 				MultiPlatformHelper::print(str.str());
@@ -205,12 +216,11 @@ bool Application::update(const FrameEvent &evt) {
 
 				 		std::pair<int, int> name(x ,z);
 
-						// Object persists
 						if(chunks[name]) {
 							chunk = chunks[name];
 							// Hide the block we're sitting on
 							if(chunk != nullptr) {
-								StaticObject* block = chunk->getBlock(hitPos.x(), hitPos.z());
+								StaticObject* block = chunk->getBlock(ix, iy, iz);
 
 								if(block != nullptr) {
 									std::stringstream str;
@@ -222,15 +232,20 @@ bool Application::update(const FrameEvent &evt) {
 									}
 									chunk->removeBlock(block);
 									recomputeColliders(chunks, currX, currZ);
+									break;
 								}
-								// else MultiPlatformHelper::print("Block null\n");
+								//else MultiPlatformHelper::print("Block null\n");
 							}
 							// else MultiPlatformHelper::print("Chunk null\n");
 						}
 					}
 				}
+				_oisManager->mouseClicked = false;
 			}
-			_oisManager->mouseClicked = false;	
+		}
+		else {
+			// No ray hit
+			highlight->getNode()->setVisible(false);
 		}
 	}
 
@@ -352,6 +367,20 @@ PlayerObject* Application::createPlayerObject(Ogre::String nme, GameObject::obje
 
 	PlayerObject* obj = new PlayerObject(nme, tp, mSceneManager, ssm, sn, ent, ms, mySim, mss, rest, frict, scale, kinematic);
 	obj->addToSimulator();
+
+	return obj;
+}
+
+Cube* Application::createCube(Ogre::String nme, GameObject::objectType tp, Ogre::String meshName, int x, int y, int z, Ogre::Vector3 scale, Ogre::Degree pitch, Ogre::Degree yaw, Ogre::Degree roll, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, bool kinematic, Simulator* mySim) {
+	createRootEntity(nme, meshName, x*scale.x*2, y*scale.y*2, z*scale.z*2);
+	Ogre::SceneNode* sn = mSceneManager->getSceneNode(nme);
+	Ogre::Entity* ent = SceneHelper::getEntity(mSceneManager, nme, 0);
+	ent->setMaterialName("highlight");
+	const btTransform pos;
+	OgreMotionState* ms = new OgreMotionState(pos, sn);
+	sn->setScale(scale.x, scale.y, scale.z);
+
+	Cube* obj = new Cube(nme, tp, mSceneManager, ssm, sn, ent, ms, mySim, mss, rest, frict, scale, kinematic);
 
 	return obj;
 }
@@ -533,6 +562,7 @@ void Application::createObjects(void) {
 
 	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 1500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj);
+	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
 }
 /* 
 * End Initialization Methods
