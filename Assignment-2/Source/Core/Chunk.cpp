@@ -362,6 +362,6 @@ Chunk::key Chunk::getKey(int x, int y, int z) {
 	return std::string(buf);
 }
 
-Chunk::key Chunk::getKey(Ogre::Vector3& pos) {
+Chunk::key Chunk::getKey(const Ogre::Vector3& pos) {
 	return getKey((int)pos.x, (int)pos.y, (int)pos.z);
 }
