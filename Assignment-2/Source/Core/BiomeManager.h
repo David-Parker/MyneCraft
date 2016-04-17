@@ -45,6 +45,8 @@ public:
 	Biome* inBiome(int, int);
 	Ogre::Entity* getTerrain(Biome::BiomeType);
 
+	bool isTreeType(Biome::BiomeType);
+
 protected:
 	Biome* createBiome(Biome::BiomeType, int, int, int);
 	std::string getBiomeName(int, int);

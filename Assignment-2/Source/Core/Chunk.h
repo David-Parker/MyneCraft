@@ -38,6 +38,7 @@ public:
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
 	StaticObject* getBlock(int x, int y, int z);
+	Biome::BiomeType getGeneratedType(Biome::BiomeType objType);
 	void removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj);
 	std::string getName() { return _name; }
 
