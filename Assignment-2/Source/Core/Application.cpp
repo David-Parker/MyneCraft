@@ -103,6 +103,8 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 // Called once per predefined frame
 bool Application::update(const FrameEvent &evt) {
 
+	moveDayTime(evt.timeSinceLastFrame);
+
 	OIS::KeyCode lastKey = _oisManager->getKeyPressed();
 	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
 
@@ -567,7 +569,8 @@ void Application::setupLighting(void) {
 }
 
 void Application::createObjects(void) {
-	mSceneManager->setSkyDome(true, "Examples/CloudySky", 5, 8);
+	mSceneManager->setSkyDome(true, "day-night", 5, 8);
+	mSceneManager->getSkyDomeNode()->roll(Ogre::Degree(10));
 
 	int xmax = 128;
 	int ymax = xmax;
@@ -584,16 +587,16 @@ void Application::createObjects(void) {
 
 	mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
 
-	mSceneManager->setAmbientLight(Ogre::ColourValue(0.6, 0.6, 0.6));
+	mSceneManager->setAmbientLight(Ogre::ColourValue(0.2, 0.2, 0.2));
 
-	Ogre::Light* directionalLight = mSceneManager->createLight("Sun");
+	sun = mSceneManager->createLight("Sun");
 
-	directionalLight->setType(Ogre::Light::LightTypes::LT_DIRECTIONAL);
-	directionalLight->setCastShadows(true);
-	directionalLight->setDiffuseColour(Ogre::ColourValue(.6, .6, .6));
-	directionalLight->setSpecularColour(Ogre::ColourValue(.4, .4, .4));
+	sun->setType(Ogre::Light::LightTypes::LT_DIRECTIONAL);
+	sun->setCastShadows(false);
+	sun->setDiffuseColour(Ogre::ColourValue(.2, .2, .2));
+	sun->setSpecularColour(Ogre::ColourValue(.4, .4, .4));
 
-	directionalLight->setDirection(Ogre::Vector3(0, -1, .5));
+	sun->setDirection(Ogre::Vector3(0, -1, .5));
 }
 /* 
 * End Initialization Methods
@@ -723,4 +726,21 @@ void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chu
 			}
 		}
 	}
+}
+
+void Application::moveDayTime(float time) {
+	static float daySeconds = 300;
+	static float lastTime = 0;
+	static float minLight = .1;
+
+	float currTime = lastTime + time;
+	lastTime = currTime;
+	float intensity = Ogre::Math::Cos(Ogre::Math::PI / daySeconds * currTime)*.3 + .5;
+	float sunAngleX = Ogre::Math::Cos( (currTime * (Ogre::Math::PI) / daySeconds) + 3*Ogre::Math::PI/2);
+	float sunAngleY = Ogre::Math::Sin( (currTime * (Ogre::Math::PI) / daySeconds) + 3*Ogre::Math::PI/2);
+
+	mSceneManager->setAmbientLight(Ogre::ColourValue(intensity, intensity, intensity));
+
+	sun->setDiffuseColour(Ogre::ColourValue(intensity, intensity, intensity));
+	sun->setDirection(Ogre::Vector3(sunAngleX, sunAngleY, 0));
 }

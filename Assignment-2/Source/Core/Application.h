@@ -60,6 +60,7 @@ public:
 	BiomeManager* biomeManager;
 	Player* player;
 	Cube* highlight;
+	Ogre::Light* sun;
 
 	NetManager* netManager = nullptr;
 
@@ -124,5 +125,6 @@ public:
 
 	Chunk* getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& chunks,int, int);
 	void recomputeColliders(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int, int);
+	void moveDayTime(float time);
 };
 
