@@ -247,10 +247,10 @@ bool Application::update(const FrameEvent &evt) {
 					_oisManager->mouseClicked = false;
 				}
 			}
-			else {
-				// No ray hit
-				highlight->getNode()->setVisible(false);
-			}
+		}
+		else {
+			// No ray hit
+			highlight->getNode()->setVisible(false);
 		}
 	}
 
