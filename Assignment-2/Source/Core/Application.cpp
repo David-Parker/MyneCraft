@@ -193,18 +193,30 @@ bool Application::update(const FrameEvent &evt) {
 			int iy = (int)hitPos.y();
 			int iz = (int)hitPos.z();
 
-			ix = ix - (ix % CHUNK_SCALE_FULL);
+			int modX = ix % CHUNK_SCALE_FULL;
+			int modY = iy % CHUNK_SCALE_FULL;
+			int modZ = iz % CHUNK_SCALE_FULL;
+			
+			if (iy < 0)
+				iy = iy - CHUNK_SCALE_FULL;
 
-			if (iy >= 0)
-				iy = iy - (iy % CHUNK_SCALE_FULL);
-			else iy = iy - (iy % CHUNK_SCALE_FULL) - CHUNK_SCALE_FULL;
-
-			iz = iz - (iz % CHUNK_SCALE_FULL);
+			if ( modX >= CHUNK_SCALE )
+				ix = ix - modX + CHUNK_SCALE_FULL;
+			else
+				ix = ix - modX;
+			if ( modY >= CHUNK_SCALE )
+				iy = iy - modY + CHUNK_SCALE_FULL;
+			else
+				iy = iy - modY;
+			if ( modZ >= CHUNK_SCALE )
+				iz = iz - modZ + CHUNK_SCALE_FULL;
+			else
+				iz = iz - modZ;
 
 			highlight->getNode()->setVisible(true);
 			highlight->setPosition(ix, iy, iz);
 
-				if (_oisManager->mouseClicked) {
+			if (_oisManager->mouseClicked) {
 				std::stringstream str;
 				// str << "X: " << hitPos.x() << " Z: " << hitPos.z() << std::endl;
 				MultiPlatformHelper::print(str.str());
