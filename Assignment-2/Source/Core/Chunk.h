@@ -28,7 +28,7 @@ private:
 
 	void createTree(const Ogre::Vector3&, Biome::BiomeType);
 	key getKey(int x, int y, int z);
-	key getKey(Ogre::Vector3& pos);
+	key getKey(const Ogre::Vector3& pos);
 
 	StaticObject* getObjFromChunks(const std::vector<Chunk*>& chunks, key index);
 
