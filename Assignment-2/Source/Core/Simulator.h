@@ -26,6 +26,7 @@ protected:
        btAlignedObjectArray<btCollisionShape*> collisionShapes;
        std::deque<GameObject*> objList; 
        std::deque<StaticObject*> objListStatic;
+	   std::unordered_map<btCollisionObject*, StaticObject*> invertedObjectHash;
 public: 
        Simulator(); 
        ~Simulator(); 
@@ -35,5 +36,5 @@ public:
        bool removeObject(GameObject* o); 
        void stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps = 1, const Ogre::Real fixedTimestep = 1.0f/60.0f); 
 	   void removeStaticObjects();
-	   bool rayHit(const btVector3& start, const btVector3& end, btVector3& hitPos);
+	   bool rayHit(const btVector3& start, const btVector3& end, StaticObject*& obj);
 };

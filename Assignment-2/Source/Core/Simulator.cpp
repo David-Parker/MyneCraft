@@ -21,6 +21,7 @@ void Simulator::addObject (GameObject* o) {
 
 void Simulator::addObject (StaticObject* o) { 
   objListStatic.push_back(o); 
+  invertedObjectHash[o->getBody()] = o;
   dynamicsWorld->addCollisionObject(o->getBody());       
 }
 
@@ -41,15 +42,18 @@ void Simulator::removeStaticObjects() {
 		var->cleanUpBody();
 	}
 	objListStatic.clear();
+	invertedObjectHash.clear();
 }
 
-bool Simulator::rayHit(const btVector3& start, const btVector3& end, btVector3& hitPos) {
+bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObject*& obj) {
 	btCollisionWorld::ClosestRayResultCallback RayCallback(start, end);
 
 	dynamicsWorld->rayTest(start, end, RayCallback);
 
 	if (RayCallback.hasHit()) {
-		hitPos = RayCallback.m_hitPointWorld;
+		//hitPos = RayCallback.m_hitPointWorld;
+		//RayCallback.m_collisionObject
+		obj = invertedObjectHash[RayCallback.m_collisionObject];
 		return true;
 	}
 

@@ -85,7 +85,7 @@ public:
 
 	double fps = 300.0;
 #ifdef _WIN32
-	int fieldOfView = 20000;
+	int fieldOfView = 5000;
 #endif
 #ifdef __linux__
 	int fieldOfView = 20000;

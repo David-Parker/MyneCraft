@@ -186,85 +186,72 @@ bool Application::update(const FrameEvent &evt) {
 		Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
 		btVector3 start(pos.x, pos.y, pos.z);
 		btVector3 end = start + btVector3(norm.x, norm.y, norm.z) * 1000;
-		btVector3 hitPos;
+		StaticObject* hitObj = nullptr;
 
-		if (_simulator->rayHit(start, end, hitPos)) {
-			int ix = (int)hitPos.x();
-			int iy = (int)hitPos.y();
-			int iz = (int)hitPos.z();
-
-			ix = ix - (ix % CHUNK_SCALE_FULL);
-
-			if (iy >= 0)
-				iy = iy - (iy % CHUNK_SCALE_FULL);
-			else iy = iy - (iy % CHUNK_SCALE_FULL) - CHUNK_SCALE_FULL;
-
-			iz = iz - (iz % CHUNK_SCALE_FULL);
-
-			highlight->getNode()->setVisible(true);
-			highlight->setPosition(ix, iy, iz);
+		if (_simulator->rayHit(start, end, hitObj)) {
+			if (hitObj != nullptr) {
+				highlight->getNode()->setVisible(true);
+				highlight->setPosition(hitObj->_pos);
 
 				if (_oisManager->mouseClicked) {
-				std::stringstream str;
-				// str << "X: " << hitPos.x() << " Z: " << hitPos.z() << std::endl;
-				MultiPlatformHelper::print(str.str());
 
-				chunk = getChunk(chunks, currX, currZ);
+					chunk = getChunk(chunks, currX, currZ);
 
-				for(int i = -1; i <= 1; i++) {
-					for(int j = -1; j <= 1; j++) {
+					for (int i = -1; i <= 1; i++) {
+						for (int j = -1; j <= 1; j++) {
 
-						int x = currX;
-						int z = currZ;
+							int x = currX;
+							int z = currZ;
 
-						x += i*CHUNK_SIZE;
-				 		z += j*CHUNK_SIZE;
+							x += i*CHUNK_SIZE;
+							z += j*CHUNK_SIZE;
 
-				 		std::pair<int, int> name(x ,z);
+							std::pair<int, int> name(x, z);
 
-						if(chunks[name]) {
-							chunk = chunks[name];
-							// Hide the block we're sitting on
-							if(chunk != nullptr) {
-								StaticObject* block = chunk->getBlock(ix, iy, iz);
+							if (chunks[name]) {
+								chunk = chunks[name];
+								// Hide the block we're sitting on
+								if (chunk != nullptr) {
+									StaticObject* block = chunk->getBlock(hitObj->_pos.x, hitObj->_pos.y, hitObj->_pos.z);
 
-								if(block != nullptr) {
-									std::vector<Chunk*> chunklist;
+									if (block != nullptr) {
+										std::vector<Chunk*> chunklist;
 
-									std::pair<int, int> left(x - CHUNK_SIZE, z);
-									Chunk* leftChunk = chunks[left];
+										std::pair<int, int> left(x - CHUNK_SIZE, z);
+										Chunk* leftChunk = chunks[left];
 
-									std::pair<int, int> right(x + CHUNK_SIZE, z);
-									Chunk* rightChunk = chunks[right];
+										std::pair<int, int> right(x + CHUNK_SIZE, z);
+										Chunk* rightChunk = chunks[right];
 
-									std::pair<int, int> bottom(x, z - CHUNK_SIZE);
-									Chunk* bottomChunk = chunks[bottom];
+										std::pair<int, int> bottom(x, z - CHUNK_SIZE);
+										Chunk* bottomChunk = chunks[bottom];
 
-									std::pair<int, int> top(x, z + CHUNK_SIZE);
-									Chunk* topChunk = chunks[top];
+										std::pair<int, int> top(x, z + CHUNK_SIZE);
+										Chunk* topChunk = chunks[top];
 
-									chunklist.push_back(leftChunk);
-									chunklist.push_back(rightChunk);
-									chunklist.push_back(bottomChunk);
-									chunklist.push_back(topChunk);
-									chunklist.push_back(chunk);
+										chunklist.push_back(leftChunk);
+										chunklist.push_back(rightChunk);
+										chunklist.push_back(bottomChunk);
+										chunklist.push_back(topChunk);
+										chunklist.push_back(chunk);
 
-									chunk->removeBlock(chunklist, block);
-									recomputeColliders(chunks, currX, currZ);
-									break;
+										chunk->removeBlock(chunklist, block);
+										recomputeColliders(chunks, currX, currZ);
+										break;
+									}
+									//else MultiPlatformHelper::print("Block null\n");
 								}
-								//else MultiPlatformHelper::print("Block null\n");
+								// else MultiPlatformHelper::print("Chunk null\n");
 							}
-							// else MultiPlatformHelper::print("Chunk null\n");
 						}
 					}
+					_oisManager->mouseClicked = false;
 				}
-				_oisManager->mouseClicked = false;
 			}
-		}
-		else {
-			// No ray hit
-			highlight->getNode()->setVisible(false);
+			else {
+				// No ray hit
+				highlight->getNode()->setVisible(false);
+			}
 		}
 	}
 
