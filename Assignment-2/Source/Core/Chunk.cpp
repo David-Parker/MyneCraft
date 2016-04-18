@@ -88,6 +88,8 @@ void Chunk::addChunksToSimulator() {
 
 void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 	if (obj == nullptr) assert(!"Block was null");
+	if (obj == air) return;
+	
 	key index = getKey(obj->_pos);
 	std::stringstream str;
 	str << "Rem X: " << obj->_pos.x << " Rem Z: " << obj->_pos.z << std::endl;
@@ -113,6 +115,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 		if (topObj == nullptr) {
 			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
 			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, topPos, _simulator);
+			if(so == nullptr) assert(!"StaticObject is null");
 			_staticObjects[topIndex] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}

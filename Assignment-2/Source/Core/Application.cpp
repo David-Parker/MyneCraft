@@ -194,7 +194,6 @@ bool Application::update(const FrameEvent &evt) {
 				highlight->setPosition(hitObj->_pos);
 
 				if (_oisManager->mouseClicked) {
-
 					chunk = getChunk(chunks, currX, currZ);
 
 					for (int i = -1; i <= 1; i++) {
