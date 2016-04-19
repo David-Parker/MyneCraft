@@ -550,13 +550,21 @@ void Application::setupGM(void) {
 
 void Application::setupLighting(void) {
 
-	// mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+	mSceneManager->setAmbientLight(Ogre::ColourValue(0.2, 0.2, 0.2));
+
+	sun = mSceneManager->createLight("Sun");
+
+	sun->setType(Ogre::Light::LightTypes::LT_DIRECTIONAL);
+	sun->setCastShadows(false);
+	sun->setDiffuseColour(Ogre::ColourValue(.2, .2, .2));
+	sun->setSpecularColour(Ogre::ColourValue(.4, .4, .4));
+
+	sun->setDirection(Ogre::Vector3(0, -1, .5));
 
 }
 
 void Application::createObjects(void) {
 	mSceneManager->setSkyDome(true, "day-night", 5, 8);
-	mSceneManager->getSkyDomeNode()->roll(Ogre::Degree(10));
 
 	int xmax = 128;
 	int ymax = xmax;
@@ -570,19 +578,6 @@ void Application::createObjects(void) {
 	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 1500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj);
 	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
-
-	mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
-
-	mSceneManager->setAmbientLight(Ogre::ColourValue(0.2, 0.2, 0.2));
-
-	sun = mSceneManager->createLight("Sun");
-
-	sun->setType(Ogre::Light::LightTypes::LT_DIRECTIONAL);
-	sun->setCastShadows(false);
-	sun->setDiffuseColour(Ogre::ColourValue(.2, .2, .2));
-	sun->setSpecularColour(Ogre::ColourValue(.4, .4, .4));
-
-	sun->setDirection(Ogre::Vector3(0, -1, .5));
 }
 /* 
 * End Initialization Methods
@@ -704,7 +699,6 @@ void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chu
 			x += i*CHUNK_SIZE;
 			z += j*CHUNK_SIZE;
 
-			// std::string name = getChunkName(x, z);
 			std::pair<int, int> name(x ,z);
 
 			if (chunks[name]) {

@@ -51,8 +51,6 @@ bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObjec
 	dynamicsWorld->rayTest(start, end, RayCallback);
 
 	if (RayCallback.hasHit()) {
-		//hitPos = RayCallback.m_hitPointWorld;
-		//RayCallback.m_collisionObject
 		obj = invertedObjectHash[RayCallback.m_collisionObject];
 		return true;
 	}
