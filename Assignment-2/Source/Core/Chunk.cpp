@@ -107,7 +107,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 	// Only create neighbors for non-tree blocks
 	if (!_biomeMgr->isTreeType(obj->_cubeType)) {
 		// top
-		Biome::BiomeType newType = getGeneratedType(obj->_cubeType);
+		Biome::BiomeType newType = getGeneratedType(obj->_cubeType, (int) obj->_pos.y);
 
 		Ogre::Vector3 topPos = obj->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0);
 		key topIndex = getKey(topPos);
@@ -205,16 +205,27 @@ StaticObject* Chunk::getBlock(int x, int y, int z) {
 }
 
 // This is just temporary and needs to be improved
-Biome::BiomeType Chunk::getGeneratedType(Biome::BiomeType objType) {
+// Playing around with probabilities
+Biome::BiomeType Chunk::getGeneratedType(Biome::BiomeType objType, int height) {
 	switch (objType) {
 		case Biome::GRASS :
-			return Biome::ROCK;
+			if (rand()%100 > 50) 
+				return Biome::ROCK;
+			// would use dirt but don't know how to use blender - Jeremy :)
+			else 
+				return Biome::SAND;
 			break;
 		case Biome::SAND :
-			return Biome::SAND;
+			if (rand()%100 < 90)
+				return Biome::SAND;
+			else
+				return Biome::ROCK;
 			break;
 		case Biome::SNOW :
-			return Biome::GRASS;
+			if (rand()%100 < 10)
+				return Biome::SNOW;
+			else
+				return Biome::GRASS;
 			break;
 		case Biome::ROCK :
 			return Biome::ROCK;
