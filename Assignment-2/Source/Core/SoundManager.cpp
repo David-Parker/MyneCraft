@@ -31,10 +31,8 @@ SoundManager::SoundManager(void) {
 	music = Mix_LoadMUS( "../Assets/music.wav" ); 
 #endif
 #ifdef _WIN32
-	//music = Mix_LoadMUS( "../../../Mynecraft/Assignment-2/Assets/music.wav" ); 
+	music = Mix_LoadMUS( "../../../Mynecraft/Assignment-2/Assets/music.wav" ); 
 #endif
-
-	Mix_VolumeMusic(50);
 }
 
 /* Sound Functions */
