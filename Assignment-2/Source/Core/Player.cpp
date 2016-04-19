@@ -94,7 +94,9 @@ void Player::update(OISManager* ois) {
 	_axeNode->setPosition(total + Ogre::Vector3(rx, ry, rz));
 
 	Ogre::Quaternion quat(norm.crossProduct(Ogre::Vector3::NEGATIVE_UNIT_Y), norm, Ogre::Vector3::NEGATIVE_UNIT_Y);
-	_axeNode->setOrientation(quat);
-	_axeNode->pitch(Ogre::Degree(20));
+	_axeNode->setOrientation(quat);	
+	if ( fn.y < 0 )
+		_axeNode->pitch(phi - Ogre::Degree(70));
+	else _axeNode->pitch(Ogre::Degree(20));
 	_axeNode->roll(Ogre::Degree(90));
 }
