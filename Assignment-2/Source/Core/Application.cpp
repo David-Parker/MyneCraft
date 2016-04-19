@@ -510,6 +510,7 @@ void Application::setupCameras(void) {
 	camMan->setPosition(0,300,0);
 	camMan->lookAt(0,120,1800);
 	camMan->setFarClipDistance(fieldOfView);
+	camMan->setNearClipDistance(8);
 
 	// Add viewport and cameras
 	mRenderWindow->addViewport(camMan);

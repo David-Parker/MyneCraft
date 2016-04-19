@@ -58,7 +58,15 @@ void GameObject::setVelocity(float x, float y, float z) {
 }
 
 void GameObject::setOrientation(Ogre::Quaternion qt) {
-	rootNode->setOrientation(qt);
+	if(kinematic) 
+	{
+		rootNode->setOrientation(qt);
+	}
+	else {
+		btTransform transform = body->getCenterOfMassTransform();
+		transform.setRotation(btQuaternion(qt.w, qt.x, qt.y, qt.z));
+		body->setCenterOfMassTransform(transform);
+	}
 	updateTransform();
 }
 

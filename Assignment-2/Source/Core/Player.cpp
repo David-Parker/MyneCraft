@@ -2,6 +2,7 @@
 
 Player::Player(Ogre::Camera* camera, GameObject* body) : _body(body), _playerCam(camera) {
 	_body->getNode()->setVisible(false);
+	_body->getBody()->setAngularFactor(btVector3(0, 0, 0));
 
 	for(int i = 0; i < averageSize; i++) {
 		camAvg[i] = Ogre::Vector3::ZERO;
@@ -52,10 +53,10 @@ void Player::update(OISManager* ois) {
 		_body->setVelocity(0, currentY, 0);
 	}
 
-	camAvg[camAvgIndex % averageSize] = _body->getNode()->getPosition() + Ogre::Vector3(0, 200, 0);
+	camAvg[camAvgIndex % averageSize] = _body->getNode()->getPosition() + Ogre::Vector3(0, 170, 0);
 	camAvgIndex++;
 
-	Ogre::Vector3 total;
+	Ogre::Vector3 total(0,0,0);
 	int n = 0;
 
 	for(int i = 0; i < averageSize; i++) {
