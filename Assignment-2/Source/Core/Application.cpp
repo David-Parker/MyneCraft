@@ -176,6 +176,13 @@ bool Application::update(const FrameEvent &evt) {
 			currentChunk = chunk;
 		}	
 
+		if (pos.x < 0) {
+ 			currX -= CHUNK_SIZE;
+ 		}
+ 		if (pos.z < 0) {
+ 			currZ -= CHUNK_SIZE;
+		}
+
 		Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
 		btVector3 start(pos.x, pos.y, pos.z);
 		btVector3 end = start + btVector3(norm.x, norm.y, norm.z) * 1000;
@@ -194,6 +201,7 @@ bool Application::update(const FrameEvent &evt) {
 						int z = chunk->_yStart;
 
 						if (hitObj != nullptr) {
+							// Check neighboring chunks because this objects neighbors may be in seperate chunks
 							std::vector<Chunk*> chunklist;
 
 							std::pair<int, int> left(x - CHUNK_SIZE, z);
