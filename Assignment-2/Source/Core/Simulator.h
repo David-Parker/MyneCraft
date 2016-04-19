@@ -28,6 +28,7 @@ protected:
        std::deque<GameObject*> objList; 
        std::deque<StaticObject*> objListStatic;
 	std::unordered_map<const btCollisionObject*, StaticObject*> invertedObjectHash;
+       btCollisionObject* player;
 public: 
        Simulator(); 
        ~Simulator(); 
