@@ -5,7 +5,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body) : _body(body), _playerCam
 }
 
 void Player::update(OISManager* ois) {
-	static int speed = 2500;
+	static int speed = 1000;
 
 	Ogre::Vector3 movePos = _playerCam->getDirection();
 	movePos = Ogre::Vector3(movePos.x, 0, movePos.z);
@@ -33,15 +33,15 @@ void Player::update(OISManager* ois) {
 		moved = true;
 	}
 	if (ois->isKeyDown(OIS::KC_SPACE) && _body->canJump) {
-		_body->setVelocity(_body->getBody()->getLinearVelocity().x(), 5000, _body->getBody()->getLinearVelocity().z());
+		_body->setVelocity(_body->getBody()->getLinearVelocity().x(), 2500, _body->getBody()->getLinearVelocity().z());
 		moved = true;
 		_body->canJump = false;
 	}
 	if (ois->isKeyDown(OIS::KC_LSHIFT)) {
-		speed = 5000;
+		speed = 2500;
 	}
 	else {
-		speed = 2500;
+		speed = 1000;
 	}
 	if (!moved) {
 		_body->setVelocity(0, currentY, 0);

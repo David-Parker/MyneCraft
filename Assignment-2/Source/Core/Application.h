@@ -83,7 +83,7 @@ public:
 	int width;
 	int height;
 
-	double fps = 300.0;
+	double fps = 120.0;
 #ifdef _WIN32
 	int fieldOfView = 20000;
 #endif

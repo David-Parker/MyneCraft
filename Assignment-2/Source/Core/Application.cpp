@@ -95,6 +95,8 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 		dTime = temp;
 	}
 
+	_simulator->stepSimulation(evt.timeSinceLastFrame, 7);
+
 	cameraMan->frameRenderingQueued(evt);
 
 	return true;
@@ -104,6 +106,8 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 bool Application::update(const FrameEvent &evt) {
 
 	moveDayTime(evt.timeSinceLastFrame);
+
+	// std::cout << "FPS: " << mRenderWindow->getLastFPS() << std::endl;
 
 	OIS::KeyCode lastKey = _oisManager->getKeyPressed();
 	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
@@ -241,7 +245,6 @@ bool Application::update(const FrameEvent &evt) {
 		std::cout << currentChunk->getName() << std::endl;
 		exit(0);
 	}
-	_simulator->stepSimulation(evt.timeSinceLastFrame, 1, 1.0 / fps);
 
 	player->update(_oisManager);
 
