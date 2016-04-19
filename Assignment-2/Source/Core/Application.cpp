@@ -510,6 +510,7 @@ void Application::setupCameras(void) {
 	camMan->setPosition(0,300,0);
 	camMan->lookAt(0,120,1800);
 	camMan->setFarClipDistance(fieldOfView);
+	camMan->setNearClipDistance(8);
 
 	// Add viewport and cameras
 	mRenderWindow->addViewport(camMan);
@@ -519,7 +520,7 @@ void Application::setupCameras(void) {
 
 	cameraMan = new OgreBites::SdkCameraMan(camMan);
 	_oisManager->setupCameraMan(cameraMan);
-	std::cout << camMan->getFarClipDistance() << std::endl;
+	//std::cout << camMan->getFarClipDistance() << std::endl;
 }
 
 /* Setup GameManager */
@@ -561,7 +562,7 @@ void Application::createObjects(void) {
 	biomeManager = new BiomeManager(mSceneManager);
 
 	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 1500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
-	player = new Player(playerCam, playerObj);
+	player = new Player(playerCam, playerObj, mSceneManager);
 	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
 }
 /* 

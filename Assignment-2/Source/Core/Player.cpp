@@ -1,11 +1,18 @@
 #include "Player.h"
 
-Player::Player(Ogre::Camera* camera, GameObject* body) : _body(body), _playerCam(camera) {
+Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) : _body(body), _playerCam(camera), _sceneManager(sm) {
 	_body->getNode()->setVisible(false);
 
 	for(int i = 0; i < averageSize; i++) {
 		camAvg[i] = Ogre::Vector3::ZERO;
 	}
+
+	_pickaxe = _sceneManager->createEntity("Pickaxe", "Mynecraft-Pickaxe.mesh");
+	_pickaxe->setCastShadows(true);
+	_axeNode = _sceneManager->getRootSceneNode()->createChildSceneNode("Pickaxe");
+	_axeNode->attachObject(_pickaxe);
+	_axeNode->setDirection(Ogre::Vector3(0, 1 ,0));
+	_axeNode->setScale(5, 5, 5);
 }
 
 void Player::update(OISManager* ois) {
@@ -55,7 +62,7 @@ void Player::update(OISManager* ois) {
 	camAvg[camAvgIndex % averageSize] = _body->getNode()->getPosition() + Ogre::Vector3(0, 200, 0);
 	camAvgIndex++;
 
-	Ogre::Vector3 total;
+	Ogre::Vector3 total = Ogre::Vector3(0,0,0);
 	int n = 0;
 
 	for(int i = 0; i < averageSize; i++) {
@@ -69,4 +76,24 @@ void Player::update(OISManager* ois) {
 		total /= n;
 
 	_playerCam->setPosition(total);
+
+	Ogre::Vector3 fn = _playerCam->getDirection();
+	Ogre::Vector3 norm = Ogre::Vector3(fn.x, 0, fn.z).normalisedCopy();
+	Ogre::Degree theta = norm.angleBetween(Ogre::Vector3::UNIT_X);
+	Ogre::Degree phi = fn.angleBetween(Ogre::Vector3::UNIT_Y);
+
+	Ogre::Real rx, ry, rz;
+	int sign = (norm.z < 0) ? -1 : 1;
+	
+	theta = theta + sign*angleOffset;
+	rx = axeDistance*Ogre::Math::Cos(theta)*Ogre::Math::Sin(phi);
+	ry = axeDistance*Ogre::Math::Cos(phi);
+	rz = sign*axeDistance*Ogre::Math::Sin(theta)*Ogre::Math::Sin(phi);
+
+	_axeNode->setPosition(total + Ogre::Vector3(rx, ry, rz));
+
+	Ogre::Quaternion quat(norm.crossProduct(Ogre::Vector3::NEGATIVE_UNIT_Y), norm, Ogre::Vector3::NEGATIVE_UNIT_Y);
+	_axeNode->setOrientation(quat);
+	_axeNode->pitch(Ogre::Degree(20));
+	_axeNode->roll(Ogre::Degree(90));
 }
