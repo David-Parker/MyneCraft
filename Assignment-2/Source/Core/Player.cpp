@@ -2,10 +2,15 @@
 
 Player::Player(Ogre::Camera* camera, GameObject* body) : _body(body), _playerCam(camera) {
 	_body->getNode()->setVisible(false);
+
+	for(int i = 0; i < averageSize; i++) {
+		camAvg[i] = Ogre::Vector3::ZERO;
+	}
 }
 
 void Player::update(OISManager* ois) {
 	static int speed = 1000;
+	static int camAvgIndex = 0;
 
 	Ogre::Vector3 movePos = _playerCam->getDirection();
 	movePos = Ogre::Vector3(movePos.x, 0, movePos.z);
@@ -47,5 +52,21 @@ void Player::update(OISManager* ois) {
 		_body->setVelocity(0, currentY, 0);
 	}
 
-	_playerCam->setPosition(_body->getNode()->getPosition() + Ogre::Vector3(0, 200, 0));
+	camAvg[camAvgIndex % averageSize] = _body->getNode()->getPosition() + Ogre::Vector3(0, 200, 0);
+	camAvgIndex++;
+
+	Ogre::Vector3 total;
+	int n = 0;
+
+	for(int i = 0; i < averageSize; i++) {
+		if(camAvg[i] != Ogre::Vector3::ZERO) {
+			total += camAvg[i];
+			n++;
+		}
+	}
+
+	if(n > 0)
+		total /= n;
+
+	_playerCam->setPosition(total);
 }
