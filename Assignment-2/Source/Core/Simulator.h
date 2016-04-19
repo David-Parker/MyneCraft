@@ -12,6 +12,7 @@
 #include <OgreWindowEventUtilities.h>
 #include <OgreRenderTargetListener.h>
 #include <deque>
+#include <unordered_map>
 
 class GameObject;
 class StaticObject;
@@ -26,7 +27,7 @@ protected:
        btAlignedObjectArray<btCollisionShape*> collisionShapes;
        std::deque<GameObject*> objList; 
        std::deque<StaticObject*> objListStatic;
-	   std::unordered_map<btCollisionObject*, StaticObject*> invertedObjectHash;
+	std::unordered_map<const btCollisionObject*, StaticObject*> invertedObjectHash;
 public: 
        Simulator(); 
        ~Simulator(); 
@@ -35,6 +36,6 @@ public:
        void addObject(StaticObject* o); 
        bool removeObject(GameObject* o); 
        void stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps = 1, const Ogre::Real fixedTimestep = 1.0f/60.0f); 
-	   void removeStaticObjects();
-	   bool rayHit(const btVector3& start, const btVector3& end, StaticObject*& obj);
+	void removeStaticObjects();
+	bool rayHit(const btVector3& start, const btVector3& end, StaticObject*& obj);
 };
