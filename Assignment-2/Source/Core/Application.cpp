@@ -176,13 +176,6 @@ bool Application::update(const FrameEvent &evt) {
 			currentChunk = chunk;
 		}	
 
-		if (pos.x < 0) {
-			currX -= CHUNK_SIZE;
-		}
-		if (pos.z < 0) {
-			currZ -= CHUNK_SIZE;
-		}
-
 		Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
 		btVector3 start(pos.x, pos.y, pos.z);
 		btVector3 end = start + btVector3(norm.x, norm.y, norm.z) * 1000;
@@ -194,54 +187,35 @@ bool Application::update(const FrameEvent &evt) {
 				highlight->setPosition(hitObj->_pos);
 
 				if (_oisManager->mouseClicked) {
-					chunk = getChunk(chunks, currX, currZ);
+					chunk = hitObj->_chunk;
+			
+					if (chunk != nullptr) {
+						int x = chunk->_xStart;
+						int z = chunk->_yStart;
 
-					for (int i = -1; i <= 1; i++) {
-						for (int j = -1; j <= 1; j++) {
+						if (hitObj != nullptr) {
+							std::vector<Chunk*> chunklist;
 
-							int x = currX;
-							int z = currZ;
+							std::pair<int, int> left(x - CHUNK_SIZE, z);
+							Chunk* leftChunk = chunks[left];
 
-							x += i*CHUNK_SIZE;
-							z += j*CHUNK_SIZE;
+							std::pair<int, int> right(x + CHUNK_SIZE, z);
+							Chunk* rightChunk = chunks[right];
 
-							std::pair<int, int> name(x, z);
+							std::pair<int, int> bottom(x, z - CHUNK_SIZE);
+							Chunk* bottomChunk = chunks[bottom];
 
-							if (chunks[name]) {
-								chunk = chunks[name];
-								// Hide the block we're sitting on
-								if (chunk != nullptr) {
-									StaticObject* block = chunk->getBlock(hitObj->_pos.x, hitObj->_pos.y, hitObj->_pos.z);
+							std::pair<int, int> top(x, z + CHUNK_SIZE);
+							Chunk* topChunk = chunks[top];
 
-									if (block != nullptr) {
-										std::vector<Chunk*> chunklist;
+							chunklist.push_back(leftChunk);
+							chunklist.push_back(rightChunk);
+							chunklist.push_back(bottomChunk);
+							chunklist.push_back(topChunk);
+							chunklist.push_back(chunk);
 
-										std::pair<int, int> left(x - CHUNK_SIZE, z);
-										Chunk* leftChunk = chunks[left];
-
-										std::pair<int, int> right(x + CHUNK_SIZE, z);
-										Chunk* rightChunk = chunks[right];
-
-										std::pair<int, int> bottom(x, z - CHUNK_SIZE);
-										Chunk* bottomChunk = chunks[bottom];
-
-										std::pair<int, int> top(x, z + CHUNK_SIZE);
-										Chunk* topChunk = chunks[top];
-
-										chunklist.push_back(leftChunk);
-										chunklist.push_back(rightChunk);
-										chunklist.push_back(bottomChunk);
-										chunklist.push_back(topChunk);
-										chunklist.push_back(chunk);
-
-										chunk->removeBlock(chunklist, block);
-										recomputeColliders(chunks, currX, currZ);
-										break;
-									}
-									//else MultiPlatformHelper::print("Block null\n");
-								}
-								// else MultiPlatformHelper::print("Chunk null\n");
-							}
+							chunk->removeBlock(chunklist, hitObj);
+							recomputeColliders(chunks, currX, currZ);
 						}
 					}
 					_oisManager->mouseClicked = false;
