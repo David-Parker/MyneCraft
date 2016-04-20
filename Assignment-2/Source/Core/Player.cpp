@@ -8,7 +8,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 		camAvg[i] = Ogre::Vector3::ZERO;
 	}
 
-	_pickaxe = _sceneManager->createEntity("Pickaxe", "Mynecraft-Pickaxe.mesh");
+	_pickaxe = _sceneManager->createEntity("Pickaxe", "torch.mesh");
 	_pickaxe->setCastShadows(true);
 	_axeNode = _sceneManager->getRootSceneNode()->createChildSceneNode("Pickaxe");
 	_axeNode->attachObject(_pickaxe);
