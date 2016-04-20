@@ -15,6 +15,7 @@ private:
 	Ogre::SceneManager* _sceneManager;
 	Ogre::Entity* _pickaxe;
 	Ogre::SceneNode* _axeNode;
+	Ogre::Quaternion _lastOrientation;
 
 public:
 	Player(Ogre::Camera*, GameObject* body, Ogre::SceneManager* sm);

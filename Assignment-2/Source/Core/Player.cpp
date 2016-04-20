@@ -14,6 +14,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	_axeNode->attachObject(_pickaxe);
 	_axeNode->setDirection(Ogre::Vector3(0, 1 ,0));
 	_axeNode->setScale(3, 3, 3);
+	Ogre::Vector3 initial(0, 0, 0);
+	_lastOrientation = Ogre::Quaternion(initial, initial, initial);
 }
 
 void Player::update(OISManager* ois) {
@@ -77,6 +79,15 @@ void Player::update(OISManager* ois) {
 		total /= n;
 
 	_playerCam->setPosition(total);
+
+	// reset the orientation
+	Ogre::Vector3 yAxis = _playerCam->getOrientation().yAxis();
+	if (yAxis.y < 0) {
+		Ogre::Vector3 xAxis = Ogre::Vector3(1,0,0);
+		yAxis = Ogre::Vector3(0,1,0);
+		Ogre::Vector3 zAxis = Ogre::Vector3(0,0,1);
+		_playerCam->setOrientation(Ogre::Quaternion(xAxis, yAxis, zAxis));
+	}
 
 	Ogre::Vector3 unit = _playerCam->getDirection().normalisedCopy();
 	Ogre::Vector3 u = unit.crossProduct(Ogre::Vector3::UNIT_Y).normalisedCopy();
