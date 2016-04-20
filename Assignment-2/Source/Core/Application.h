@@ -77,6 +77,7 @@ public:
 	Perlin* perlin;
 	
 	std::unordered_map<std::pair<int,int>, Chunk*> prevChunks;
+	std::unordered_map<std::pair<int, int>, Chunk*> modifiedChunks;
 	Chunk* currentChunk = nullptr;
 
 	int points;

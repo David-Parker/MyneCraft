@@ -159,13 +159,18 @@ bool Application::update(const FrameEvent &evt) {
 					chunks[name] = prevChunks[name];
 				}
 				else if(!chunks[name]) {
-					chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator);
+					if (modifiedChunks[name]) {
+						chunks[name] = modifiedChunks[name];
+					}
+					else {
+						chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator);
+					}
 				}
 			}
 		}
 
 		for(auto& var : prevChunks) {
-			if(!chunks[var.first]) {
+			if(!chunks[var.first] && !modifiedChunks[var.first]) {
 				delete var.second;
 				var.second = nullptr;
 			}
@@ -227,6 +232,11 @@ bool Application::update(const FrameEvent &evt) {
 							chunklist.push_back(chunk);
 
 							chunk->removeBlock(chunklist, hitObj);
+							chunk->modified = true;
+
+							std::pair<int, int> name(x, z);
+							modifiedChunks[name] = chunk;
+
 							recomputeColliders(chunks, currX, currZ);
 						}
 					}
