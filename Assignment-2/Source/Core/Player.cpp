@@ -26,8 +26,9 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Sword");
 	rotNode = node->createChildSceneNode("SwordNode");
 	rotNode->attachObject(item);
-	rotNode->setPosition(Ogre::Vector3(-2, -12, 10));
-	rotNode->setDirection(Ogre::Vector3(2, -1 , -3));
+	rotNode->setPosition(Ogre::Vector3(-2, 6, 10));
+	rotNode->roll(Ogre::Degree(90));
+	rotNode->pitch(Ogre::Degree(-90));
 	node->setScale(1, 1, 1);
 	node->setVisible(false);
 
