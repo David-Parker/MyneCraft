@@ -223,7 +223,6 @@ bool OISManager::keyReleased( const OIS::KeyEvent &e ) {
 }
  
 bool OISManager::mouseMoved( const OIS::MouseEvent &e ) {
-
     if(cameraMan) cameraMan->injectMouseMove(e);
 
     // From -width/2 to +width/2

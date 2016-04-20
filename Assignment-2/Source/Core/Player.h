@@ -22,6 +22,8 @@ public:
 	Ogre::Camera* _playerCam;
 	GameObject* _body;
 
+	enum BiomeType{ PICKAXE, SWORD, CANDLE };
+
 	void setWeapon(int);
 	Ogre::SceneNode* getWeaponNode();
 	void update(OISManager*);
