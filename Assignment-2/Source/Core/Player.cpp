@@ -8,12 +8,36 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 		camAvg[i] = Ogre::Vector3::ZERO;
 	}
 
-	_pickaxe = _sceneManager->createEntity("Pickaxe", "Mynecraft-Pickaxe.mesh");
-	_pickaxe->setCastShadows(true);
-	_axeNode = _sceneManager->getRootSceneNode()->createChildSceneNode("Pickaxe");
-	_axeNode->attachObject(_pickaxe);
-	_axeNode->setDirection(Ogre::Vector3(0, 1 ,0));
-	_axeNode->setScale(3, 3, 3);
+	Ogre::Entity* axe = _sceneManager->createEntity("Pickaxe", "Mynecraft-Pickaxe.mesh");
+	axe->setCastShadows(true);
+	Ogre::SceneNode* node = _sceneManager->getRootSceneNode()->createChildSceneNode("Pickaxe");
+	node->attachObject(axe);
+	node->setDirection(Ogre::Vector3(0, 1 ,0));
+	node->setScale(3, 3, 3);
+	node->setVisible(false);
+
+	inventory.push_back(node);
+
+	equippedItem = -1;
+}
+
+void Player::setWeapon ( int i ) {
+	if ( equippedItem >= 0 && equippedItem < inventory.size() ) {
+		inventory[equippedItem]->setVisible(false);
+	}
+	if ( i < 0 || i >= inventory.size() )
+		equippedItem = -1;
+	else {
+		equippedItem = i;
+		inventory[equippedItem]->setVisible(true);
+	}
+}
+
+Ogre::SceneNode* Player::getWeaponNode() {
+	if ( equippedItem != -1 )
+		return inventory[equippedItem];
+	else
+		return nullptr;
 }
 
 void Player::update(OISManager* ois) {
@@ -78,15 +102,18 @@ void Player::update(OISManager* ois) {
 
 	_playerCam->setPosition(total);
 
-	Ogre::Vector3 unit = _playerCam->getDirection().normalisedCopy();
-	Ogre::Vector3 u = unit.crossProduct(Ogre::Vector3::UNIT_Y).normalisedCopy();
-	Ogre::Vector3 v = unit.crossProduct(u).normalisedCopy();
+	Ogre::SceneNode* node = getWeaponNode();
+	if ( node != nullptr ) {
+		Ogre::Vector3 unit = _playerCam->getDirection().normalisedCopy();
+		Ogre::Vector3 u = unit.crossProduct(Ogre::Vector3::UNIT_Y).normalisedCopy();
+		Ogre::Vector3 v = unit.crossProduct(u).normalisedCopy();
 
-	Ogre::Quaternion qt(unit, u, v);
+		Ogre::Quaternion qt(unit, u, v);
 
-	_axeNode->setOrientation(qt);
+		node->setOrientation(qt);
 
-	Ogre::Vector3 offset = unit.crossProduct(qt.zAxis()).normalisedCopy();
-	_axeNode->setPosition(total + unit*50 - offset*20);
-	_axeNode->roll(Ogre::Degree(-25));
+		Ogre::Vector3 offset = unit.crossProduct(qt.zAxis()).normalisedCopy();
+		node->setPosition(total + unit*50 - offset*20);
+		node->roll(Ogre::Degree(-25));
+	}
 }
