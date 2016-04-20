@@ -34,6 +34,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
+
 	item = _sceneManager->createEntity("Light", "torch.mesh");
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Light");
@@ -42,6 +43,13 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	rotNode->setPosition(Ogre::Vector3(0, 0, 3));
 	rotNode->setDirection(Ogre::Vector3(0, -1 , 0));
 	node->setScale(4, 4, 4);
+
+	Ogre::Light* light = _sceneManager->createLight("torch");
+	light->setDiffuseColour(1, .6, .05);
+	light->setType(Ogre::Light::LT_POINT);
+	float range = 5000.0f;
+	light->setAttenuation(range, 1.0f, .5f/range, 5.0f/(range*range));
+	node->attachObject(light);
 	node->setVisible(false);
 
 	inventory.push_back(node);
