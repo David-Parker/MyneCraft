@@ -13,7 +13,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	_axeNode = _sceneManager->getRootSceneNode()->createChildSceneNode("Pickaxe");
 	_axeNode->attachObject(_pickaxe);
 	_axeNode->setDirection(Ogre::Vector3(0, 1 ,0));
-	_axeNode->setScale(5, 5, 5);
+	_axeNode->setScale(3, 3, 3);
 }
 
 void Player::update(OISManager* ois) {
@@ -78,25 +78,15 @@ void Player::update(OISManager* ois) {
 
 	_playerCam->setPosition(total);
 
-	Ogre::Vector3 fn = _playerCam->getDirection();
-	Ogre::Vector3 norm = Ogre::Vector3(fn.x, 0, fn.z).normalisedCopy();
-	Ogre::Degree theta = norm.angleBetween(Ogre::Vector3::UNIT_X);
-	Ogre::Degree phi = fn.angleBetween(Ogre::Vector3::UNIT_Y);
+	Ogre::Vector3 unit = _playerCam->getDirection().normalisedCopy();
+	Ogre::Vector3 u = unit.crossProduct(Ogre::Vector3::UNIT_Y).normalisedCopy();
+	Ogre::Vector3 v = unit.crossProduct(u).normalisedCopy();
 
-	Ogre::Real rx, ry, rz;
-	int sign = (norm.z < 0) ? -1 : 1;
-	
-	theta = theta + sign*angleOffset;
-	rx = axeDistance*Ogre::Math::Cos(theta)*Ogre::Math::Sin(phi);
-	ry = axeDistance*Ogre::Math::Cos(phi);
-	rz = sign*axeDistance*Ogre::Math::Sin(theta)*Ogre::Math::Sin(phi);
+	Ogre::Quaternion qt(unit, u, v);
 
-	_axeNode->setPosition(total + Ogre::Vector3(rx, ry, rz));
+	_axeNode->setOrientation(qt);
 
-	Ogre::Quaternion quat(norm.crossProduct(Ogre::Vector3::NEGATIVE_UNIT_Y), norm, Ogre::Vector3::NEGATIVE_UNIT_Y);
-	_axeNode->setOrientation(quat);	
-	if ( fn.y < 0 )
-		_axeNode->pitch(phi - Ogre::Degree(70));
-	else _axeNode->pitch(Ogre::Degree(20));
-	_axeNode->roll(Ogre::Degree(90));
+	Ogre::Vector3 offset = unit.crossProduct(qt.zAxis()).normalisedCopy();
+	_axeNode->setPosition(total + unit*50 - offset*20);
+	_axeNode->roll(Ogre::Degree(-25));
 }
