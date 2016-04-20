@@ -208,43 +208,10 @@ bool Application::update(const FrameEvent &evt) {
 				highlight->setPosition(hitObj->_pos);
 
 				if (_oisManager->mouseClicked) {
-					chunk = hitObj->_chunk;
-			
-					if (chunk != nullptr) {
-						int x = chunk->_xStart;
-						int z = chunk->_yStart;
+					player->clickAction(hitObj, chunks, modifiedChunks);
 
-						if (hitObj != nullptr) {
-							// Check neighboring chunks because this objects neighbors may be in seperate chunks
-							std::vector<Chunk*> chunklist;
+					recomputeColliders(chunks, currX, currZ);
 
-							std::pair<int, int> left(x - CHUNK_SIZE, z);
-							Chunk* leftChunk = chunks[left];
-
-							std::pair<int, int> right(x + CHUNK_SIZE, z);
-							Chunk* rightChunk = chunks[right];
-
-							std::pair<int, int> bottom(x, z - CHUNK_SIZE);
-							Chunk* bottomChunk = chunks[bottom];
-
-							std::pair<int, int> top(x, z + CHUNK_SIZE);
-							Chunk* topChunk = chunks[top];
-
-							chunklist.push_back(leftChunk);
-							chunklist.push_back(rightChunk);
-							chunklist.push_back(bottomChunk);
-							chunklist.push_back(topChunk);
-							chunklist.push_back(chunk);
-
-							chunk->removeBlock(chunklist, hitObj);
-							chunk->modified = true;
-
-							std::pair<int, int> name(x, z);
-							modifiedChunks[name] = chunk;
-
-							recomputeColliders(chunks, currX, currZ);
-						}
-					}
 					_oisManager->mouseClicked = false;
 				}
 			}

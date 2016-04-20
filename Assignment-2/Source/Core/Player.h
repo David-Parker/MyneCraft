@@ -5,6 +5,7 @@
 
 #include "GameObject.h"
 #include "OISManager.h"
+#include "Chunk.h"
 
 const static int averageSize = 10;
 const static int axeDistance = 70;
@@ -27,4 +28,6 @@ public:
 	void setWeapon(int);
 	Ogre::SceneNode* getWeaponNode();
 	void update(OISManager*);
+	void clickAction(StaticObject* hitObj, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks);
+	void pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks);
 };
