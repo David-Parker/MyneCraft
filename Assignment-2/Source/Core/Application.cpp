@@ -131,7 +131,7 @@ bool Application::update(const FrameEvent &evt) {
 		mRunning = false;
 	}
 
-	Ogre::Vector3 pos = camMan->getPosition();
+	Ogre::Vector3 pos = player->_body->getNode()->getPosition();
 	static int range = CHUNK_SIZE * 1;
 	static Chunk* currentChunk = nullptr;
 
@@ -197,7 +197,8 @@ bool Application::update(const FrameEvent &evt) {
 		}
 
 		Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
-		btVector3 start(pos.x, pos.y, pos.z);
+		Ogre::Vector3 camPos = playerCam->getPosition();
+		btVector3 start(camPos.x, camPos.y, camPos.z);
 		btVector3 end = start + btVector3(norm.x, norm.y, norm.z) * 1000;
 		StaticObject* hitObj = nullptr;
 
