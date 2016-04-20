@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <cmath>
 
 #include "GameObject.h"
@@ -13,13 +14,15 @@ class Player {
 private:
 	Ogre::Vector3 camAvg[averageSize];
 	Ogre::SceneManager* _sceneManager;
-	Ogre::Entity* _pickaxe;
-	Ogre::SceneNode* _axeNode;
+	int equippedItem;
+	std::vector<Ogre::SceneNode*> inventory;
 
 public:
 	Player(Ogre::Camera*, GameObject* body, Ogre::SceneManager* sm);
 	Ogre::Camera* _playerCam;
 	GameObject* _body;
 
+	void setWeapon(int);
+	Ogre::SceneNode* getWeaponNode();
 	void update(OISManager*);
 };

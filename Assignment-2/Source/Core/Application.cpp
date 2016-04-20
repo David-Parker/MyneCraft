@@ -115,13 +115,17 @@ bool Application::update(const FrameEvent &evt) {
 	if (lastKey == OIS::KC_M) {
 		gameManager->mute();
 	}
-	else if (lastKey == OIS::KC_1 || lastKey == OIS::KC_2 || lastKey == OIS::KC_3 || lastKey == OIS::KC_4) {
+	else if ( lastKey >= OIS::KC_1 && lastKey <= OIS::KC_9 ) {
+		int index = lastKey - 2;
+		player->setWeapon(index);
+	}
+	/*else if ( CameraStuff ) {
 		int index = lastKey - 2;
 		if (index >= 0 && index < cameras.size()) {
 			mRenderWindow->removeAllViewports();
 			mRenderWindow->addViewport(cameras[index]);
 		}
-	}
+	}*/
 	else if(lastKey == OIS::KC_ESCAPE) {
 		// close window when ESC is pressed
 		mRunning = false;
