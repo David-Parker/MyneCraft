@@ -21,13 +21,13 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = _sceneManager->createEntity("Sword", "Cube.015.mesh");
+	item = _sceneManager->createEntity("Sword", "Mynecraft-Sword.mesh");
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Sword");
 	rotNode = node->createChildSceneNode("SwordNode");
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(-2, -12, 10));
-	rotNode->setDirection(Ogre::Vector3(2, -1 , -2));
+	rotNode->setDirection(Ogre::Vector3(2, -1 , -3));
 	node->setScale(1, 1, 1);
 	node->setVisible(false);
 
