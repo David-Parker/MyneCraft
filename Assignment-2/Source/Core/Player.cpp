@@ -158,6 +158,13 @@ void Player::update(OISManager* ois) {
 	OIS::KeyCode lastkey;
 	bool moved = false;
 
+	if (ois->isKeyDown(OIS::KC_LSHIFT)) {
+		speed = 2500;
+	}
+	else {
+		speed = 1000;
+	}
+
 	if (ois->isKeyDown(OIS::KC_W)) {
 		_body->setVelocity(movePos.x*speed, currentY, movePos.z*speed);
 		moved = true;
@@ -179,11 +186,12 @@ void Player::update(OISManager* ois) {
 		moved = true;
 		_body->canJump = false;
 	}
-	if (ois->isKeyDown(OIS::KC_LSHIFT)) {
-		speed = 2500;
-	}
-	else {
-		speed = 1000;
+	
+	// Limit player speed
+	if (_body->getBody()->getLinearVelocity().length() > 3000) {
+		btVector3 linearSpeed = _body->getBody()->getLinearVelocity();
+		linearSpeed = linearSpeed.normalized() * 3000;
+		_body->getBody()->setLinearVelocity(linearSpeed);
 	}
 	if (!moved) {
 		_body->setVelocity(0, currentY, 0);
@@ -221,6 +229,7 @@ void Player::update(OISManager* ois) {
 		node->setPosition(total + unit*50 - offset*20);
 		node->roll(Ogre::Degree(-25));
 	}
+
 }
 
 bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks) {
