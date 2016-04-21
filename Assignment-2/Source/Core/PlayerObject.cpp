@@ -10,7 +10,12 @@ GameObject(nme, tp, scnMgr, ssm, node, ent, ms, sim, mss, rest, frict, scal, kin
 
 void PlayerObject::update() {
 	if(context->hit) {
-		canJump = true;
+		int x = round(context->normal.x());
+		int y = round(context->normal.y());
+		int z = round(context->normal.z());
+
+		if(x == 0 && y == 1 && z == 0)
+			canJump = true;
 	}
 }
 

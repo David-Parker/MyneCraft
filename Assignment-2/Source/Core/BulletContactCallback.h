@@ -2,6 +2,7 @@
 
 #include <btBulletDynamicsCommon.h>
 #include "CollisionContext.h"
+#include "Simulator.h"
 
 /*
 A struct to handle contactTest queries via the ContactResultCallback
@@ -12,10 +13,11 @@ struct BulletContactCallback : public btCollisionWorld::ContactResultCallback {
 	//! Constructor, pass whatever context you want to have available when processing contacts
 	/*! You may also want to set m_collisionFilterGroup and m_collisionFilterMask
 	 *  (supplied by the superclass) for needsCollision() */
-	BulletContactCallback(btRigidBody& tgtBody , CollisionContext& context);
+	BulletContactCallback(btRigidBody& tgtBody , CollisionContext& context, Simulator* sim);
 	
 	btRigidBody& body; //!< The body the sensor is monitoring
 	CollisionContext& ctxt; //!< External information for contact processing
+	Simulator* _sim;
 	
 	//! If you don't want to consider collisions where the bodies are joined by a constraint, override needsCollision:
 	/*! However, if you use a btCollisionObject for #body instead of a btRigidBody,

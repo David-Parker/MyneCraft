@@ -126,7 +126,7 @@ void GameObject::addToSimulator() {
 	body->setActivationState(DISABLE_DEACTIVATION);
 
 	context = new CollisionContext();
-	cCallBack = new BulletContactCallback(*body, *context);
+	cCallBack = new BulletContactCallback(*body, *context, simulator);
 	simulator->addObject(this);
 }
 

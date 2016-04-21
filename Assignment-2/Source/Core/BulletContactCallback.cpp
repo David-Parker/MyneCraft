@@ -5,8 +5,8 @@
 //! Constructor, pass whatever context you want to have available when processing contacts
 /*! You may also want to set m_collisionFilterGroup and m_collisionFilterMask
  *  (supplied by the superclass) for needsCollision() */
-BulletContactCallback::BulletContactCallback(btRigidBody& tgtBody , CollisionContext& context /*, ... */)
-	: btCollisionWorld::ContactResultCallback(), body(tgtBody), ctxt(context) { }
+BulletContactCallback::BulletContactCallback(btRigidBody& tgtBody , CollisionContext& context, Simulator* sim /*, ... */)
+	: btCollisionWorld::ContactResultCallback(), body(tgtBody), ctxt(context), _sim(sim) { }
 
 bool BulletContactCallback::needsCollision(btBroadphaseProxy* proxy) const {
 	// superclass will check m_collisionFilterGroup and m_collisionFilterMask
@@ -36,6 +36,7 @@ btScalar BulletContactCallback::addSingleResult(btManifoldPoint& cp,
 	ctxt.normal = cp.m_normalWorldOnB;
 	ctxt.velocity = body.getLinearVelocity();
 	ctxt.velNorm = ctxt.normal.dot(ctxt.velocity);
+	_sim->outer->update();
 
 	return 0;
 }

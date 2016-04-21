@@ -31,8 +31,8 @@ void Simulator::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, co
 	dynamicsWorld->stepSimulation(elapsedTime, maxSubSteps, fixedTimestep);
 
 	for(auto& var : objList) {
+		outer = var;
 		dynamicsWorld->contactTest(var->getBody(), *(var->cCallBack));
-		var->update();
 		var->cCallBack->ctxt.hit = false;
 	}
 }
