@@ -95,7 +95,9 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 		dTime = temp;
 	}
 
-	_simulator->stepSimulation(evt.timeSinceLastFrame, 7);
+	_simulator->stepSimulation(evt.timeSinceLastFrame, 7, 1.0 / fps);
+
+	player->constrainSpeed();
 
 	cameraMan->frameRenderingQueued(evt);
 

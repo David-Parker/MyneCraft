@@ -186,13 +186,7 @@ void Player::update(OISManager* ois) {
 		moved = true;
 		_body->canJump = false;
 	}
-	
-	// Limit player speed
-	if (_body->getBody()->getLinearVelocity().length() > 3000) {
-		btVector3 linearSpeed = _body->getBody()->getLinearVelocity();
-		linearSpeed = linearSpeed.normalized() * 3000;
-		_body->getBody()->setLinearVelocity(linearSpeed);
-	}
+
 	if (!moved) {
 		_body->setVelocity(0, currentY, 0);
 	}
@@ -320,4 +314,18 @@ void Player::getNeighborChunks(std::vector<Chunk*>& chunklist, int x, int z, std
 	chunklist.push_back(bottomChunk);
 	chunklist.push_back(topChunk);
 	chunklist.push_back(chunk);
+}
+
+void Player::constrainSpeed() {
+	static int maxSpeed = 15000;
+
+	// Limit player speed
+	btVector3 velocity = _body->getBody()->getLinearVelocity();
+    btScalar lspeed = velocity.length();
+    if(lspeed > maxSpeed) {
+        velocity *= maxSpeed/lspeed;
+        _body->setVelocity(velocity.x(), velocity.y(), velocity.z());
+    }
+
+	// std::cout << "Speed: " << _body->getBody()->getLinearVelocity().length() << std::endl;
 }
