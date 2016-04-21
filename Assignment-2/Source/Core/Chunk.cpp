@@ -369,10 +369,12 @@ StaticObject* Chunk::getBlock(int x, int y, int z) {
 // This is just temporary and needs to be improved
 // Playing around with probabilities
 Biome::BiomeType Chunk::getGeneratedType(Biome::BiomeType objType, int height) {
+	std::cout << height << std::endl;
+	std::cout << "height" << std::endl;
 	switch (objType) {
 		case Biome::GRASS :
 			if (rand()%100 > 50)
-				return Biome::ROCK;
+				return Biome::DIRT;
 			// would use dirt but don't know how to use blender - Jeremy :)
 			else 
 				return Biome::SAND;

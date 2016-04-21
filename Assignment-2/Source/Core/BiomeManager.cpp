@@ -6,6 +6,7 @@ BiomeManager::BiomeManager(Ogre::SceneManager* smgr) : mSceneManager(smgr) {
 	snowMesh = worldBiomes.at(0)->getEntity(Biome::SNOW);
 	sandMesh = worldBiomes.at(0)->getEntity(Biome::SAND);
 	rockMesh = worldBiomes.at(0)->getEntity(Biome::ROCK);
+	dirtMesh = worldBiomes.at(0)->getEntity(Biome::DIRT);
 }
 
 
@@ -38,6 +39,7 @@ Ogre::Entity* BiomeManager::getTerrain(Biome::BiomeType type) {
 		case Biome::SNOW: return snowMesh;
 		case Biome::SAND: return sandMesh;
 		case Biome::ROCK: return rockMesh;
+		case Biome::DIRT: return dirtMesh;
 	}
 	return nullptr;
 }
