@@ -228,6 +228,7 @@ bool OISManager::mouseMoved( const OIS::MouseEvent &e ) {
     // From -width/2 to +width/2
     mouseXAxis = (e.state.X.abs) - e.state.width/2;
     mouseYAxis = (e.state.Y.abs) - e.state.height/2;
+	mouseWheel = e.state.Z.rel / 120.0f;
 
 #ifdef _DEBUG
     //CEGUI::System &sys = CEGUI::System::getSingleton();
@@ -238,6 +239,10 @@ bool OISManager::mouseMoved( const OIS::MouseEvent &e ) {
 #endif
 
     return true;
+}
+
+void OISManager::resetWheel() {
+	mouseWheel = 0;
 }
  
 bool OISManager::mousePressed( const OIS::MouseEvent &e, OIS::MouseButtonID id ) {
@@ -272,6 +277,10 @@ int OISManager::getMouseXAxis() {
 
 int OISManager::getMouseYAxis() {
     return mouseYAxis;
+}
+
+int OISManager::getMouseWheel() {
+	return mouseWheel;
 }
 
 OIS::KeyCode OISManager::getKeyPressed(){

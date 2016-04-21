@@ -119,6 +119,7 @@ bool Application::update(const FrameEvent &evt) {
 		int index = lastKey - 2;
 		player->setWeapon(index);
 	}
+
 	/*else if ( CameraStuff ) {
 		int index = lastKey - 2;
 		if (index >= 0 && index < cameras.size()) {
@@ -129,6 +130,16 @@ bool Application::update(const FrameEvent &evt) {
 	else if(lastKey == OIS::KC_ESCAPE) {
 		// close window when ESC is pressed
 		mRunning = false;
+	}
+
+	if (int delta = _oisManager->getMouseWheel()) {
+		int index = player->getWeapon() + delta;
+		index = index % Player::NUM_WEP;
+		if (index < 0)
+			index += Player::NUM_WEP;
+
+		player->setWeapon(index);
+		_oisManager->resetWheel();
 	}
 
 	Ogre::Vector3 pos = player->_body->getNode()->getPosition();

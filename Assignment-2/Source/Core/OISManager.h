@@ -46,8 +46,10 @@ public:
 
     int getMouseXAxis();
     int getMouseYAxis();
+	int getMouseWheel();
     OIS::KeyCode getKeyPressed();
     OIS::KeyCode lastKeyPressed();
+	void resetWheel();
 
     bool mouseClicked = false;
 
@@ -85,6 +87,7 @@ private:
     // Our private members here
     int mouseXAxis;
     int mouseYAxis;
+	int mouseWheel = 0;
     OIS::KeyCode mKeyPressed;
 };
 #endif

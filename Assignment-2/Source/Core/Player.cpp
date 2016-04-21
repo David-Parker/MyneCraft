@@ -121,6 +121,10 @@ void Player::setWeapon ( int i ) {
 	}
 }
 
+int Player::getWeapon() {
+	return equippedItem;
+}
+
 Ogre::SceneNode* Player::getWeaponNode() {
 	if ( equippedItem != -1 )
 		return inventory[equippedItem];
