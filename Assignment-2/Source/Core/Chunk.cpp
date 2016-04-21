@@ -370,25 +370,24 @@ StaticObject* Chunk::getBlock(int x, int y, int z) {
 // This is just temporary and needs to be improved
 // Playing around with probabilities
 Biome::BiomeType Chunk::getGeneratedType(Biome::BiomeType objType, int height) {
+	static int offset = 18 * CHUNK_SCALE_FULL;
 	switch (objType) {
 		case Biome::GRASS :
-			if (rand()%100 > 50)
+		case Biome::DIRT :
+			if (rand()%500 < (height + offset))
 				return Biome::DIRT;
 			// would use dirt but don't know how to use blender - Jeremy :)
 			else 
-				return Biome::SAND;
+				return Biome::ROCK;
 			break;
 		case Biome::SAND :
-			if (rand()%100 < 90)
+			if (rand()%500 < (height + offset))
 				return Biome::SAND;
 			else
 				return Biome::ROCK;
 			break;
 		case Biome::SNOW :
-			if (rand()%100 < 10)
-				return Biome::SNOW;
-			else
-				return Biome::GRASS;
+			return Biome::DIRT;
 			break;
 		case Biome::ROCK :
 			return Biome::ROCK;

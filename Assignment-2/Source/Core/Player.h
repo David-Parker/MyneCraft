@@ -24,7 +24,7 @@ public:
 	Ogre::Camera* _playerCam;
 	GameObject* _body;
 
-	enum ITEM_TYPE{ PICKAXE, SWORD, CANDLE, GRASS_CUBE, ROCK_CUBE, SNOW_CUBE, SAND_CUBE, DIRT_CUBE, NUM_WEP };
+	enum ITEM_TYPE{ PICKAXE, SWORD, CANDLE, GRASS_CUBE, ROCK_CUBE, SNOW_CUBE, SAND_CUBE, DIRT_CUBE, PLANK_CUBE, NUM_WEP };
 
 	void setWeapon(int);
 	Ogre::SceneNode* getWeaponNode();
@@ -33,4 +33,5 @@ public:
 	void pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks);
 	void cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, Biome::BiomeType type);
 	int getWeapon();
+	void constrainSpeed();
 };
