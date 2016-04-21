@@ -47,12 +47,13 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				so = new StaticObject(biomeMgr->getTerrain(Biome::GRASS), Biome::GRASS, scale, pos, sim, this);
 			}
 
-			createTree(pos, so->_cubeType);
-
-			key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
-
 			_staticObjects[index] = so;
-			_staticObjects[airIndex] = air;
+
+			// Create tree returns true if a tree was created in this position.
+			if ( !createTree(pos, so->_cubeType) ) {
+				key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+				_staticObjects[airIndex] = air;
+			}
 
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
@@ -397,16 +398,16 @@ Biome::BiomeType Chunk::getGeneratedType(Biome::BiomeType objType, int height) {
 	}
 }
 
-void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
+bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 
 	static const int breadth = 5;
 	static const int firHeight = 5;
 	static const int firBreadth = 7;
 	
 
-	if ( type == Biome::GRASS && rand()%400 != 5 ) return;
-	if ( type == Biome::SNOW && rand()%3000 != 5 ) return;
-	if ( type == Biome::SAND && rand()%2000 != 5 ) return;
+	if ( type == Biome::GRASS && rand()%500 != 5 ) return false;
+	if ( type == Biome::SNOW && rand()%3000 != 5 ) return false;
+	if ( type == Biome::SAND && rand()%2000 != 5 ) return false;
 
 	// Describes the shape of the leaves, think of each 5x5 grid as another layer
 	bool leaves[breadth][breadth][breadth] = {	{ { 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 } },
@@ -448,7 +449,7 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 					}
 				}
 			}
-			break;
+			return true;
 		case Biome::SNOW:
 			//Fir Tree
 			for (int i = 0; i < firBreadth; i++) {
@@ -470,7 +471,7 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 				_staticObjects[index] = firBlock;
 				_sg->addEntity(firBlock->_geom, firBlock->_pos, firBlock->_orientation, firBlock->_scale);
 			}
-			break;
+			return true;
 		case Biome::SAND:
 			//Cactus
 			for (int i = 1; i <= 10; i++) {
@@ -528,7 +529,8 @@ void Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 					_sg->addEntity(armBlock->_geom, armBlock->_pos, armBlock->_orientation, armBlock->_scale);
 				}
 			}
-			break;
+			return true;
+		default: return false;
 	}
 }
 
