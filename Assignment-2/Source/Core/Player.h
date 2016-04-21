@@ -17,17 +17,19 @@ private:
 	Ogre::SceneManager* _sceneManager;
 	int equippedItem;
 	std::vector<Ogre::SceneNode*> inventory;
+	void getNeighborChunks(std::vector<Chunk*>& chunklist, int x, int z, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, Chunk* chunk);
 
 public:
 	Player(Ogre::Camera*, GameObject* body, Ogre::SceneManager* sm);
 	Ogre::Camera* _playerCam;
 	GameObject* _body;
 
-	enum ITEM_TYPE{ PICKAXE, SWORD, CANDLE, GRASS_CUBE, SNOW_CUBE, SAND_CUBE };
+	enum ITEM_TYPE{ PICKAXE, SWORD, CANDLE, GRASS_CUBE, ROCK_CUBE, SNOW_CUBE, SAND_CUBE };
 
 	void setWeapon(int);
 	Ogre::SceneNode* getWeaponNode();
 	void update(OISManager*);
-	void clickAction(StaticObject* hitObj, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks);
+	bool clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks);
 	void pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks);
+	void cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, Biome::BiomeType type);
 };

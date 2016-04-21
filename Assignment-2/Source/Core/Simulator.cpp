@@ -46,7 +46,7 @@ void Simulator::removeStaticObjects() {
 	invertedObjectHash.clear();
 }
 
-bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObject*& obj) {
+bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObject*& obj, btVector3& hitNormal) {
 	btCollisionWorld::AllHitsRayResultCallback RayCallback(start, end);
 
 	dynamicsWorld->rayTest(start, end, RayCallback);
@@ -60,6 +60,7 @@ bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObjec
 				if(RayCallback.m_hitPointWorld[i].distance(start) < closest.distance(start)) {
 					closest = RayCallback.m_hitPointWorld[i];
 					obj = invertedObjectHash[var];
+					hitNormal = RayCallback.m_hitNormalWorld[i];
 					ret = true;
 				}
 			}

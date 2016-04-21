@@ -31,6 +31,7 @@ private:
 	key getKey(const Ogre::Vector3& pos);
 
 	StaticObject* getObjFromChunks(const std::vector<Chunk*>& chunks, key index);
+	void createAirNeighbors(const std::vector<Chunk*>& chunks, StaticObject* obj);
 
 public:
 	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*);
@@ -40,6 +41,7 @@ public:
 	StaticObject* getBlock(int x, int y, int z);
 	Biome::BiomeType getGeneratedType(Biome::BiomeType objType, int height);
 	void removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj);
+	void addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const btVector3& hitnormal, Biome::BiomeType newType);
 	std::string getName() { return _name; }
 
 	std::unordered_map<key, StaticObject*> _staticObjects;

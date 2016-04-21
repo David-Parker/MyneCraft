@@ -206,10 +206,28 @@ void Player::update(OISManager* ois) {
 	}
 }
 
-void Player::clickAction(StaticObject* hitObj, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks) {
+bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks) {
 	if (equippedItem == PICKAXE) {
 		pickaxeAction(hitObj, chunks, modifiedChunks);
+		return true;
 	}
+	if (equippedItem == GRASS_CUBE) {
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::GRASS);
+		return true;
+	}
+	if (equippedItem == ROCK_CUBE) {
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::ROCK);
+		return true;
+	}
+	if (equippedItem == SNOW_CUBE) {
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::SNOW);
+		return true;
+	}
+	if (equippedItem == SAND_CUBE) {
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::SAND);
+		return true;
+	}
+	return false;
 }
 
 void Player::pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks) {
@@ -222,24 +240,7 @@ void Player::pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<in
 		if (hitObj != nullptr) {
 			// Check neighboring chunks because this objects neighbors may be in seperate chunks
 			std::vector<Chunk*> chunklist;
-
-			std::pair<int, int> left(x - CHUNK_SIZE, z);
-			Chunk* leftChunk = chunks[left];
-
-			std::pair<int, int> right(x + CHUNK_SIZE, z);
-			Chunk* rightChunk = chunks[right];
-
-			std::pair<int, int> bottom(x, z - CHUNK_SIZE);
-			Chunk* bottomChunk = chunks[bottom];
-
-			std::pair<int, int> top(x, z + CHUNK_SIZE);
-			Chunk* topChunk = chunks[top];
-
-			chunklist.push_back(leftChunk);
-			chunklist.push_back(rightChunk);
-			chunklist.push_back(bottomChunk);
-			chunklist.push_back(topChunk);
-			chunklist.push_back(chunk);
+			getNeighborChunks(chunklist, x, z, chunks, chunk);
 
 			chunk->removeBlock(chunklist, hitObj);
 			chunk->modified = true;
@@ -248,4 +249,45 @@ void Player::pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<in
 			modifiedChunks[name] = chunk;
 		}
 	}
+}
+
+void Player::cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, Biome::BiomeType type) {
+	Chunk* chunk = hitObj->_chunk;
+
+	if (chunk != nullptr) {
+		int x = chunk->_xStart;
+		int z = chunk->_yStart;
+
+		if (hitObj != nullptr) {
+			// Check neighboring chunks because this objects neighbors may be in seperate chunks
+			std::vector<Chunk*> chunklist;
+			getNeighborChunks(chunklist, x, z, chunks, chunk);
+
+			chunk->addBlock(chunklist, hitObj, hitnormal, type);
+			chunk->modified = true;
+
+			std::pair<int, int> name(x, z);
+			modifiedChunks[name] = chunk;
+		}
+	}
+}
+
+void Player::getNeighborChunks(std::vector<Chunk*>& chunklist, int x, int z, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, Chunk* chunk) {
+	std::pair<int, int> left(x - CHUNK_SIZE, z);
+	Chunk* leftChunk = chunks[left];
+
+	std::pair<int, int> right(x + CHUNK_SIZE, z);
+	Chunk* rightChunk = chunks[right];
+
+	std::pair<int, int> bottom(x, z - CHUNK_SIZE);
+	Chunk* bottomChunk = chunks[bottom];
+
+	std::pair<int, int> top(x, z + CHUNK_SIZE);
+	Chunk* topChunk = chunks[top];
+
+	chunklist.push_back(leftChunk);
+	chunklist.push_back(rightChunk);
+	chunklist.push_back(bottomChunk);
+	chunklist.push_back(topChunk);
+	chunklist.push_back(chunk);
 }

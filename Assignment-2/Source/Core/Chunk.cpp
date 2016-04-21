@@ -91,8 +91,6 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 	if (obj == air) return;
 	
 	key index = getKey(obj->_pos);
-	std::stringstream str;
-	str << "Rem X: " << obj->_pos.x << " Rem Z: " << obj->_pos.z << std::endl;
 
 	if (_staticObjects.count(index) == 0) return;
 
@@ -119,14 +117,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 			_staticObjects[topIndex] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
-		else {
-			if (topObj == air) {
-				// Do nothing
-			}
-			else {
-				// Do nothing
-			}
-		}
+
 		// bottom
 		Ogre::Vector3 bottomPos = obj->_pos + Ogre::Vector3(0, -CHUNK_SCALE_FULL, 0);
 		key bottomIndex = getKey(bottomPos);
@@ -184,6 +175,177 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 	}
 
 	_sg->build();
+}
+
+void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const btVector3& hitnormal, Biome::BiomeType newType) {
+	if (obj == nullptr) assert(!"Block was null");
+	if (obj == air) return;
+
+	// Sometimes the vector comes in with very small values close to zero, just truncate values to 0 or 1
+	int x = round(hitnormal.x());
+	int y = round(hitnormal.y());
+	int z = round(hitnormal.z());
+
+	btVector3 norm = btVector3(x, y, z);
+
+	key index = getKey(obj->_pos);
+
+	if (_staticObjects.count(index) == 0) return;
+
+	_sg->reset();
+
+	for (auto& so : _staticObjects) {
+		if (so.second == air || so.second == nullptr) continue;
+		_sg->addEntity(so.second->_geom, so.second->_pos, so.second->_orientation, so.second->_scale);
+	}
+
+	// Top
+	if (norm == btVector3(0, 1, 0)) {
+		Ogre::Vector3 topPos = obj->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0);
+		key topIndex = getKey(topPos);
+		StaticObject* topObj = getObjFromChunks(chunks, topIndex);
+
+		if (topObj == air) {
+			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
+			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, topPos, _simulator, this);
+			if (so == nullptr) assert(!"StaticObject is null");
+			_staticObjects[topIndex] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+			createAirNeighbors(chunks, so);
+		}
+	}
+
+	// Bottom
+	if (norm == btVector3(0, -1, 0)) {
+		Ogre::Vector3 pos = obj->_pos + Ogre::Vector3(0, -CHUNK_SCALE_FULL, 0);
+		key index = getKey(pos);
+		StaticObject* obj = getObjFromChunks(chunks, index);
+
+		if (obj == air) {
+			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
+			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			if (so == nullptr) assert(!"StaticObject is null");
+			_staticObjects[index] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+			createAirNeighbors(chunks, so);
+		}
+	}
+
+	// Left
+	if (norm == btVector3(-1, 0, 0)) {
+		Ogre::Vector3 pos = obj->_pos + Ogre::Vector3(-CHUNK_SCALE_FULL, 0, 0);
+		key index = getKey(pos);
+		StaticObject* obj = getObjFromChunks(chunks, index);
+
+		if (obj == air) {
+			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
+			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			if (so == nullptr) assert(!"StaticObject is null");
+			_staticObjects[index] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+			createAirNeighbors(chunks, so);
+		}
+	}
+
+	// Right
+	if (norm == btVector3(1, 0, 0)) {
+		Ogre::Vector3 pos = obj->_pos + Ogre::Vector3(CHUNK_SCALE_FULL, 0, 0);
+		key index = getKey(pos);
+		StaticObject* obj = getObjFromChunks(chunks, index);
+
+		if (obj == air) {
+			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
+			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			if (so == nullptr) assert(!"StaticObject is null");
+			_staticObjects[index] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+			createAirNeighbors(chunks, so);
+		}
+	}
+
+	// Front
+	if (norm == btVector3(0, 0, 1)) {
+		Ogre::Vector3 pos = obj->_pos + Ogre::Vector3(0, 0, CHUNK_SCALE_FULL);
+		key index = getKey(pos);
+		StaticObject* obj = getObjFromChunks(chunks, index);
+
+		if (obj == air) {
+			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
+			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			if (so == nullptr) assert(!"StaticObject is null");
+			_staticObjects[index] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+			createAirNeighbors(chunks, so);
+		}
+	}
+
+	// Back
+	if (norm == btVector3(0, 0, -1)) {
+		Ogre::Vector3 pos = obj->_pos + Ogre::Vector3(0, 0, -CHUNK_SCALE_FULL);
+		key index = getKey(pos);
+		StaticObject* obj = getObjFromChunks(chunks, index);
+
+		if (obj == air) {
+			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
+			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			if (so == nullptr) assert(!"StaticObject is null");
+			_staticObjects[index] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+			createAirNeighbors(chunks, so);
+		}
+	}
+
+	_sg->build();
+}
+
+void Chunk::createAirNeighbors(const std::vector<Chunk*>& chunks, StaticObject* obj) {
+	// top
+	Ogre::Vector3 topPos = obj->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0);
+	key topIndex = getKey(topPos);
+	StaticObject* topObj = getObjFromChunks(chunks, topIndex);
+	if (topObj == nullptr) {
+		_staticObjects[topIndex] = air;
+	}
+
+	// bottom
+	Ogre::Vector3 bottomPos = obj->_pos + Ogre::Vector3(0, -CHUNK_SCALE_FULL, 0);
+	key bottomIndex = getKey(bottomPos);
+	StaticObject* bottomObj = getObjFromChunks(chunks, bottomIndex);
+	if (bottomObj == nullptr) {
+		_staticObjects[bottomIndex] = air;
+	}
+
+	// left
+	Ogre::Vector3 leftPos = obj->_pos + Ogre::Vector3(-CHUNK_SCALE_FULL, 0, 0);
+	key leftIndex = getKey(leftPos);
+	StaticObject* leftObj = getObjFromChunks(chunks, leftIndex);
+	if (leftObj == nullptr) {
+		_staticObjects[leftIndex] = air;
+	}
+
+	// right
+	Ogre::Vector3 rightPos = obj->_pos + Ogre::Vector3(CHUNK_SCALE_FULL, 0, 0);
+	key rightIndex = getKey(rightPos);
+	StaticObject* rightObj = getObjFromChunks(chunks, rightIndex);
+	if (rightObj == nullptr) {
+		_staticObjects[rightIndex] = air;
+	}
+
+	// back
+	Ogre::Vector3 backPos = obj->_pos + Ogre::Vector3(0, 0, -CHUNK_SCALE_FULL);
+	key backIndex = getKey(backPos);
+	StaticObject* backObj = getObjFromChunks(chunks, backIndex);
+	if (backObj == nullptr) {
+		_staticObjects[backIndex] = air;
+	}
+
+	// front
+	Ogre::Vector3 frontPos = obj->_pos + Ogre::Vector3(0, 0, CHUNK_SCALE_FULL);
+	key frontIndex = getKey(frontPos);
+	StaticObject* frontObj = getObjFromChunks(chunks, frontIndex);
+	if (frontObj == nullptr) {
+		_staticObjects[frontIndex] = air;
+	}
 }
 
 StaticObject* Chunk::getObjFromChunks(const std::vector<Chunk*>& chunks, key index) {

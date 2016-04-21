@@ -182,6 +182,13 @@ bool Application::update(const FrameEvent &evt) {
 
 		prevChunks.swap(chunks);
 
+		if (pos.x < 0) {
+			currX -= CHUNK_SIZE;
+		}
+		if (pos.z < 0) {
+			currZ -= CHUNK_SIZE;
+		}
+
 		// Add only the current chunk's static objects to the bullet simulation
 		Chunk* chunk = getChunk(chunks, currX, currZ);
 		if (chunk != currentChunk) {
@@ -189,28 +196,23 @@ bool Application::update(const FrameEvent &evt) {
 			currentChunk = chunk;
 		}	
 
-		if (pos.x < 0) {
- 			currX -= CHUNK_SIZE;
- 		}
- 		if (pos.z < 0) {
- 			currZ -= CHUNK_SIZE;
-		}
-
 		Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
 		Ogre::Vector3 camPos = playerCam->getPosition();
 		btVector3 start(camPos.x, camPos.y, camPos.z);
 		btVector3 end = start + btVector3(norm.x, norm.y, norm.z) * 1000;
+		btVector3 hitNormal;
 		StaticObject* hitObj = nullptr;
 
-		if (_simulator->rayHit(start, end, hitObj)) {
+		if (_simulator->rayHit(start, end, hitObj, hitNormal)) {
 			if (hitObj != nullptr) {
 				highlight->getNode()->setVisible(true);
 				highlight->setPosition(hitObj->_pos);
 
 				if (_oisManager->mouseClicked) {
-					player->clickAction(hitObj, chunks, modifiedChunks);
-
-					recomputeColliders(chunks, currX, currZ);
+					// Return value tells us if we need to recompute the colliders or not
+					if (player->clickAction(hitObj, hitNormal, chunks, modifiedChunks)) {
+						recomputeColliders(chunks, currX, currZ);
+					}
 
 					_oisManager->mouseClicked = false;
 				}
