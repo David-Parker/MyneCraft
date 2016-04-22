@@ -55,6 +55,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				_staticObjects[airIndex] = air;
 			}
 
+			createCloud(pos);
+
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
 	}
@@ -550,6 +552,27 @@ bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 			return true;
 		default: return false;
 	}
+}
+
+bool Chunk::createCloud(const Ogre::Vector3& pos) {
+	if(rand() % 400 != 10) return false;
+
+	int imax = rand() % 25 + 5;
+	int jmax = rand() % 25 + 5;
+
+	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
+
+	for(int i = 0; i < imax; i++) {
+		for(int j = 0; j < jmax; j++) {
+			Ogre::Vector3 cloudPos(pos.x + i*CHUNK_SCALE_FULL, 60*CHUNK_SCALE_FULL, pos.z + j*CHUNK_SCALE_FULL);
+			StaticObject* cloud = new StaticObject(_biome->getEntity(Biome::ICE), Biome::ICE, scale, cloudPos, _simulator, this);
+			key index = getKey(cloud->_pos);
+			_staticObjects[index] = cloud;
+			_sg->addEntity(cloud->_geom, cloud->_pos, cloud->_orientation, cloud->_scale);
+		}
+	}
+
+	return true;
 }
 
 Chunk::key Chunk::getKey(int x, int y, int z) {
