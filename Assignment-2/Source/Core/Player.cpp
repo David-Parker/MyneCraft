@@ -42,7 +42,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	rotNode->setPosition(Ogre::Vector3(0, 0, 3));
 	rotNode->roll(Ogre::Degree(-60));
 	rotNode->setDirection(Ogre::Vector3(0, -1 , 0));
-	node->setScale(1, 5, 1);
+	node->setScale(2, 10, 2);
 
 	Ogre::Light* light = _sceneManager->createLight("torch");
 	light->setDiffuseColour(1, .6, .05);
