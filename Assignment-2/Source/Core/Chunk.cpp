@@ -560,17 +560,13 @@ bool Chunk::createCloud(const Ogre::Vector3& pos) {
 	int imax = rand() % 25 + 5;
 	int jmax = rand() % 25 + 5;
 
-	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
+	Ogre::Vector3 scale(imax*CHUNK_SCALE, CHUNK_SCALE, jmax*CHUNK_SCALE);
 
-	for(int i = 0; i < imax; i++) {
-		for(int j = 0; j < jmax; j++) {
-			Ogre::Vector3 cloudPos(pos.x + i*CHUNK_SCALE_FULL, 60*CHUNK_SCALE_FULL, pos.z + j*CHUNK_SCALE_FULL);
-			StaticObject* cloud = new StaticObject(_biome->getEntity(Biome::ICE), Biome::ICE, scale, cloudPos, _simulator, this);
-			key index = getKey(cloud->_pos);
-			_staticObjects[index] = cloud;
-			_sg->addEntity(cloud->_geom, cloud->_pos, cloud->_orientation, cloud->_scale);
-		}
-	}
+	Ogre::Vector3 cloudPos(pos.x, 60*CHUNK_SCALE_FULL, pos.z);
+	StaticObject* cloud = new StaticObject(_biome->getEntity(Biome::CLOUD), Biome::CLOUD, scale, cloudPos, _simulator, this);
+	key index = getKey(cloud->_pos);
+	_staticObjects[index] = cloud;
+	_sg->addEntity(cloud->_geom, cloud->_pos, cloud->_orientation, cloud->_scale);
 
 	return true;
 }
