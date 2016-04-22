@@ -19,6 +19,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	node->setScale(3, 3, 3);
 	node->setVisible(false);
 
+	_animation.createPickaxeAnimation(node);
+
 	inventory.push_back(node);
 
 	item = _sceneManager->createEntity("Sword", "Mynecraft-Sword.mesh");
@@ -244,6 +246,8 @@ void Player::update(OISManager* ois) {
 		node->roll(Ogre::Degree(-25));
 	}
 
+	_animation.playAnimation();
+
 }
 
 bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks) {
@@ -301,6 +305,7 @@ void Player::pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<in
 			modifiedChunks[name] = chunk;
 		}
 	}
+	_animation.setPickaxe();
 }
 
 void Player::cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, Biome::BiomeType type) {

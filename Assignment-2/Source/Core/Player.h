@@ -6,6 +6,7 @@
 #include "GameObject.h"
 #include "OISManager.h"
 #include "Chunk.h"
+#include "Animation.h"
 
 const static int averageSize = 10;
 const static int axeDistance = 70;
@@ -18,7 +19,7 @@ private:
 	int equippedItem;
 	std::vector<Ogre::SceneNode*> inventory;
 	void getNeighborChunks(std::vector<Chunk*>& chunklist, int x, int z, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, Chunk* chunk);
-
+	Animation _animation;
 public:
 	Player(Ogre::Camera*, GameObject* body, Ogre::SceneManager* sm);
 	Ogre::Camera* _playerCam;
