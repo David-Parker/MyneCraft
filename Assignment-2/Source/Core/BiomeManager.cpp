@@ -51,5 +51,5 @@ Ogre::Entity* BiomeManager::getTerrain(Biome::BiomeType type) {
 }
 
 bool BiomeManager::isTreeType(Biome::BiomeType type) {
-	return type == Biome::WOOD || type == Biome::LEAF || type == Biome::ICE || type == Biome::CACTUS;
+	return type == Biome::WOOD || type == Biome::LEAF || type == Biome::ICE || type == Biome::CACTUS || type == Biome::CLOUD;
 }
