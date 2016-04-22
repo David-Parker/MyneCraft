@@ -305,7 +305,8 @@ void Player::pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<in
 
 void Player::cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, Biome::BiomeType type) {
 	Chunk* chunk = hitObj->_chunk;
-
+	if ( (hitObj->_pos - _body->getNode()->getPosition()).length() < 2.5*CHUNK_SCALE_FULL )
+		return;
 	if (chunk != nullptr) {
 		int x = chunk->_xStart;
 		int z = chunk->_yStart;

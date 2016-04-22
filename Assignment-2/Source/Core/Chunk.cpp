@@ -307,7 +307,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 		if (!lights[tkey]) {
 			float range = 5000.0f;
 			Ogre::Light* light = _mSceneManager->createLight(tkey);
-			light->setDiffuseColour(1, .6, .05);
+			light->setDiffuseColour(0.9, 0.4, 0.2);
 			light->setType(Ogre::Light::LT_POINT);
 			light->setAttenuation(range, 1.0f, .5f/range, 5.0f/(range*range));
 			light->setPosition(pos);
