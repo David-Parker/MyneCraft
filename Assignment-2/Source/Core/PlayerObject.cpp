@@ -24,7 +24,6 @@ void PlayerObject::update() {
 	    btScalar speed = velocity.length();
 	    if(speed >= deathSpeed) {
 	        isDead = true;
-	        // std::cout << "DEAD" << std::endl;
 	    }
 	}
 }

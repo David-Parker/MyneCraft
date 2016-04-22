@@ -9,6 +9,7 @@ BiomeManager::BiomeManager(Ogre::SceneManager* smgr) : mSceneManager(smgr) {
 	dirtMesh = worldBiomes.at(0)->getEntity(Biome::DIRT);
 	torchMesh = worldBiomes.at(0)->getEntity(Biome::TORCH);
 	plankMesh = worldBiomes.at(0)->getEntity(Biome::PLANK);
+	cloudMesh = worldBiomes.at(0)->getEntity(Biome::CLOUD);
 }
 
 
@@ -44,10 +45,11 @@ Ogre::Entity* BiomeManager::getTerrain(Biome::BiomeType type) {
 		case Biome::DIRT: return dirtMesh;
 		case Biome::TORCH: return torchMesh;
 		case Biome::PLANK: return plankMesh;
+		case Biome::CLOUD: return cloudMesh;
 	}
 	return nullptr;
 }
 
 bool BiomeManager::isTreeType(Biome::BiomeType type) {
-	return type == Biome::WOOD || type == Biome::LEAF || type == Biome::ICE || type == Biome::CACTUS;
+	return type == Biome::WOOD || type == Biome::LEAF || type == Biome::ICE || type == Biome::CACTUS || type == Biome::CLOUD;
 }

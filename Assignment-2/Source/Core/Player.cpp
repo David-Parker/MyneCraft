@@ -44,7 +44,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	rotNode->setPosition(Ogre::Vector3(0, 0, 3));
 	rotNode->roll(Ogre::Degree(-60));
 	rotNode->setDirection(Ogre::Vector3(0, -1 , 0));
-	node->setScale(1, 5, 1);
+	node->setScale(2, 10, 2);
 
 	Ogre::Light* light = _sceneManager->createLight("torch");
 	light->setDiffuseColour(1, .6, .05);
@@ -173,44 +173,45 @@ void Player::update(OISManager* ois) {
 	OIS::KeyCode lastkey;
 	bool moved = false;
 
-	if (_body->isDead) {
-		_body->setVelocity(0, 0, 0);
-		_body->setPosition(0, 1500, 0);
-		_body->isDead = false;
+	// if(!_body) assert(!"Body cannot be null!");
+	
+	// if (_body->isDead) {
+	// 	_body->setVelocity(0, 0, 0);
+	// 	_body->setPosition(0, 1500, 0);
+	// 	_body->isDead = false;
+	// }
+
+	if (ois->isKeyDown(OIS::KC_LSHIFT)) {
+		speed = 2500;
 	}
 	else {
-		if (ois->isKeyDown(OIS::KC_LSHIFT)) {
-			speed = 2500;
-		}
-		else {
-			speed = 1000;
-		}
+		speed = 1000;
+	}
 
-		if (ois->isKeyDown(OIS::KC_W)) {
-			_body->setVelocity(movePos.x*speed, currentY, movePos.z*speed);
-			moved = true;
-		}
-		if (ois->isKeyDown(OIS::KC_S)) {
-			_body->setVelocity(movePos.x*-speed, currentY, movePos.z*-speed);
-			moved = true;
-		}
-		if (ois->isKeyDown(OIS::KC_D)) {
-			_body->setVelocity(strafePos.x*speed, currentY, strafePos.z*speed);
-			moved = true;
-		}
-		if (ois->isKeyDown(OIS::KC_A)) {
-			_body->setVelocity(strafePos.x*-speed, currentY, strafePos.z*-speed);
-			moved = true;
-		}
-		if (ois->isKeyDown(OIS::KC_SPACE) && _body->canJump) {
-			_body->setVelocity(_body->getBody()->getLinearVelocity().x(), 2500, _body->getBody()->getLinearVelocity().z());
-			moved = true;
-			_body->canJump = false;
-		}
+	if (ois->isKeyDown(OIS::KC_W)) {
+		_body->setVelocity(movePos.x*speed, currentY, movePos.z*speed);
+		moved = true;
+	}
+	if (ois->isKeyDown(OIS::KC_S)) {
+		_body->setVelocity(movePos.x*-speed, currentY, movePos.z*-speed);
+		moved = true;
+	}
+	if (ois->isKeyDown(OIS::KC_D)) {
+		_body->setVelocity(strafePos.x*speed, currentY, strafePos.z*speed);
+		moved = true;
+	}
+	if (ois->isKeyDown(OIS::KC_A)) {
+		_body->setVelocity(strafePos.x*-speed, currentY, strafePos.z*-speed);
+		moved = true;
+	}
+	if (ois->isKeyDown(OIS::KC_SPACE) && _body->canJump) {
+		_body->setVelocity(_body->getBody()->getLinearVelocity().x(), 2500, _body->getBody()->getLinearVelocity().z());
+		moved = true;
+		_body->canJump = false;
+	}
 
-		if (!moved) {
-			_body->setVelocity(0, currentY, 0);
-		}
+	if (!moved) {
+		_body->setVelocity(0, currentY, 0);
 	}
 
 	camAvg[camAvgIndex % averageSize] = _body->getNode()->getPosition() + Ogre::Vector3(0, 170, 0);
@@ -310,7 +311,8 @@ void Player::pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<in
 
 void Player::cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, Biome::BiomeType type) {
 	Chunk* chunk = hitObj->_chunk;
-
+	if ( (hitObj->_pos - _body->getNode()->getPosition()).length() < 2.8*CHUNK_SCALE_FULL )
+		return;
 	if (chunk != nullptr) {
 		int x = chunk->_xStart;
 		int z = chunk->_yStart;

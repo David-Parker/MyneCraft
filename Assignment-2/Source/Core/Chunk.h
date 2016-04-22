@@ -29,6 +29,7 @@ private:
 	std::unordered_map<key, Ogre::Light*> lights;
 
 	bool createTree(const Ogre::Vector3&, Biome::BiomeType);
+	bool createCloud(const Ogre::Vector3& pos);
 	key getKey(int x, int y, int z);
 	key getKey(const Ogre::Vector3& pos);
 

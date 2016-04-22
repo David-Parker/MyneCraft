@@ -60,4 +60,5 @@ protected:
 	Ogre::Entity* dirtMesh;
 	Ogre::Entity* torchMesh;
 	Ogre::Entity* plankMesh;
+	Ogre::Entity* cloudMesh;
 };

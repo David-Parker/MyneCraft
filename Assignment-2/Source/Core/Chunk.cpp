@@ -55,6 +55,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				_staticObjects[airIndex] = air;
 			}
 
+			createCloud(pos);
+
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
 	}
@@ -307,7 +309,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 		if (!lights[tkey]) {
 			float range = 5000.0f;
 			Ogre::Light* light = _mSceneManager->createLight(tkey);
-			light->setDiffuseColour(1, .6, .05);
+			light->setDiffuseColour(0.9, 0.4, 0.2);
 			light->setType(Ogre::Light::LT_POINT);
 			light->setAttenuation(range, 1.0f, .5f/range, 5.0f/(range*range));
 			light->setPosition(pos);
@@ -550,6 +552,23 @@ bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 			return true;
 		default: return false;
 	}
+}
+
+bool Chunk::createCloud(const Ogre::Vector3& pos) {
+	if(rand() % 400 != 10) return false;
+
+	int imax = rand() % 25 + 5;
+	int jmax = rand() % 25 + 5;
+
+	Ogre::Vector3 scale(imax*CHUNK_SCALE, CHUNK_SCALE, jmax*CHUNK_SCALE);
+
+	Ogre::Vector3 cloudPos(pos.x, 60*CHUNK_SCALE_FULL, pos.z);
+	StaticObject* cloud = new StaticObject(_biome->getEntity(Biome::CLOUD), Biome::CLOUD, scale, cloudPos, _simulator, this);
+	key index = getKey(cloud->_pos);
+	_staticObjects[index] = cloud;
+	_sg->addEntity(cloud->_geom, cloud->_pos, cloud->_orientation, cloud->_scale);
+
+	return true;
 }
 
 Chunk::key Chunk::getKey(int x, int y, int z) {
