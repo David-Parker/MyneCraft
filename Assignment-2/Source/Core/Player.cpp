@@ -42,7 +42,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	rotNode->setPosition(Ogre::Vector3(0, 0, 3));
 	rotNode->roll(Ogre::Degree(-60));
 	rotNode->setDirection(Ogre::Vector3(0, -1 , 0));
-	node->setScale(1, 5, 1);
+	node->setScale(2, 10, 2);
 
 	Ogre::Light* light = _sceneManager->createLight("torch");
 	light->setDiffuseColour(1, .6, .05);
@@ -306,7 +306,8 @@ void Player::pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<in
 
 void Player::cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, Biome::BiomeType type) {
 	Chunk* chunk = hitObj->_chunk;
-
+	if ( (hitObj->_pos - _body->getNode()->getPosition()).length() < 2.8*CHUNK_SCALE_FULL )
+		return;
 	if (chunk != nullptr) {
 		int x = chunk->_xStart;
 		int z = chunk->_yStart;
