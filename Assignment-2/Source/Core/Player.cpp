@@ -158,37 +158,44 @@ void Player::update(OISManager* ois) {
 	OIS::KeyCode lastkey;
 	bool moved = false;
 
-	if (ois->isKeyDown(OIS::KC_LSHIFT)) {
-		speed = 2500;
+	if (_body->isDead) {
+		_body->setVelocity(0, 0, 0);
+		_body->setPosition(0, 1500, 0);
+		_body->isDead = false;
 	}
 	else {
-		speed = 1000;
-	}
+		if (ois->isKeyDown(OIS::KC_LSHIFT)) {
+			speed = 2500;
+		}
+		else {
+			speed = 1000;
+		}
 
-	if (ois->isKeyDown(OIS::KC_W)) {
-		_body->setVelocity(movePos.x*speed, currentY, movePos.z*speed);
-		moved = true;
-	}
-	if (ois->isKeyDown(OIS::KC_S)) {
-		_body->setVelocity(movePos.x*-speed, currentY, movePos.z*-speed);
-		moved = true;
-	}
-	if (ois->isKeyDown(OIS::KC_D)) {
-		_body->setVelocity(strafePos.x*speed, currentY, strafePos.z*speed);
-		moved = true;
-	}
-	if (ois->isKeyDown(OIS::KC_A)) {
-		_body->setVelocity(strafePos.x*-speed, currentY, strafePos.z*-speed);
-		moved = true;
-	}
-	if (ois->isKeyDown(OIS::KC_SPACE) && _body->canJump) {
-		_body->setVelocity(_body->getBody()->getLinearVelocity().x(), 2500, _body->getBody()->getLinearVelocity().z());
-		moved = true;
-		_body->canJump = false;
-	}
+		if (ois->isKeyDown(OIS::KC_W)) {
+			_body->setVelocity(movePos.x*speed, currentY, movePos.z*speed);
+			moved = true;
+		}
+		if (ois->isKeyDown(OIS::KC_S)) {
+			_body->setVelocity(movePos.x*-speed, currentY, movePos.z*-speed);
+			moved = true;
+		}
+		if (ois->isKeyDown(OIS::KC_D)) {
+			_body->setVelocity(strafePos.x*speed, currentY, strafePos.z*speed);
+			moved = true;
+		}
+		if (ois->isKeyDown(OIS::KC_A)) {
+			_body->setVelocity(strafePos.x*-speed, currentY, strafePos.z*-speed);
+			moved = true;
+		}
+		if (ois->isKeyDown(OIS::KC_SPACE) && _body->canJump) {
+			_body->setVelocity(_body->getBody()->getLinearVelocity().x(), 2500, _body->getBody()->getLinearVelocity().z());
+			moved = true;
+			_body->canJump = false;
+		}
 
-	if (!moved) {
-		_body->setVelocity(0, currentY, 0);
+		if (!moved) {
+			_body->setVelocity(0, currentY, 0);
+		}
 	}
 
 	camAvg[camAvgIndex % averageSize] = _body->getNode()->getPosition() + Ogre::Vector3(0, 170, 0);
