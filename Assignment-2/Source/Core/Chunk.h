@@ -26,7 +26,7 @@ private:
 	Biome* _biome;
 	BiomeManager* _biomeMgr;
 
-	void createTree(const Ogre::Vector3&, Biome::BiomeType);
+	bool createTree(const Ogre::Vector3&, Biome::BiomeType);
 	key getKey(int x, int y, int z);
 	key getKey(const Ogre::Vector3& pos);
 

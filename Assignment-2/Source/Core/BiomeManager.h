@@ -58,4 +58,5 @@ protected:
 	Ogre::Entity* sandMesh;
 	Ogre::Entity* rockMesh;
 	Ogre::Entity* dirtMesh;
+	Ogre::Entity* plankMesh;
 };

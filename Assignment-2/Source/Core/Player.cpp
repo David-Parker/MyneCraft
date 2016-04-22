@@ -119,6 +119,19 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
+	item = _sceneManager->createEntity("PlankCube", "Cube-Plank.mesh");
+	item->setCastShadows(true);
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("PlankCube");
+	rotNode = node->createChildSceneNode("PlankCubeNode");
+	rotNode->attachObject(item);
+	rotNode->setPosition(Ogre::Vector3(0, 0, 2));
+	rotNode->roll(Ogre::Degree(90));
+	rotNode->pitch(Ogre::Degree(-90));
+	node->setScale(9, 9, 9);
+	node->setVisible(false);
+
+	inventory.push_back(node);
+
 	equippedItem = -1;
 }
 
@@ -256,6 +269,10 @@ bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::
 	}
 	if (equippedItem == DIRT_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::DIRT);
+		return true;
+	}
+	if (equippedItem == PLANK_CUBE) {
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::PLANK);
 		return true;
 	}
 	return false;
