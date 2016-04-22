@@ -34,15 +34,15 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-
-	item = _sceneManager->createEntity("Light", "torch.mesh");
+	item = _sceneManager->createEntity("Light", "Cube-Torch.mesh");
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Light");
 	rotNode = node->createChildSceneNode("LightNode");
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(0, 0, 3));
+	rotNode->roll(Ogre::Degree(-60));
 	rotNode->setDirection(Ogre::Vector3(0, -1 , 0));
-	node->setScale(4, 4, 4);
+	node->setScale(1, 5, 1);
 
 	Ogre::Light* light = _sceneManager->createLight("torch");
 	light->setDiffuseColour(1, .6, .05);
@@ -249,6 +249,10 @@ void Player::update(OISManager* ois) {
 bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks) {
 	if (equippedItem == PICKAXE) {
 		pickaxeAction(hitObj, chunks, modifiedChunks);
+		return true;
+	}
+	if (equippedItem == TORCH_CUBE) {
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::TORCH);
 		return true;
 	}
 	if (equippedItem == GRASS_CUBE) {
