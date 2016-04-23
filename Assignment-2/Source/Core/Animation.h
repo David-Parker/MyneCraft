@@ -9,8 +9,11 @@ public:
 	Animation();
 	~Animation();
 	void addAction(Action* action);
-	void setPickaxe();
+	void setActionLock(int actionPos);
 	void createPickaxeAnimation(Ogre::SceneNode* sceneNode);
+	void createSwordAnimation(Ogre::SceneNode* sceneNode);
+	void createTorchAnimation(Ogre::SceneNode* sceneNode);
+	void createBlockAnimation(Ogre::SceneNode* sceneNode);
 	void playAnimation();
 	bool _inAction;
 	Action* _currentAction = nullptr;

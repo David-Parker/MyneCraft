@@ -20,19 +20,42 @@ void Animation::playAnimation() {
 void Animation::createPickaxeAnimation(Ogre::SceneNode* sceneNode) {
 	Action* action = new Action(sceneNode);
 	static int numtimes = 4;
-	static int offset = -10;
+	static int dOffset = -10;
+	static int tOffset = 2;
 	for (int i = 0; i <= numtimes; ++i)
-		action->addAction(Action::YAW, Ogre::Degree(offset*i));
+		action->addAction(Action::YAW, Ogre::Degree(dOffset * i), Ogre::Vector3(tOffset, 0, 0) * i);
 	for (int i = numtimes; i >= 0; --i)
-		action->addAction(Action::YAW, Ogre::Degree(offset*i));
+		action->addAction(Action::YAW, Ogre::Degree(dOffset * i), Ogre::Vector3(tOffset, 0, 0) * i);
 
 	addAction(action);
 }
 
-void Animation::setPickaxe() {
-	if (_inAction && _currentAction != _actions.at(0))
-		return;
-	_currentAction = _actions.at(0);
-	_inAction = true;
+void Animation::createSwordAnimation(Ogre::SceneNode* sceneNode) {
+	createPickaxeAnimation(sceneNode);
 }
 
+void Animation::createTorchAnimation(Ogre::SceneNode* sceneNode) {
+	createPickaxeAnimation(sceneNode);
+}
+
+void Animation::createBlockAnimation(Ogre::SceneNode* sceneNode) {
+	Action* action = new Action(sceneNode);
+	static int numtimes = 4;
+	static int dOffset = 10;
+	static int tOffset = 0;
+	for (int i = 0; i <= numtimes; ++i)
+		action->addAction(Action::YAW, Ogre::Degree(dOffset * i), Ogre::Vector3(0, tOffset, tOffset) * i);
+	for (int i = numtimes; i >= 0; --i)
+		action->addAction(Action::YAW, Ogre::Degree(dOffset * i), Ogre::Vector3(0, tOffset, tOffset) * i);
+
+	addAction(action);
+}
+
+void Animation::setActionLock(int actionPos) {
+	if (_actions.size() <= actionPos)
+		return;
+	if (_inAction && _currentAction != _actions.at(actionPos))
+		return;
+	_currentAction = _actions.at(actionPos);
+	_inAction = true;
+}

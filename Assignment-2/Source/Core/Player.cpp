@@ -34,6 +34,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	node->setScale(1, 1, 1);
 	node->setVisible(false);
 
+	_animation.createSwordAnimation(node);
+
 	inventory.push_back(node);
 
 	item = _sceneManager->createEntity("Light", "Cube-Torch.mesh");
@@ -54,6 +56,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	node->attachObject(light);
 	node->setVisible(false);
 
+	_animation.createSwordAnimation(node);
+
 	inventory.push_back(node);
 
 	item = _sceneManager->createEntity("GrassCube", "Cube-Grass.mesh");
@@ -66,6 +70,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	rotNode->pitch(Ogre::Degree(-90));
 	node->setScale(9, 9, 9);
 	node->setVisible(false);
+
+	_animation.createBlockAnimation(node);
 
 	inventory.push_back(node);
 
@@ -80,6 +86,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	node->setScale(9, 9, 9);
 	node->setVisible(false);
 
+	_animation.createBlockAnimation(node);
+
 	inventory.push_back(node);
 
 	item = _sceneManager->createEntity("SnowCube", "Cube-Snow.mesh");
@@ -92,6 +100,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	rotNode->pitch(Ogre::Degree(-90));
 	node->setScale(9, 9, 9);
 	node->setVisible(false);
+
+	_animation.createBlockAnimation(node);
 
 	inventory.push_back(node);
 
@@ -106,6 +116,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	node->setScale(9, 9, 9);
 	node->setVisible(false);
 
+	_animation.createBlockAnimation(node);
+
 	inventory.push_back(node);
 
 	item = _sceneManager->createEntity("DirtCube", "Cube-Dirt.mesh");
@@ -118,6 +130,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	rotNode->pitch(Ogre::Degree(-90));
 	node->setScale(9, 9, 9);
 	node->setVisible(false);
+
+	_animation.createBlockAnimation(node);
 
 	inventory.push_back(node);
 
@@ -132,13 +146,17 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	node->setScale(9, 9, 9);
 	node->setVisible(false);
 
+	_animation.createBlockAnimation(node);
+
 	inventory.push_back(node);
 
 	equippedItem = -1;
 }
 
 void Player::setWeapon ( int i ) {
-	if ( equippedItem >= 0 && equippedItem < inventory.size() ) {
+	if (_animation._inAction)
+		return;
+	if ( equippedItem >= 0 && equippedItem < inventory.size()) {
 		inventory[equippedItem]->setVisible(false);
 	}
 	if ( i < 0 || i >= inventory.size() )
@@ -254,34 +272,46 @@ void Player::update(OISManager* ois) {
 bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks) {
 	if (equippedItem == PICKAXE) {
 		pickaxeAction(hitObj, chunks, modifiedChunks);
+		_animation.setActionLock(PICKAXE);
+		return true;
+	}
+	if (equippedItem == SWORD) {
+		_animation.setActionLock(SWORD);
 		return true;
 	}
 	if (equippedItem == TORCH_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::TORCH);
+		_animation.setActionLock(TORCH_CUBE);
 		return true;
 	}
 	if (equippedItem == GRASS_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::GRASS);
+		_animation.setActionLock(GRASS_CUBE);
 		return true;
 	}
 	if (equippedItem == ROCK_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::ROCK);
+		_animation.setActionLock(ROCK_CUBE);
 		return true;
 	}
 	if (equippedItem == SNOW_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::SNOW);
+		_animation.setActionLock(SNOW_CUBE);
 		return true;
 	}
 	if (equippedItem == SAND_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::SAND);
+		_animation.setActionLock(SAND_CUBE);
 		return true;
 	}
 	if (equippedItem == DIRT_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::DIRT);
+		_animation.setActionLock(DIRT_CUBE);
 		return true;
 	}
 	if (equippedItem == PLANK_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::PLANK);
+		_animation.setActionLock(PLANK_CUBE);
 		return true;
 	}
 	return false;
@@ -306,7 +336,6 @@ void Player::pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<in
 			modifiedChunks[name] = chunk;
 		}
 	}
-	_animation.setPickaxe();
 }
 
 void Player::cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, Biome::BiomeType type) {

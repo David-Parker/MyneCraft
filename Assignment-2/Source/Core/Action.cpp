@@ -6,9 +6,10 @@ Action::Action(Ogre::SceneNode* sceneNode) {
 
 }
 
-void Action::addAction(ACTION_TYPE type, Ogre::Degree degree) {
+void Action::addAction(ACTION_TYPE type, Ogre::Degree degree, Ogre::Vector3 translation) {
 	_actions.push_back(type);
 	_degrees.push_back(degree);
+	_translations.push_back(translation);
 }
 
 /**
@@ -17,6 +18,7 @@ void Action::addAction(ACTION_TYPE type, Ogre::Degree degree) {
 bool Action::playAction() {
 	ACTION_TYPE action = _actions.at(_currentActionIndex);
 	Ogre::Degree degree = _degrees.at(_currentActionIndex);
+	Ogre::Vector3 translation = _translations.at(_currentActionIndex);
 
 	if (action == PITCH) {
 		_sceneNode->pitch(degree);
@@ -31,6 +33,8 @@ bool Action::playAction() {
 		assert(!"Block was null");
 	}
 
+	_sceneNode->translate(translation);
+	
 	++_currentActionIndex;
 
 	if (_currentActionIndex == _actions.size()) {
