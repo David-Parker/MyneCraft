@@ -262,7 +262,7 @@ void Player::update(OISManager* ois) {
 
 		Ogre::Vector3 offset = unit.crossProduct(qt.zAxis()).normalisedCopy();
 		node->setPosition(total + unit*50 - offset*20);
-		node->roll(Ogre::Degree(-25));
+		node->roll(Ogre::Degree(-10));
 	}
 
 	_animation.playAnimation();
