@@ -14,11 +14,12 @@ static Ogre::Entity* leafCube = nullptr;
 static Ogre::Entity* cactusCube = nullptr;
 static Ogre::Entity* torchCube = nullptr;
 static Ogre::Entity* plankCube = nullptr;
+static Ogre::Entity* glassCube = nullptr;
 static Ogre::Entity* cloudCube = nullptr;
 
 class Biome {
 public:
-	enum BiomeType{ SNOW, SAND, ROCK, GRASS, DIRT, TORCH, ICE, WOOD, LEAF, CACTUS, PLANK, CLOUD, AIR, NUM_BIOMES };
+	enum BiomeType{ SNOW, SAND, ROCK, GRASS, DIRT, TORCH, ICE, WOOD, LEAF, CACTUS, PLANK, GLASS, CLOUD, AIR, NUM_BIOMES };
 
 	Biome(Ogre::SceneManager*, BiomeType, int, int, int);
 	~Biome(void);

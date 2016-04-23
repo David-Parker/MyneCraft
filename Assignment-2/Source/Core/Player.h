@@ -25,7 +25,7 @@ public:
 	Ogre::Camera* _playerCam;
 	GameObject* _body;
 
-	enum ITEM_TYPE{ PICKAXE, SWORD, TORCH_CUBE, GRASS_CUBE, ROCK_CUBE, SNOW_CUBE, SAND_CUBE, DIRT_CUBE, PLANK_CUBE, NUM_WEP };
+	enum ITEM_TYPE{ PICKAXE, SWORD, TORCH_CUBE, GRASS_CUBE, ROCK_CUBE, SNOW_CUBE, SAND_CUBE, DIRT_CUBE, PLANK_CUBE, GLASS_CUBE, NUM_WEP };
 
 	void setWeapon(int);
 	Ogre::SceneNode* getWeaponNode();

@@ -13,6 +13,7 @@ Biome::Biome(Ogre::SceneManager* smgr, BiomeType type, int x, int y, int r) : mS
 	cactusCube = mSceneManager->createEntity("Cube-Cactus.mesh");
 	torchCube = mSceneManager->createEntity("Cube-Torch.mesh");
 	plankCube = mSceneManager->createEntity("Cube-Plank.mesh");
+	glassCube = mSceneManager->createEntity("Cube-Glass.mesh");
 	cloudCube = mSceneManager->createEntity("Cube-Cloud.mesh");
 }
 
@@ -57,6 +58,7 @@ Ogre::Entity* Biome::getEntity(BiomeType type) {
 		case CACTUS: return cactusCube;
 		case TORCH: return torchCube;
 		case PLANK: return plankCube;
+		case GLASS: return glassCube;
 		case CLOUD: return cloudCube;
 		default: return nullptr;
 	}
