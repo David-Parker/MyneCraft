@@ -30,6 +30,26 @@ void Application::init()
 	// This is really just a debugging try-catch block for catching and printing exceptions
 	try {
 
+		/*srand(time(0));*/
+		std::fstream saveFile;
+
+		saveFile.open("save.txt", std::ios::in);
+
+		std::string line;
+		getline(saveFile, line);
+
+		if (line == magicHeader) {
+			getline(saveFile, line);
+			seed = std::stoi(line);
+		}
+		else {
+			seed = time(0);
+		}
+
+		saveFile.close();
+
+		srand(seed);
+
 		t1 = new Timer();
 
 		_simulator = new Simulator();
@@ -60,9 +80,6 @@ void Application::init()
 }
 
 void Application::setupWorld() {
-	time_t  timev;
-	seed = time(&timev);
-
 	std::fstream saveFile;
 
 	saveFile.open("save.txt", std::ios::in);
@@ -116,8 +133,6 @@ void Application::setupWorld() {
 			}
 		}
 	}
-
-	srand(seed);
 
 	saveFile.close();
 }
