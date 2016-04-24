@@ -136,9 +136,9 @@ bool Application::update(const FrameEvent &evt) {
 
 	if (int delta = _oisManager->getMouseWheel()) {
 		int index = player->getWeapon() + delta;
-		index = index % Player::NUM_WEP;
+		index = index % (Player::NUM_WEP+1);
 		if (index < 0)
-			index += Player::NUM_WEP;
+			index += Player::NUM_WEP+1;
 
 		player->setWeapon(index);
 		_oisManager->resetWheel();
@@ -513,7 +513,7 @@ void Application::setupCameras(void) {
 
 	cameras = std::vector<Ogre::Camera*>();
 	cameras.push_back(playerCam);
-	
+
 	_oisManager->setupCameraMan(playerCam);
 	//std::cout << camMan->getFarClipDistance() << std::endl;
 }
