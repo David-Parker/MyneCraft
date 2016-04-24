@@ -15,8 +15,6 @@
 #include <OISKeyboard.h>
 #include <OISInputManager.h>
 
-#include <SdkCameraMan.h>
-
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/Renderer.h>
 
@@ -54,7 +52,6 @@ public:
 	Ogre::String mPluginsCfg;
 	Ogre::RenderWindow * mRenderWindow;
 	Ogre::SceneManager * mSceneManager;
-	OgreBites::SdkCameraMan * cameraMan;
 	Ogre::Camera* playerCam;
 	Ogre::Timer* t1;
 	BiomeManager* biomeManager;

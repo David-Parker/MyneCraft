@@ -6,7 +6,6 @@
 OISManager *OISManager::mOISManager;
  
 OISManager::OISManager( void ) :
-    cameraMan( 0 ),
     mMouse( 0 ),
     mKeyboard( 0 ),
     mInputSystem( 0 ) {
@@ -27,7 +26,6 @@ OISManager::~OISManager( void ) {
         // If you use OIS1.0RC1 or above, uncomment this line
         // and comment the line below it
         mInputSystem->destroyInputSystem( mInputSystem );
-        //mInputSystem->destroyInputSystem();
         mInputSystem = 0;
  
         // Clear Listeners
@@ -75,10 +73,8 @@ void OISManager::initialise( Ogre::RenderWindow *renderWindow ) {
     }
 }
 
-void OISManager::setupCameraMan(OgreBites::SdkCameraMan * camMan){
-    if(!cameraMan){
-        cameraMan = camMan;
-    }
+void OISManager::setupCameraMan(Ogre::Camera* camMan){
+    cameraMan = camMan;
 }
  
 void OISManager::capture( void ) {
@@ -194,7 +190,6 @@ OIS::Keyboard* OISManager::getKeyboard( void ) {
 
  
 bool OISManager::keyPressed( const OIS::KeyEvent &e ) {
-    //if(cameraMan) cameraMan->injectKeyDown(e);
     mKeyPressed = e.key;
 
 #ifdef _DEBUG
@@ -218,14 +213,22 @@ OIS::KeyCode OISManager::lastKeyPressed() {
 
 bool OISManager::keyReleased( const OIS::KeyEvent &e ) {
 	mKeyPressed = OIS::KC_UNASSIGNED;
-    if(cameraMan) cameraMan->injectKeyUp(e);
     return true;
 }
  
 bool OISManager::mouseMoved( const OIS::MouseEvent &e ) {
-
-    if(cameraMan) cameraMan->injectMouseMove(e);
-
+    static Ogre::Degree curPitch(0);
+    static Ogre::Degree maxPitch(75);
+    static Ogre::Degree minPitch(-80);
+    if(cameraMan) {
+        cameraMan->yaw(Ogre::Degree(-e.state.X.rel * 0.15f));
+        Ogre::Degree nextPitch(-e.state.Y.rel * 0.15f);
+        Ogre::Degree tPitch = curPitch + nextPitch;
+        if ( tPitch > minPitch && tPitch < maxPitch ) {
+            curPitch = curPitch + nextPitch;
+            cameraMan->pitch(nextPitch);
+        }
+    }
     // From -width/2 to +width/2
     mouseXAxis = (e.state.X.abs) - e.state.width/2;
     mouseYAxis = (e.state.Y.abs) - e.state.height/2;
@@ -246,7 +249,6 @@ bool OISManager::mousePressed( const OIS::MouseEvent &e, OIS::MouseButtonID id )
     CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertButton(id));
 #endif
     mouseClicked  = true;
-    if(cameraMan) cameraMan->injectMouseDown(e, id);
     return true;
 }
  
@@ -255,7 +257,6 @@ bool OISManager::mouseReleased( const OIS::MouseEvent &e, OIS::MouseButtonID id 
     CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertButton(id));
 #endif
     mouseClicked  = false;
-    if(cameraMan) cameraMan->injectMouseUp(e, id);
     return true;
 }
  

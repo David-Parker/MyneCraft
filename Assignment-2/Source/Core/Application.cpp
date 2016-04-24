@@ -97,7 +97,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 
 	_simulator->stepSimulation(evt.timeSinceLastFrame, 7);
 
-	cameraMan->frameRenderingQueued(evt);
+	//cameraMan->frameRenderingQueued(evt);
 
 	return true;
 }
@@ -114,14 +114,14 @@ bool Application::update(const FrameEvent &evt) {
 
 	if (lastKey == OIS::KC_M) {
 		gameManager->mute();
-	}
+	}/*
 	else if (lastKey == OIS::KC_1 || lastKey == OIS::KC_2 || lastKey == OIS::KC_3 || lastKey == OIS::KC_4) {
 		int index = lastKey - 2;
 		if (index >= 0 && index < cameras.size()) {
 			mRenderWindow->removeAllViewports();
 			mRenderWindow->addViewport(cameras[index]);
 		}
-	}
+	}*/
 	else if(lastKey == OIS::KC_ESCAPE) {
 		// close window when ESC is pressed
 		mRunning = false;
@@ -513,23 +513,21 @@ void Application::setupCEGUI(void) {
 
 void Application::setupCameras(void) {
 
-	Ogre::Camera* camMan = mSceneManager->createCamera("Camera Man");
-	playerCam = camMan;
-
-	camMan->setAutoAspectRatio(true);
-	camMan->setPosition(0,300,0);
-	camMan->lookAt(0,120,1800);
-	camMan->setFarClipDistance(fieldOfView);
-	camMan->setNearClipDistance(8);
+	playerCam = mSceneManager->createCamera("Camera Man");
+	
+	playerCam->setAutoAspectRatio(true);
+	playerCam->setPosition(0,300,0);
+	playerCam->lookAt(0,120,1800);
+	playerCam->setFarClipDistance(fieldOfView);
+	playerCam->setNearClipDistance(8);
 
 	// Add viewport and cameras
-	mRenderWindow->addViewport(camMan);
+	mRenderWindow->addViewport(playerCam);
 
 	cameras = std::vector<Ogre::Camera*>();
-	cameras.push_back(camMan);
+	cameras.push_back(playerCam);
 
-	cameraMan = new OgreBites::SdkCameraMan(camMan);
-	_oisManager->setupCameraMan(cameraMan);
+	_oisManager->setupCameraMan(playerCam);
 	//std::cout << camMan->getFarClipDistance() << std::endl;
 }
 

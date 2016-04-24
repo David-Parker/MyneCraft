@@ -79,7 +79,7 @@ void Player::update(OISManager* ois) {
 		total /= n;
 
 	_playerCam->setPosition(total);
-
+	/*
 	// reset the orientation
 	Ogre::Vector3 yAxis = _playerCam->getOrientation().yAxis().normalisedCopy();
 	if (yAxis.y < 0) {
@@ -94,7 +94,7 @@ void Player::update(OISManager* ois) {
 		Ogre::Vector3 uz = unit.crossProduct(ux).normalisedCopy();
 		_playerCam->setOrientation(Ogre::Quaternion(unit, ux, uz));
 	}
-
+	*/
 	Ogre::Vector3 unit = _playerCam->getDirection().normalisedCopy();
 	Ogre::Vector3 u = unit.crossProduct(Ogre::Vector3::UNIT_Y).normalisedCopy();
 	Ogre::Vector3 v = unit.crossProduct(u).normalisedCopy();
