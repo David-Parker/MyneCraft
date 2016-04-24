@@ -27,6 +27,8 @@ Application::~Application()
 
 void Application::init()
 {
+	time_t  timev;
+	srand(time(&timev));
 	// This is really just a debugging try-catch block for catching and printing exceptions
 	try {
 
@@ -552,13 +554,13 @@ void Application::createObjects(void) {
 	int xmax = 128;
 	int ymax = xmax;
 	int rndmax = 8;
-	float density = 1.5f; // 1 is very steep, 10 is pretty flat.
+	float density = 1.8f; // 1 is very steep, 10 is pretty flat.
 
 	perlin = new Perlin(xmax, ymax, rndmax, density);
 
 	biomeManager = new BiomeManager(mSceneManager);
 
-	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 1500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
+	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj, mSceneManager);
 	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
 }
