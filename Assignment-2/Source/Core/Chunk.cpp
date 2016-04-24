@@ -1,7 +1,7 @@
 #include "Chunk.h"
 #include "MultiPlatformHelper.h"
 
-Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeManager* biomeMgr, Perlin* perlin, Simulator* sim) : _biomeMgr(biomeMgr), _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
+Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeManager* biomeMgr, Perlin* perlin, Simulator* sim, bool generate) : _biomeMgr(biomeMgr), _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
 	if (air == nullptr) air = new StaticObject(nullptr, Biome::AIR, Ogre::Vector3(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE), Ogre::Vector3::ZERO, sim, this);
 
 	_name = getChunkName(xStart, yStart);
@@ -18,51 +18,54 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 	Biome* curBiome = biomeMgr->inBiome(_xStart, _yStart);
 
-	for (int i = xStart; i < _xEnd; ++i) {
+	// Does this chunk generate new terrain?
+	if (generate) {
+		for (int i = xStart; i < _xEnd; ++i) {
 
-		for (int j = yStart; j < _yEnd; ++j) {
+			for (int j = yStart; j < _yEnd; ++j) {
 
-			float fi = (float)i / (float)100.0f;
-			float fj = (float)j / (float)100.0f;
+				float fi = (float)i / (float)100.0f;
+				float fj = (float)j / (float)100.0f;
 
-			int y = (int)((perlin->getPerlin(fi, fj)) * steepness);
+				int y = (int)((perlin->getPerlin(fi, fj)) * steepness);
 
-			Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
-			key index = getKey(pos);
-			StaticObject* so;
-			Biome::BiomeType tempType;
+				Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
+				key index = getKey(pos);
+				StaticObject* so;
+				Biome::BiomeType tempType;
 
-			if(y >= 15 && curBiome != nullptr ) {
-				if (curBiome->getType() != Biome::SAND) {
+				if (y >= 15 && curBiome != nullptr) {
+					if (curBiome->getType() != Biome::SAND) {
+						Ogre::Entity* type = curBiome->getCubeEntity(i, j, y, tempType);
+						so = new StaticObject(type, tempType, scale, pos, sim, this);
+					}
+				}
+				if (curBiome != nullptr) {
 					Ogre::Entity* type = curBiome->getCubeEntity(i, j, y, tempType);
 					so = new StaticObject(type, tempType, scale, pos, sim, this);
 				}
-			}
-			if (curBiome != nullptr) {
-				Ogre::Entity* type = curBiome->getCubeEntity(i, j, y, tempType);
-				so = new StaticObject(type, tempType, scale, pos, sim, this);
-			}
-				
-			else {
-				so = new StaticObject(biomeMgr->getTerrain(Biome::GRASS), Biome::GRASS, scale, pos, sim, this);
-			}
 
-			_staticObjects[index] = so;
+				else {
+					so = new StaticObject(biomeMgr->getTerrain(Biome::GRASS), Biome::GRASS, scale, pos, sim, this);
+				}
 
-			// Create tree returns true if a tree was created in this position.
-			if ( !createTree(pos, so->_cubeType) ) {
-				key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
-				_staticObjects[airIndex] = air;
+				_staticObjects[index] = so;
+
+				// Create tree returns true if a tree was created in this position.
+				if (!createTree(pos, so->_cubeType)) {
+					key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+					_staticObjects[airIndex] = air;
+				}
+
+				createCloud(pos);
+
+				_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 			}
-
-			createCloud(pos);
-
-			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
-	}
 
-	_sg->setRegionDimensions(Ogre::Vector3(3000, 300, 3000));
-	_sg->build();
+		_sg->setRegionDimensions(Ogre::Vector3(3000, 300, 3000));
+		_sg->build();
+	}
 }
 
 Chunk::~Chunk() {
@@ -579,4 +582,43 @@ Chunk::key Chunk::getKey(int x, int y, int z) {
 
 Chunk::key Chunk::getKey(const Ogre::Vector3& pos) {
 	return getKey((int)pos.x, (int)pos.y, (int)pos.z);
+}
+
+BlockInfo Chunk::getBlockInfo(key thekey, Biome::BiomeType type) {
+	int x, y, z;
+	std::string delimiter = "_";
+	size_t last = 0; 
+	size_t next = 0; 
+
+	next = thekey.find(delimiter, last);
+	x = std::stoi(thekey.substr(last, next - last));
+	last = next + 1;
+
+	next = thekey.find(delimiter, last);
+	y = std::stoi(thekey.substr(last, next - last));
+	last = next + 1;
+
+	next = thekey.find(delimiter, last);
+	z = std::stoi(thekey.substr(last));
+
+	return BlockInfo(x, y, z, type);
+}
+
+void Chunk::rebuildFromSave(const std::vector<BlockInfo>& blocks) {
+	for (auto& var : blocks) {
+		StaticObject* so;
+		Ogre::Vector3 pos(var.x, var.y, var.z);
+		Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
+		key index = getKey(pos);
+
+		if (var.type == Biome::AIR) {
+			_staticObjects[index] = air;
+		}
+		else {
+			so = new StaticObject(_biomeMgr->getTerrain(var.type), var.type, scale, pos, _simulator, this);
+			_staticObjects[index] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+		}	
+	}
+	_sg->build();
 }

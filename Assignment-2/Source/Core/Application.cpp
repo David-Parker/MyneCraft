@@ -27,8 +27,6 @@ Application::~Application()
 
 void Application::init()
 {
-	time_t  timev;
-	srand(time(&timev));
 	// This is really just a debugging try-catch block for catching and printing exceptions
 	try {
 
@@ -61,6 +59,97 @@ void Application::init()
 	}
 }
 
+void Application::setupWorld() {
+	time_t  timev;
+	seed = time(&timev);
+
+	std::fstream saveFile;
+
+	saveFile.open("save.txt", std::ios::in);
+
+	std::string line;
+	getline(saveFile, line);
+
+	if (line != magicHeader) {
+		// New save
+		saveFile.close();
+		saveFile.open("save.txt", std::ios::out);
+		saveFile << magicHeader << std::endl;
+		saveFile << seed << std::endl;
+		saveFile.close();
+	}
+	else {
+		getline(saveFile, line);
+		seed = std::stoi(line);
+
+		while (getline(saveFile, line)) {
+			if (line == "EOF") break;
+
+			// Generate this new chunk
+			if (line == "CHUNK") {
+				getline(saveFile, line);
+				int x = std::stoi(line);
+				getline(saveFile, line);
+				int z = std::stoi(line);
+				std::pair<int, int> index(x, z);
+
+				Chunk* chunk = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator, false);
+				modifiedChunks[index] = chunk;
+				std::vector<BlockInfo> blocks;
+
+				while (getline(saveFile, line)) {
+					if (line == "ENDCHUNK") break;
+
+					int bx = std::stoi(line);
+					getline(saveFile, line);
+					int by = std::stoi(line);
+					getline(saveFile, line);
+					int bz = std::stoi(line);
+					getline(saveFile, line);
+					Biome::BiomeType type = (Biome::BiomeType) std::stoi(line);
+
+					BlockInfo b(bx, by, bz, type);
+					blocks.push_back(b);
+				}
+
+				chunk->rebuildFromSave(blocks);
+			}
+		}
+	}
+
+	srand(seed);
+
+	saveFile.close();
+}
+
+void Application::saveWorld() {
+	std::fstream saveFile;
+	saveFile.open("save.txt", std::ios::out);
+
+	// Write out header
+	saveFile << magicHeader << std::endl;
+	saveFile << seed << std::endl;
+
+	for (auto& var : modifiedChunks) {
+		if (var.second == nullptr) continue;
+		saveFile << "CHUNK" << std::endl;
+		saveFile << var.second->_xStart << std::endl;
+		saveFile << var.second->_yStart << std::endl;
+		for (auto& block : var.second->_staticObjects) {
+			if (block.second == nullptr) continue;
+			BlockInfo bi = var.second->getBlockInfo(block.first, block.second->_cubeType);
+			saveFile << bi.x << std::endl;
+			saveFile << bi.y << std::endl;
+			saveFile << bi.z << std::endl;
+			saveFile << bi.type << std::endl;
+		}
+		saveFile << "ENDCHUNK" << std::endl;
+	}
+
+	saveFile << "EOF";
+	saveFile.close();
+}
+
 /* 
 * Update Methods 
 */
@@ -73,6 +162,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 
 	if (!mRunning)
 	{
+		saveWorld();
 		return false;
 	}
 	try {
@@ -123,14 +213,6 @@ bool Application::update(const FrameEvent &evt) {
 		int index = lastKey - 2;
 		player->setWeapon(index);
 	}
-
-	/*else if ( CameraStuff ) {
-		int index = lastKey - 2;
-		if (index >= 0 && index < cameras.size()) {
-			mRenderWindow->removeAllViewports();
-			mRenderWindow->addViewport(cameras[index]);
-		}
-	}*/
 	else if(lastKey == OIS::KC_ESCAPE) {
 		// close window when ESC is pressed
 		mRunning = false;
@@ -182,7 +264,7 @@ bool Application::update(const FrameEvent &evt) {
 						chunks[name] = modifiedChunks[name];
 					}
 					else {
-						chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator);
+						chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator, true);
 					}
 				}
 			}
@@ -563,6 +645,8 @@ void Application::createObjects(void) {
 	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj, mSceneManager);
 	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
+
+	setupWorld();
 }
 /* 
 * End Initialization Methods

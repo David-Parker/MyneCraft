@@ -8,6 +8,7 @@
 #include "StaticObject.h"
 #include "BiomeManager.h"
 #include "Perlin.h"
+#include "BlockInfo.h"
 
 #define CHUNK_SIZE 16
 #define CHUNK_SCALE 50
@@ -37,7 +38,7 @@ private:
 	void createAirNeighbors(const std::vector<Chunk*>& chunks, StaticObject* obj);
 
 public:
-	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*);
+	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*, bool generate);
 	~Chunk();
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
@@ -48,6 +49,8 @@ public:
 	std::string getName() { return _name; }
 
 	std::unordered_map<key, StaticObject*> _staticObjects;
+	BlockInfo getBlockInfo(key, Biome::BiomeType type);
+	void rebuildFromSave(const std::vector<BlockInfo>& blocks);
 
 	Ogre::Vector3 _scale;
 	int _xStart = 0;

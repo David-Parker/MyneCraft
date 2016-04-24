@@ -62,4 +62,8 @@ protected:
 	Ogre::Entity* plankMesh;
 	Ogre::Entity* glassMesh;
 	Ogre::Entity* cloudMesh;
+	Ogre::Entity* iceMesh;
+	Ogre::Entity* woodMesh;
+	Ogre::Entity* leafMesh;
+	Ogre::Entity* cactusMesh;
 };

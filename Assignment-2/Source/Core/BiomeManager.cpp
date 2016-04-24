@@ -11,6 +11,10 @@ BiomeManager::BiomeManager(Ogre::SceneManager* smgr) : mSceneManager(smgr) {
 	plankMesh = worldBiomes.at(0)->getEntity(Biome::PLANK);
 	glassMesh = worldBiomes.at(0)->getEntity(Biome::GLASS);
 	cloudMesh = worldBiomes.at(0)->getEntity(Biome::CLOUD);
+	iceMesh = worldBiomes.at(0)->getEntity(Biome::ICE);
+	woodMesh = worldBiomes.at(0)->getEntity(Biome::WOOD);
+	leafMesh = worldBiomes.at(0)->getEntity(Biome::LEAF);
+	cactusMesh = worldBiomes.at(0)->getEntity(Biome::CACTUS);
 }
 
 
@@ -48,6 +52,10 @@ Ogre::Entity* BiomeManager::getTerrain(Biome::BiomeType type) {
 		case Biome::PLANK: return plankMesh;
 		case Biome::GLASS: return glassMesh;
 		case Biome::CLOUD: return cloudMesh;
+		case Biome::ICE: return iceMesh;
+		case Biome::WOOD: return woodMesh;
+		case Biome::LEAF: return leafMesh;
+		case Biome::CACTUS: return cactusMesh;
 	}
 	return nullptr;
 }

@@ -39,6 +39,7 @@
 #include "BiomeManager.h"
 #include "Player.h"
 #include "Cube.h"
+#include "BlockInfo.h"
 
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
@@ -83,6 +84,9 @@ public:
 	int points;
 	int width;
 	int height;
+	int seed;
+
+	std::string magicHeader = "#MCSAVEFILE";
 
 	double fps = 120.0;
 #ifdef _WIN32
@@ -111,6 +115,8 @@ public:
 	bool updateServer(const Ogre::FrameEvent &evt);
 	bool updateClient(const Ogre::FrameEvent &evt);
 
+	void setupWorld();
+	void saveWorld();
 	void setupWindowRendererSystem(void);
 	void setupResources(void);
 	void setupOIS(void);
