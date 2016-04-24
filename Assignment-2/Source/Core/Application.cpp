@@ -191,8 +191,6 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 
 	player->constrainSpeed();
 
-	cameraMan->frameRenderingQueued(evt);
-
 	return true;
 }
 
@@ -220,9 +218,9 @@ bool Application::update(const FrameEvent &evt) {
 
 	if (int delta = _oisManager->getMouseWheel()) {
 		int index = player->getWeapon() + delta;
-		index = index % Player::NUM_WEP;
+		index = index % (Player::NUM_WEP+1);
 		if (index < 0)
-			index += Player::NUM_WEP;
+			index += Player::NUM_WEP+1;
 
 		player->setWeapon(index);
 		_oisManager->resetWheel();
@@ -584,23 +582,21 @@ void Application::setupCEGUI(void) {
 
 void Application::setupCameras(void) {
 
-	Ogre::Camera* camMan = mSceneManager->createCamera("Camera Man");
-	playerCam = camMan;
+	playerCam = mSceneManager->createCamera("Camera Man");
 
-	camMan->setAutoAspectRatio(true);
-	camMan->setPosition(0,300,0);
-	camMan->lookAt(0,120,1800);
-	camMan->setFarClipDistance(fieldOfView);
-	camMan->setNearClipDistance(8);
+	playerCam->setAutoAspectRatio(true);
+	playerCam->setPosition(0,300,0);
+	playerCam->lookAt(0,120,1800);
+	playerCam->setFarClipDistance(fieldOfView);
+	playerCam->setNearClipDistance(8);
 
 	// Add viewport and cameras
-	mRenderWindow->addViewport(camMan);
+	mRenderWindow->addViewport(playerCam);
 
 	cameras = std::vector<Ogre::Camera*>();
-	cameras.push_back(camMan);
+	cameras.push_back(playerCam);
 
-	cameraMan = new OgreBites::SdkCameraMan(camMan);
-	_oisManager->setupCameraMan(cameraMan);
+	_oisManager->setupCameraMan(playerCam);
 	//std::cout << camMan->getFarClipDistance() << std::endl;
 }
 
