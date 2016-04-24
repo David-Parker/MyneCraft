@@ -225,12 +225,14 @@ bool OISManager::mouseMoved( const OIS::MouseEvent &e ) {
     static Ogre::Degree minPitch(-80);
 
     if(cameraMan) {
-        Ogre::Degree nextPitch(-e.state.Y.rel * 0.15f);
-        curPitch = Ogre::Math::Clamp(curPitch + nextPitch, minPitch, maxPitch);
-        curPitch = curPitch + nextPitch;
-
         cameraMan->yaw(Ogre::Degree(-e.state.X.rel * 0.15f));
-        cameraMan->pitch(nextPitch);
+
+        Ogre::Degree nextPitch(-e.state.Y.rel * 0.15f);
+        Ogre::Degree tPitch = curPitch + nextPitch;
+        if ( tPitch > minPitch && tPitch < maxPitch ) {
+            curPitch = curPitch + nextPitch;
+            cameraMan->pitch(nextPitch);
+        }
     }
 
     // From -width/2 to +width/2
