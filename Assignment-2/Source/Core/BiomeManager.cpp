@@ -27,10 +27,10 @@ Biome* BiomeManager::inBiome(int x, int y) {
 	if ( biomeGrid[pair] )
 		return biomeGrid[pair];
 	else {
-		int cX = pair.first * biomeGridSize + biomeGridSize/2 + (rand()%positionVariance) - positionVariance/2;
-		int cY = pair.second * biomeGridSize + biomeGridSize/2 + (rand()%positionVariance) - positionVariance/2;
-		int rad = rand()%biomeRadiusVariance + minBiomeRadius;
-		int rndType = rand()%3;
+		int cX = pair.first * biomeGridSize + biomeGridSize/2 + (Rand::rand()%positionVariance) - positionVariance/2;
+		int cY = pair.second * biomeGridSize + biomeGridSize/2 + (Rand::rand()%positionVariance) - positionVariance/2;
+		int rad = Rand::rand()%biomeRadiusVariance + minBiomeRadius;
+		int rndType = Rand::rand()%3;
 		
 		biomeGrid[pair] = createBiome((Biome::BiomeType)(rndType), cX, cY, rad);
 		return biomeGrid[pair];

@@ -2,6 +2,7 @@
 #include <random>
 #include <math.h>
 #include <Ogre.h>
+#include "Rand.h"
 
 static Ogre::Entity* grassCube = nullptr;
 static Ogre::Entity* snowCube = nullptr;

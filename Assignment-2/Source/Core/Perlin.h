@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <random>
+#include "Rand.h"
 #include <vector>
 
 /* PsedoCode taken from https://en.wikipedia.org/wiki/Perlin_noise */

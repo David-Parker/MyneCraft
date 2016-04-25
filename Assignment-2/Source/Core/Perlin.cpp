@@ -13,8 +13,8 @@ void Perlin::generateGradientTrivial() {
 	static float moTWO = randomMax / 2;
 	for (int i = 0; i < xMax; i++) {
 		for (int j = 0; j < yMax; j++) {
-			gradient[i][j][0] = float(rand() % randomMax) / moTWO;
-			gradient[i][j][1] = float(rand() % randomMax) / moTWO;
+			gradient[i][j][0] = float(Rand::rand() % randomMax) / moTWO;
+			gradient[i][j][1] = float(Rand::rand() % randomMax) / moTWO;
 		}
 	}
 

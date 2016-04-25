@@ -25,7 +25,7 @@ bool Biome::inBiome(int x, int y) {
 Ogre::Entity* Biome::getCubeEntity(int x, int y, int h, BiomeType& type) {
 	int dSq = ((centerX - x) * (centerX - x)) + ((centerY - y) * (centerY - y));
 	float rSQoN = radius * radius / 9;
-	int rnd = rand()%20;
+	int rnd = Rand::rand()%20;
 	if ( (dSq < 2 * rSQoN)
 			|| (dSq < 4 * rSQoN && rnd < 18)
 			|| (dSq < 6 * rSQoN && rnd < 14)

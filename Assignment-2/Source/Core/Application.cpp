@@ -869,6 +869,7 @@ void Application::loadSeed() {
 	if (line == magicHeader) {
 		getline(saveFile, line);
 		seed = std::stoi(line);
+		std::cout << "Getting seed from file: " << seed << std::endl;
 	}
 	else {
 		seed = time(0);
@@ -876,5 +877,5 @@ void Application::loadSeed() {
 
 	saveFile.close();
 
-	srand(seed);
+	Rand::srand(seed);
 }

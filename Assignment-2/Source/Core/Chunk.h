@@ -9,6 +9,7 @@
 #include "BiomeManager.h"
 #include "Perlin.h"
 #include "BlockInfo.h"
+#include "Rand.h"
 
 #define CHUNK_SIZE 16
 #define CHUNK_SCALE 50

@@ -398,14 +398,13 @@ Biome::BiomeType Chunk::getGeneratedType(Biome::BiomeType objType, int height) {
 	switch (objType) {
 		case Biome::GRASS :
 		case Biome::DIRT :
-			if (rand()%500 < (height + offset))
+			if (Rand::rand()%500 < (height + offset))
 				return Biome::DIRT;
-			// would use dirt but don't know how to use blender - Jeremy :)
 			else 
 				return Biome::ROCK;
 			break;
 		case Biome::SAND :
-			if (rand()%500 < (height + offset))
+			if (Rand::rand()%500 < (height + offset))
 				return Biome::SAND;
 			else
 				return Biome::ROCK;
@@ -428,9 +427,9 @@ bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 	static const int firBreadth = 7;
 	
 
-	if ( type == Biome::GRASS && rand()%500 != 5 ) return false;
-	if ( type == Biome::SNOW && rand()%3000 != 5 ) return false;
-	if ( type == Biome::SAND && rand()%2000 != 5 ) return false;
+	if ( type == Biome::GRASS && Rand::rand()%500 != 5 ) return false;
+	if ( type == Biome::SNOW && Rand::rand()%3000 != 5 ) return false;
+	if ( type == Biome::SAND && Rand::rand()%2000 != 5 ) return false;
 
 	// Describes the shape of the leaves, think of each 5x5 grid as another layer
 	bool leaves[breadth][breadth][breadth] = {	{ { 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 } },
@@ -504,7 +503,7 @@ bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 				_sg->addEntity(stalk->_geom, stalk->_pos, stalk->_orientation, stalk->_scale);
 			}
 			//Arms
-			if ( rand()%2 ) {
+			if ( Rand::rand()%2 ) {
 				StaticObject* armConnector1 = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(CHUNK_SCALE_FULL, 4*CHUNK_SCALE_FULL, 0), _simulator, this);
 				key index = getKey(armConnector1->_pos);
 				_staticObjects[index] = armConnector1;
@@ -558,10 +557,10 @@ bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 }
 
 bool Chunk::createCloud(const Ogre::Vector3& pos) {
-	if(rand() % 400 != 10) return false;
+	if(Rand::rand() % 400 != 10) return false;
 
-	int imax = rand() % 25 + 5;
-	int jmax = rand() % 25 + 5;
+	int imax = Rand::rand() % 25 + 5;
+	int jmax = Rand::rand() % 25 + 5;
 
 	Ogre::Vector3 scale(imax*CHUNK_SCALE, CHUNK_SCALE, jmax*CHUNK_SCALE);
 
