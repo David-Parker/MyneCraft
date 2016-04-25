@@ -82,6 +82,7 @@ public:
 	int width;
 	int height;
 	int seed;
+	float lastTime;
 
 	std::string magicHeader = "#MCSAVEFILE";
 

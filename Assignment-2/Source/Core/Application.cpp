@@ -75,11 +75,15 @@ void Application::setupWorld() {
 		saveFile.open("save.txt", std::ios::out);
 		saveFile << magicHeader << std::endl;
 		saveFile << seed << std::endl;
+		saveFile << 0.0 << std::endl;
 		saveFile.close();
 	}
 	else {
 		getline(saveFile, line);
 		seed = std::stoi(line);
+
+		getline(saveFile, line);
+		lastTime = std::stof(line);
 
 		while (getline(saveFile, line)) {
 			if (line == "EOF") break;
@@ -126,6 +130,7 @@ void Application::saveWorld() {
 	// Write out header
 	saveFile << magicHeader << std::endl;
 	saveFile << seed << std::endl;
+	saveFile << lastTime << std::endl;
 
 	for (auto& var : modifiedChunks) {
 		if (var.second == nullptr) continue;
@@ -772,7 +777,6 @@ void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chu
 
 void Application::moveDayTime(float time) {
 	static float daySeconds = 300;
-	static float lastTime = 0;
 	static float minLight = .1;
 
 	float currTime = lastTime + time;
