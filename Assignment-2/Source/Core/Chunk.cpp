@@ -614,6 +614,25 @@ void Chunk::rebuildFromSave(const std::vector<BlockInfo>& blocks) {
 		if (var.type == Biome::AIR) {
 			_staticObjects[index] = air;
 		}
+		else if (var.type == Biome::TORCH) {
+			scale = Ogre::Vector3(CHUNK_SCALE / 5, 4 * CHUNK_SCALE / 5, CHUNK_SCALE / 5);
+
+			key tkey = "torch_" + getKey(pos);
+			if (!lights[tkey]) {
+				float range = 5000.0f;
+				Ogre::Light* light = _mSceneManager->createLight(tkey);
+				light->setDiffuseColour(0.9, 0.4, 0.2);
+				light->setType(Ogre::Light::LT_POINT);
+				light->setAttenuation(range, 1.0f, .5f / range, 5.0f / (range*range));
+				light->setPosition(pos);
+				light->setVisible(true);
+				lights[tkey] = light;
+			}
+
+			so = new StaticObject(_biomeMgr->getTerrain(var.type), var.type, scale, pos, _simulator, this);
+			_staticObjects[index] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+		}
 		else {
 			so = new StaticObject(_biomeMgr->getTerrain(var.type), var.type, scale, pos, _simulator, this);
 			_staticObjects[index] = so;

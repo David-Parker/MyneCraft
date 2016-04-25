@@ -30,25 +30,7 @@ void Application::init()
 	// This is really just a debugging try-catch block for catching and printing exceptions
 	try {
 
-		/*srand(time(0));*/
-		std::fstream saveFile;
-
-		saveFile.open("save.txt", std::ios::in);
-
-		std::string line;
-		getline(saveFile, line);
-
-		if (line == magicHeader) {
-			getline(saveFile, line);
-			seed = std::stoi(line);
-		}
-		else {
-			seed = time(0);
-		}
-
-		saveFile.close();
-
-		srand(seed);
+		loadSeed();
 
 		t1 = new Timer();
 
@@ -803,4 +785,24 @@ void Application::moveDayTime(float time) {
 
 	sun->setDiffuseColour(Ogre::ColourValue(intensity, intensity, intensity));
 	sun->setDirection(Ogre::Vector3(sunAngleX, sunAngleY, 0));
+}
+
+void Application::loadSeed() {
+	std::fstream saveFile;
+	saveFile.open("save.txt", std::ios::in);
+
+	std::string line;
+	getline(saveFile, line);
+
+	if (line == magicHeader) {
+		getline(saveFile, line);
+		seed = std::stoi(line);
+	}
+	else {
+		seed = time(0);
+	}
+
+	saveFile.close();
+
+	srand(seed);
 }
