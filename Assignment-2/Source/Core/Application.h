@@ -26,8 +26,10 @@
 #include <vector>
 #include <utility>
 
+
 #include "Perlin.h"
 #include "NetManager.h"
+#include "GameState.h"
 #include "GameManager.h"
 #include "OISManager.h"
 #include "Simulator.h"
@@ -47,6 +49,9 @@ public:
 	virtual ~Application();
 
 	virtual void init();
+
+	enum State{ HOME, SINGLE, SERVER, CLIENT, ENDGAME, HOWTO };
+	State gameState = HOME;
 
 	Ogre::Root * mRoot;
 	Ogre::String mResourcesCfg;
@@ -68,7 +73,11 @@ public:
 
     CEGUI::OgreRenderer* mRenderer;
 	
+	CEGUI::Window* quitButton;
+    CEGUI::Window* singlePlayerButton;
+
 	std::vector<Ogre::Camera*> cameras;
+	std::list<GameState> states;
 
 	Ogre::StaticGeometry* sg;
 
@@ -122,8 +131,10 @@ public:
 	void setupCameras(void);
 	void setupGM(void);
 	void setupLighting(void);
+	void createGame(void);
 	void createObjects(void);
-	bool Quit(const CEGUI::EventArgs &e);
+	bool Quit(const CEGUI::EventArgs&);
+	bool StartSinglePlayer(const CEGUI::EventArgs&);
 
 	bool setupNetwork(bool);
 	bool error();
@@ -131,6 +142,7 @@ public:
 	void hideGui();
 	void showGui();
 	void resetNetManager();
+	void setState(State state);
 
 	Chunk* getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& chunks,int, int);
 	void recomputeColliders(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int, int);

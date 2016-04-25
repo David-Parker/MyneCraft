@@ -50,14 +50,19 @@ void Application::init()
 		ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
 		setupLighting();
-
-		sg = mSceneManager->createStaticGeometry("CubeArea");
-
-		createObjects();
-
 	}
 	catch (Exception e) {
 		std::cout << "Exception Caught: " << e.what() << std::endl;
+	}
+}
+
+void Application::createGame() {
+	try {
+		sg = mSceneManager->createStaticGeometry("CubeArea");
+		createObjects();
+	}
+	catch (Exception e) {
+		std::cout << "Caught: " << e.what() << std::endl;
 	}
 }
 
@@ -158,10 +163,9 @@ void Application::saveWorld() {
 bool Application::frameRenderingQueued(const FrameEvent &evt) {
 
 	static float dTime = t1->getMilliseconds();
-#ifdef _DEBUG
+#if _DEBUG
 	CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 #endif
-
 	if (!mRunning)
 	{
 		saveWorld();
@@ -179,6 +183,27 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 	if (mRenderWindow->isClosed())
 	{
 		return false;
+	}
+
+	// All logic is now controlled by a state machine
+	switch(gameState) {
+		case HOME:
+			handleGUI(evt);
+			return true;
+			break;
+		case SERVER:
+			break;
+		case CLIENT:
+			break;
+		case SINGLE:
+			break;
+		case ENDGAME:
+			return true;
+			break;
+		case HOWTO:
+			return true;
+			break;
+		default: break;
 	}
 
 	// Code per frame in fixed FPS
@@ -214,8 +239,7 @@ bool Application::update(const FrameEvent &evt) {
 		player->setWeapon(index);
 	}
 	else if(lastKey == OIS::KC_ESCAPE) {
-		// close window when ESC is pressed
-		mRunning = false;
+		setState(HOME);
 	}
 
 	if (int delta = _oisManager->getMouseWheel()) {
@@ -334,20 +358,12 @@ bool Application::update(const FrameEvent &evt) {
 
 bool Application::handleGUI(const FrameEvent &evt) {
 
-	if(!begin) {
-		_oisManager->capture();
+	_oisManager->capture();
 
-		OIS::KeyCode lastKey = _oisManager->lastKeyPressed();
+	OIS::KeyCode lastKey = _oisManager->lastKeyPressed();
 
-		if(lastKey == OIS::KC_ESCAPE) {
-			// close window when ESC is pressed
-			mRunning = false;
-		}
-		return true;
-	}
-	else {
-		return false;
-	}
+	return true;
+
 }
 
 bool Application::updateServer(const FrameEvent &evt) {
@@ -555,7 +571,7 @@ void Application::setupOIS(void) {
 }
 
 void Application::setupCEGUI(void) {
-#ifdef _DEBUG
+
 	mRenderer = &CEGUI::OgreRenderer::bootstrapSystem(*mRenderWindow);
 	CEGUI::ImageManager::setImagesetDefaultResourceGroup("Imagesets");
 	CEGUI::Font::setDefaultResourceGroup("Fonts");
@@ -570,16 +586,21 @@ void Application::setupCEGUI(void) {
 	CEGUI::Window *sheet = wmgr.createWindow("DefaultWindow", "_MasterRoot");
 	CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(sheet);
 
-	CEGUI::Window* quitButton = wmgr.createWindow("AlfiskoSkin/Button", "QuitButton");
+	quitButton = wmgr.createWindow("AlfiskoSkin/Button", "QuitButton");
 	quitButton->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.0f, 0), CEGUI::UDim(0.0f, 0)),
 		CEGUI::UVector2(CEGUI::UDim(0.1f, 0), CEGUI::UDim(0.05f, 0))));
 	quitButton->setText("Quit");
 
+	singlePlayerButton = wmgr.createWindow("AlfiskoSkin/Button", "SinglePlayerButton");
+	singlePlayerButton->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.3f, 0), CEGUI::UDim(0.35f, 0)),
+		CEGUI::UVector2(CEGUI::UDim(0.7f, 0), CEGUI::UDim(0.4f, 0))));
+	singlePlayerButton->setText("Single Player");
+
 	sheet->addChild(quitButton);
+	sheet->addChild(singlePlayerButton);
 
+	singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::StartSinglePlayer, this));
 	quitButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::Quit, this));
-#endif
-
 }
 
 void Application::setupCameras(void) {
@@ -597,9 +618,6 @@ void Application::setupCameras(void) {
 
 	cameras = std::vector<Ogre::Camera*>();
 	cameras.push_back(playerCam);
-
-	_oisManager->setupCameraMan(playerCam);
-	//std::cout << camMan->getFarClipDistance() << std::endl;
 }
 
 /* Setup GameManager */
@@ -654,13 +672,22 @@ void Application::createObjects(void) {
 /* 
 *CEGUI Button Callbacks 
 */
-
-
 bool Application::Quit(const CEGUI::EventArgs& e) {
-
 	mRunning = false;
     return true;
 }
+
+bool Application::StartSinglePlayer(const CEGUI::EventArgs& e) {
+	if ( !begin ) {
+		begin = true;
+		createGame();
+	}
+	setState(SINGLE);
+	return true;
+}
+/* 
+* End CEGUI Button Callbacks 
+*/
 
 bool Application::setupNetwork(bool isServer) {
 
@@ -732,19 +759,60 @@ std::unordered_map<std::string, char*> Application::dataParser(char* buf) {
 }
 
 void Application::hideGui() {
-
+	CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
+	quitButton->hide();
+	singlePlayerButton->hide();
 }
 
 void Application::showGui() {
-
+	CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().show();
+	quitButton->show();
+	singlePlayerButton->show();
 }
-
 
 void Application::resetNetManager() {
 	if(netManager) {
 		delete netManager;
 		netManager = new NetManager();
 	} 
+}
+
+void Application::setState(State state) {
+
+	switch(state) {
+		case HOME:
+			resetNetManager();
+			states.clear();
+			hideGui();
+			showGui();
+			_oisManager->setupCameraMan(nullptr);
+			gameState = HOME;
+			break;
+		case SERVER:
+			resetNetManager();
+			hideGui();
+			gameState = SERVER;
+			break;
+		case CLIENT:
+			resetNetManager();
+			hideGui();
+			gameState = CLIENT;
+			break;
+		case SINGLE:
+			_oisManager->setupCameraMan(playerCam);
+			hideGui();
+			gameState = SINGLE;
+			break;
+		case ENDGAME:
+			hideGui();
+			gameState = ENDGAME;
+			break;
+		case HOWTO:
+			hideGui();
+			gameState = HOWTO;
+			//howToText->show();
+			break;
+	}
 }
 
 Chunk* Application::getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int x, int z) {

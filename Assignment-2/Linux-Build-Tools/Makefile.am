@@ -1,4 +1,4 @@
-noinst_HEADERS = Application.h MultiPlatformHelper.h OISManager.h SceneHelper.h CoreConfig.h SoundManager.h GameManager.h GameObject.h PlayerObject.h Cube.h Perlin.h Simulator.h BulletContactCallback.h CollisionContext.h OgreMotionState.h NetManager.h StaticObject.h Biome.h BiomeManager.h Chunk.h Player.h Animation.h Action.h BlockInfo.h
+noinst_HEADERS = Application.h MultiPlatformHelper.h OISManager.h SceneHelper.h CoreConfig.h SoundManager.h GameState.h GameManager.h GameObject.h PlayerObject.h Cube.h Perlin.h Simulator.h BulletContactCallback.h CollisionContext.h OgreMotionState.h NetManager.h StaticObject.h Biome.h BiomeManager.h Chunk.h Player.h Animation.h Action.h BlockInfo.h
 
 bin_PROGRAMS = assignment2
 assignment2_CPPFLAGS = -I$(top_srcdir) -std=c++11 -Wunused-variable
