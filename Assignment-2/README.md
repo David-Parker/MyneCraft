@@ -39,6 +39,11 @@ We are definitely on track for the final submission. Features of our project inc
 * Heavily optimized, static geometry creation and destruction based on position, localized bullet simulation, etc.
 * Background game music
 
+#### Issues
+* Inifnite block growth (cancer blocks), when a block gets incorrectly generated, it thinks its neihbors are null and starts to generate blocks everywhere when deleted. This bug is rarare and usually only occurs when something else was setup incorrectly.
+* Clouds, when brought back in from level save, are of unit size and look like dots in the sky
+* Somtimes it is possible to get pushed out of the level and fall infinitely into the ground
+
 ### Todo
 * Cave generation, use perlin + fractal noise to simualte "perlin worms" which generate nice, connected caves
 * Multiplayer, online playing with friends would be cool
