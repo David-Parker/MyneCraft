@@ -49,6 +49,8 @@ void Application::init()
 
 		ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
+		CubeManager::injectSceneManager(mSceneManager);
+	
 		setupLighting();
 	}
 	catch (Exception e) {
@@ -114,7 +116,7 @@ void Application::setupWorld() {
 					getline(saveFile, line);
 					int bz = std::stoi(line);
 					getline(saveFile, line);
-					Biome::BiomeType type = (Biome::BiomeType) std::stoi(line);
+					CubeManager::CubeType type = (CubeManager::CubeType) std::stoi(line);
 
 					BlockInfo b(bx, by, bz, type);
 					blocks.push_back(b);
@@ -239,6 +241,9 @@ bool Application::update(const FrameEvent &evt) {
 		player->setWeapon(index);
 	}
 	else if(lastKey == OIS::KC_ESCAPE) {
+		mRunning = false;
+	}
+	else if(lastKey == OIS::KC_P) {
 		setState(HOME);
 	}
 
@@ -361,6 +366,9 @@ bool Application::handleGUI(const FrameEvent &evt) {
 	_oisManager->capture();
 
 	OIS::KeyCode lastKey = _oisManager->lastKeyPressed();
+
+	if (lastKey == OIS::KC_ESCAPE)
+		mRunning = false;
 
 	return true;
 

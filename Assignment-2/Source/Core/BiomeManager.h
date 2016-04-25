@@ -8,6 +8,7 @@
 #include <Ogre.h>
 
 #include "Biome.h"
+#include "CubeManager.h"
 #include "StaticObject.h"
 
 // TODO Put in its own file
@@ -43,27 +44,14 @@ public:
 	~BiomeManager(void);
 
 	Biome* inBiome(int, int);
-	Ogre::Entity* getTerrain(Biome::BiomeType);
+	Ogre::Entity* getTerrain(CubeManager::CubeType);
 
-	bool isTreeType(Biome::BiomeType);
+	bool isTreeType(CubeManager::CubeType);
 
 protected:
-	Biome* createBiome(Biome::BiomeType, int, int, int);
+	Biome* createBiome(CubeManager::CubeType, int, int, int);
 	std::string getBiomeName(int, int);
 	std::unordered_map<std::pair<int, int>, Biome*> biomeGrid;
 	std::vector<Biome*> worldBiomes;
 	Ogre::SceneManager* mSceneManager;
-	Ogre::Entity* grassMesh;
-	Ogre::Entity* snowMesh;
-	Ogre::Entity* sandMesh;
-	Ogre::Entity* rockMesh;
-	Ogre::Entity* dirtMesh;
-	Ogre::Entity* torchMesh;
-	Ogre::Entity* plankMesh;
-	Ogre::Entity* glassMesh;
-	Ogre::Entity* cloudMesh;
-	Ogre::Entity* iceMesh;
-	Ogre::Entity* woodMesh;
-	Ogre::Entity* leafMesh;
-	Ogre::Entity* cactusMesh;
 };

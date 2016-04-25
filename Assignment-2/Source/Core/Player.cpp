@@ -38,7 +38,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = _sceneManager->createEntity("Light", "Cube-Torch.mesh");
+	item = CubeManager::getSingleton()->getEntity(CubeManager::TORCH);
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Light");
 	rotNode = node->createChildSceneNode("LightNode");
@@ -60,7 +60,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = _sceneManager->createEntity("GrassCube", "Cube-Grass.mesh");
+	item = CubeManager::getSingleton()->getEntity(CubeManager::GRASS);
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("GrassCube");
 	rotNode = node->createChildSceneNode("GrassCubeNode");
@@ -75,7 +75,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = _sceneManager->createEntity("RockCube", "Cube-Rock.mesh");
+	item = CubeManager::getSingleton()->getEntity(CubeManager::ROCK);
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("RockCube");
 	rotNode = node->createChildSceneNode("RockCubeNode");
@@ -90,7 +90,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = _sceneManager->createEntity("SnowCube", "Cube-Snow.mesh");
+	item = CubeManager::getSingleton()->getEntity(CubeManager::SNOW);
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("SnowCube");
 	rotNode = node->createChildSceneNode("SnowCubeNode");
@@ -105,7 +105,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = _sceneManager->createEntity("SandCube", "Cube-Sand.mesh");
+	item = CubeManager::getSingleton()->getEntity(CubeManager::SAND);
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("SandCube");
 	rotNode = node->createChildSceneNode("SandCubeNode");
@@ -120,7 +120,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = _sceneManager->createEntity("DirtCube", "Cube-Dirt.mesh");
+	item = CubeManager::getSingleton()->getEntity(CubeManager::DIRT);
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("DirtCube");
 	rotNode = node->createChildSceneNode("DirtCubeNode");
@@ -135,7 +135,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = _sceneManager->createEntity("PlankCube", "Cube-Plank.mesh");
+	item = CubeManager::getSingleton()->getEntity(CubeManager::PLANK);
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("PlankCube");
 	rotNode = node->createChildSceneNode("PlankCubeNode");
@@ -150,7 +150,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = _sceneManager->createEntity("GlassCube", "Cube-Glass.mesh");
+	item = CubeManager::getSingleton()->getEntity(CubeManager::GLASS);
 	item->setCastShadows(true);
 	node = _sceneManager->getRootSceneNode()->createChildSceneNode("GlassCube");
 	rotNode = node->createChildSceneNode("GlassCubeNode");
@@ -295,42 +295,42 @@ bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::
 		return true;
 	}
 	if (equippedItem == TORCH_CUBE) {
-		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::TORCH);
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::TORCH);
 		_animation.setActionLock(TORCH_CUBE);
 		return true;
 	}
 	if (equippedItem == GRASS_CUBE) {
-		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::GRASS);
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::GRASS);
 		_animation.setActionLock(GRASS_CUBE);
 		return true;
 	}
 	if (equippedItem == ROCK_CUBE) {
-		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::ROCK);
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::ROCK);
 		_animation.setActionLock(ROCK_CUBE);
 		return true;
 	}
 	if (equippedItem == SNOW_CUBE) {
-		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::SNOW);
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::SNOW);
 		_animation.setActionLock(SNOW_CUBE);
 		return true;
 	}
 	if (equippedItem == SAND_CUBE) {
-		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::SAND);
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::SAND);
 		_animation.setActionLock(SAND_CUBE);
 		return true;
 	}
 	if (equippedItem == DIRT_CUBE) {
-		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::DIRT);
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::DIRT);
 		_animation.setActionLock(DIRT_CUBE);
 		return true;
 	}
 	if (equippedItem == PLANK_CUBE) {
-		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::PLANK);
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::PLANK);
 		_animation.setActionLock(PLANK_CUBE);
 		return true;
 	}
 	if (equippedItem == GLASS_CUBE) {
-		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, Biome::GLASS);
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::GLASS);
 		_animation.setActionLock(GLASS_CUBE);
 		return true;
 	}
@@ -358,7 +358,7 @@ void Player::pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<in
 	}
 }
 
-void Player::cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, Biome::BiomeType type) {
+void Player::cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, CubeManager::CubeType type) {
 	Chunk* chunk = hitObj->_chunk;
 	if ( (hitObj->_pos - _body->getNode()->getPosition()).length() < 2.8*CHUNK_SCALE_FULL )
 		return;

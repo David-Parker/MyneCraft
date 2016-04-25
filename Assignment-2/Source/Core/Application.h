@@ -36,6 +36,7 @@
 #include "PlayerObject.h"
 #include "StaticObject.h"
 #include "Chunk.h"
+#include "CubeManager.h"
 #include "BiomeManager.h"
 #include "Player.h"
 #include "Cube.h"

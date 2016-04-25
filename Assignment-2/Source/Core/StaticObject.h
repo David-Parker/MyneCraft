@@ -39,16 +39,16 @@ protected:
 	bool _kinematic;
 	bool _needsUpdates;
 
-	Biome::BiomeType _objectType;
+	CubeManager::CubeType _objectType;
 
 public:
 	Ogre::Entity* _geom;
 	Ogre::Vector3 _scale;
 	Ogre::Vector3 _pos;
 	Ogre::Quaternion _orientation{};
-	Biome::BiomeType _cubeType;
+	CubeManager::CubeType _cubeType;
 	Chunk* _chunk;
-	StaticObject(Ogre::Entity* mesh, Biome::BiomeType, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator, Chunk* chunk);
+	StaticObject(Ogre::Entity* mesh, CubeManager::CubeType, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator, Chunk* chunk);
 	~StaticObject();
 	btCollisionObject* getBody() { return _collisionObject; }
 	void addToSimulator();

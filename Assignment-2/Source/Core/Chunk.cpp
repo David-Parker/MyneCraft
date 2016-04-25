@@ -2,7 +2,7 @@
 #include "MultiPlatformHelper.h"
 
 Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeManager* biomeMgr, Perlin* perlin, Simulator* sim, bool generate) : _biomeMgr(biomeMgr), _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
-	if (air == nullptr) air = new StaticObject(nullptr, Biome::AIR, Ogre::Vector3(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE), Ogre::Vector3::ZERO, sim, this);
+	if (air == nullptr) air = new StaticObject(nullptr, CubeManager::AIR, Ogre::Vector3(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE), Ogre::Vector3::ZERO, sim, this);
 
 	_name = getChunkName(xStart, yStart);
 
@@ -32,10 +32,10 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
 				key index = getKey(pos);
 				StaticObject* so;
-				Biome::BiomeType tempType;
+				CubeManager::CubeType tempType;
 
 				if (y >= 15 && curBiome != nullptr) {
-					if (curBiome->getType() != Biome::SAND) {
+					if (curBiome->getType() != CubeManager::SAND) {
 						Ogre::Entity* type = curBiome->getCubeEntity(i, j, y, tempType);
 						so = new StaticObject(type, tempType, scale, pos, sim, this);
 					}
@@ -46,7 +46,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				}
 
 				else {
-					so = new StaticObject(biomeMgr->getTerrain(Biome::GRASS), Biome::GRASS, scale, pos, sim, this);
+					so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
 				}
 
 				_staticObjects[index] = so;
@@ -115,14 +115,14 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 	// Only create neighbors for non-tree blocks
 	if (!_biomeMgr->isTreeType(obj->_cubeType)) {
 		// top
-		Biome::BiomeType newType = getGeneratedType(obj->_cubeType, (int) obj->_pos.y);
+		CubeManager::CubeType newType = getGeneratedType(obj->_cubeType, (int) obj->_pos.y);
 
 		Ogre::Vector3 topPos = obj->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0);
 		key topIndex = getKey(topPos);
 		StaticObject* topObj = getObjFromChunks(chunks, topIndex);
 		if (topObj == nullptr) {
 			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, topPos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, topPos, _simulator, this);
 			if(so == nullptr) assert(!"StaticObject is null");
 			_staticObjects[topIndex] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
@@ -134,7 +134,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 		StaticObject* bottomObj = getObjFromChunks(chunks, bottomIndex);
 		if (bottomObj == nullptr) {
 			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, bottomPos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, bottomPos, _simulator, this);
 			_staticObjects[bottomIndex] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
@@ -145,7 +145,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 		StaticObject* leftObj = getObjFromChunks(chunks, leftIndex);
 		if (leftObj == nullptr) {
 			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, leftPos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, leftPos, _simulator, this);
 			_staticObjects[leftIndex] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
@@ -156,7 +156,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 		StaticObject* rightObj = getObjFromChunks(chunks, rightIndex);
 		if (rightObj == nullptr) {
 			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, rightPos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, rightPos, _simulator, this);
 			_staticObjects[rightIndex] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
@@ -167,7 +167,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 		StaticObject* backObj = getObjFromChunks(chunks, backIndex);
 		if (backObj == nullptr) {
 			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, backPos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, backPos, _simulator, this);
 			_staticObjects[backIndex] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
@@ -178,7 +178,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 		StaticObject* frontObj = getObjFromChunks(chunks, frontIndex);
 		if (frontObj == nullptr) {
 			Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, frontPos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, frontPos, _simulator, this);
 			_staticObjects[frontIndex] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
@@ -187,7 +187,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 	_sg->build();
 }
 
-void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const btVector3& hitnormal, Biome::BiomeType newType) {
+void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const btVector3& hitnormal, CubeManager::CubeType newType) {
 	if (obj == nullptr) assert(!"Block was null");
 	if (obj == air) return;
 
@@ -197,7 +197,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 	int z = round(hitnormal.z());
 	
 	Ogre::Vector3 scale;
-	if (newType == Biome::TORCH)
+	if (newType == CubeManager::TORCH)
 		scale = Ogre::Vector3(CHUNK_SCALE/5, 4*CHUNK_SCALE/5, CHUNK_SCALE/5);
 	else
 		scale = Ogre::Vector3(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
@@ -224,7 +224,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 		StaticObject* topObj = getObjFromChunks(chunks, topIndex);
 
 		if (topObj == air) {
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, pos, _simulator, this);
 			if (so == nullptr) assert(!"StaticObject is null");
 			_staticObjects[topIndex] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
@@ -239,7 +239,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 		StaticObject* obj = getObjFromChunks(chunks, index);
 
 		if (obj == air) {
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, pos, _simulator, this);
 			if (so == nullptr) assert(!"StaticObject is null");
 			_staticObjects[index] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
@@ -254,7 +254,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 		StaticObject* obj = getObjFromChunks(chunks, index);
 
 		if (obj == air) {
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, pos, _simulator, this);
 			if (so == nullptr) assert(!"StaticObject is null");
 			_staticObjects[index] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
@@ -269,7 +269,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 		StaticObject* obj = getObjFromChunks(chunks, index);
 
 		if (obj == air) {
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, pos, _simulator, this);
 			if (so == nullptr) assert(!"StaticObject is null");
 			_staticObjects[index] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
@@ -284,7 +284,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 		StaticObject* obj = getObjFromChunks(chunks, index);
 
 		if (obj == air) {
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, pos, _simulator, this);
 			if (so == nullptr) assert(!"StaticObject is null");
 			_staticObjects[index] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
@@ -299,7 +299,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 		StaticObject* obj = getObjFromChunks(chunks, index);
 
 		if (obj == air) {
-			StaticObject* so = new StaticObject(_biomeMgr->getTerrain(newType), newType, scale, pos, _simulator, this);
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(newType), newType, scale, pos, _simulator, this);
 			if (so == nullptr) assert(!"StaticObject is null");
 			_staticObjects[index] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
@@ -307,7 +307,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 		}
 	}
 
-	if (newType == Biome::TORCH) {
+	if (newType == CubeManager::TORCH) {
 		key tkey = "torch_"+getKey(pos);
 		if (!lights[tkey]) {
 			float range = 5000.0f;
@@ -393,44 +393,44 @@ StaticObject* Chunk::getBlock(int x, int y, int z) {
 
 // This is just temporary and needs to be improved
 // Playing around with probabilities
-Biome::BiomeType Chunk::getGeneratedType(Biome::BiomeType objType, int height) {
+CubeManager::CubeType Chunk::getGeneratedType(CubeManager::CubeType objType, int height) {
 	static int offset = 18 * CHUNK_SCALE_FULL;
 	switch (objType) {
-		case Biome::GRASS :
-		case Biome::DIRT :
+		case CubeManager::GRASS :
+		case CubeManager::DIRT :
 			if (rand()%500 < (height + offset))
-				return Biome::DIRT;
+				return CubeManager::DIRT;
 			// would use dirt but don't know how to use blender - Jeremy :)
 			else 
-				return Biome::ROCK;
+				return CubeManager::ROCK;
 			break;
-		case Biome::SAND :
+		case CubeManager::SAND :
 			if (rand()%500 < (height + offset))
-				return Biome::SAND;
+				return CubeManager::SAND;
 			else
-				return Biome::ROCK;
+				return CubeManager::ROCK;
 			break;
-		case Biome::SNOW :
-			return Biome::DIRT;
+		case CubeManager::SNOW :
+			return CubeManager::DIRT;
 			break;
-		case Biome::ROCK :
-			return Biome::ROCK;
+		case CubeManager::ROCK :
+			return CubeManager::ROCK;
 			break;
 		default :
 			return objType;
 	}
 }
 
-bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
+bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type) {
 
 	static const int breadth = 5;
 	static const int firHeight = 5;
 	static const int firBreadth = 7;
 	
 
-	if ( type == Biome::GRASS && rand()%500 != 5 ) return false;
-	if ( type == Biome::SNOW && rand()%3000 != 5 ) return false;
-	if ( type == Biome::SAND && rand()%2000 != 5 ) return false;
+	if ( type == CubeManager::GRASS && rand()%500 != 5 ) return false;
+	if ( type == CubeManager::SNOW && rand()%3000 != 5 ) return false;
+	if ( type == CubeManager::SAND && rand()%2000 != 5 ) return false;
 
 	// Describes the shape of the leaves, think of each 5x5 grid as another layer
 	bool leaves[breadth][breadth][breadth] = {	{ { 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 } },
@@ -450,10 +450,10 @@ bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 	Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
 
 	switch ( type ) {
-		case Biome::GRASS:
+		case CubeManager::GRASS:
 			// Trunk
 			for (int i = 1; i <= 3; i++) {
-				StaticObject* treeLimb = new StaticObject(_biome->getEntity(Biome::WOOD), Biome::WOOD, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator, this);
+				StaticObject* treeLimb = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WOOD), CubeManager::WOOD, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator, this);
 				key index = getKey(treeLimb->_pos);
 				_staticObjects[index] = treeLimb;
 				_sg->addEntity(treeLimb->_geom, treeLimb->_pos, treeLimb->_orientation, treeLimb->_scale);
@@ -464,7 +464,7 @@ bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 				for (int j = 0; j < breadth; j++) {
 					for (int k = 0; k < breadth; k++) {
 						if (leaves[i][j][k]) {
-							StaticObject* treeLimb = new StaticObject(_biome->getEntity(Biome::LEAF), Biome::LEAF, scale, pos + Ogre::Vector3((i - 2)*CHUNK_SCALE_FULL, (j + breadth - 1)*CHUNK_SCALE_FULL, (k - 2)*CHUNK_SCALE_FULL), _simulator, this);
+							StaticObject* treeLimb = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::LEAF), CubeManager::LEAF, scale, pos + Ogre::Vector3((i - 2)*CHUNK_SCALE_FULL, (j + breadth - 1)*CHUNK_SCALE_FULL, (k - 2)*CHUNK_SCALE_FULL), _simulator, this);
 							key index = getKey(treeLimb->_pos);
 							_staticObjects[index] = treeLimb;
 							_sg->addEntity(treeLimb->_geom, treeLimb->_pos, treeLimb->_orientation, treeLimb->_scale);
@@ -473,13 +473,13 @@ bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 				}
 			}
 			return true;
-		case Biome::SNOW:
+		case CubeManager::SNOW:
 			//Fir Tree
 			for (int i = 0; i < firBreadth; i++) {
 				for (int j = 0; j < firHeight; j++) {
 					for (int k = 0; k < firBreadth; k++) {
 						if (firTree[i][j][k]) {
-							StaticObject* firBlock = new StaticObject(_biome->getEntity(Biome::ICE), Biome::ICE, scale, pos + Ogre::Vector3((i - 3)*CHUNK_SCALE_FULL, (2*j+3)*CHUNK_SCALE_FULL, (k - 3)*CHUNK_SCALE_FULL), _simulator, this);
+							StaticObject* firBlock = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::ICE), CubeManager::ICE, scale, pos + Ogre::Vector3((i - 3)*CHUNK_SCALE_FULL, (2*j+3)*CHUNK_SCALE_FULL, (k - 3)*CHUNK_SCALE_FULL), _simulator, this);
 							key index = getKey(firBlock->_pos);
 							_staticObjects[index] = firBlock;
 							_sg->addEntity(firBlock->_geom, firBlock->_pos, firBlock->_orientation, firBlock->_scale);
@@ -489,64 +489,64 @@ bool Chunk::createTree(const Ogre::Vector3& pos, Biome::BiomeType type) {
 			}
 			//Trunk
 			for (int i = 0 ; i <= firHeight*2 ; i++ ) {
-				StaticObject* firBlock = new StaticObject(_biome->getEntity(Biome::WOOD), Biome::WOOD, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator, this);
+				StaticObject* firBlock = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WOOD), CubeManager::WOOD, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator, this);
 				key index = getKey(firBlock->_pos);
 				_staticObjects[index] = firBlock;
 				_sg->addEntity(firBlock->_geom, firBlock->_pos, firBlock->_orientation, firBlock->_scale);
 			}
 			return true;
-		case Biome::SAND:
+		case CubeManager::SAND:
 			//Cactus
 			for (int i = 1; i <= 10; i++) {
-				StaticObject* stalk = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator, this);
+				StaticObject* stalk = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CACTUS), CubeManager::CACTUS, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 0), _simulator, this);
 				key index = getKey(stalk->_pos);
 				_staticObjects[index] = stalk;
 				_sg->addEntity(stalk->_geom, stalk->_pos, stalk->_orientation, stalk->_scale);
 			}
 			//Arms
 			if ( rand()%2 ) {
-				StaticObject* armConnector1 = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(CHUNK_SCALE_FULL, 4*CHUNK_SCALE_FULL, 0), _simulator, this);
+				StaticObject* armConnector1 = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CACTUS), CubeManager::CACTUS, scale, pos + Ogre::Vector3(CHUNK_SCALE_FULL, 4*CHUNK_SCALE_FULL, 0), _simulator, this);
 				key index = getKey(armConnector1->_pos);
 				_staticObjects[index] = armConnector1;
 				_sg->addEntity(armConnector1->_geom, armConnector1->_pos, armConnector1->_orientation, armConnector1->_scale);
 			
-				StaticObject* armConnector2 = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(-CHUNK_SCALE_FULL, 4*CHUNK_SCALE_FULL, 0), _simulator, this);
+				StaticObject* armConnector2 = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CACTUS), CubeManager::CACTUS, scale, pos + Ogre::Vector3(-CHUNK_SCALE_FULL, 4*CHUNK_SCALE_FULL, 0), _simulator, this);
 				key index2 = getKey(armConnector2->_pos);
 				_staticObjects[index2] = armConnector2;
 				_sg->addEntity(armConnector2->_geom, armConnector2->_pos, armConnector2->_orientation, armConnector2->_scale);
 				
 				for (int i = 4; i <= 8; i++) {
-					StaticObject* armBlock = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(2*CHUNK_SCALE_FULL, i*CHUNK_SCALE_FULL, 0), _simulator, this);
+					StaticObject* armBlock = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CACTUS), CubeManager::CACTUS, scale, pos + Ogre::Vector3(2*CHUNK_SCALE_FULL, i*CHUNK_SCALE_FULL, 0), _simulator, this);
 					key index = getKey(armBlock->_pos);
 					_staticObjects[index] = armBlock;
 					_sg->addEntity(armBlock->_geom, armBlock->_pos, armBlock->_orientation, armBlock->_scale);
 				}
 				for (int i = 4; i <= 9; i++) {
-					StaticObject* armBlock = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(-2*CHUNK_SCALE_FULL, i*CHUNK_SCALE_FULL, 0), _simulator, this);
+					StaticObject* armBlock = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CACTUS), CubeManager::CACTUS, scale, pos + Ogre::Vector3(-2*CHUNK_SCALE_FULL, i*CHUNK_SCALE_FULL, 0), _simulator, this);
 					key index = getKey(armBlock->_pos);
 					_staticObjects[index] = armBlock;
 					_sg->addEntity(armBlock->_geom, armBlock->_pos, armBlock->_orientation, armBlock->_scale);
 				}
 			}
 			else {
-				StaticObject* armConnector1 = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(0, 4*CHUNK_SCALE_FULL, CHUNK_SCALE_FULL), _simulator, this);
+				StaticObject* armConnector1 = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CACTUS), CubeManager::CACTUS, scale, pos + Ogre::Vector3(0, 4*CHUNK_SCALE_FULL, CHUNK_SCALE_FULL), _simulator, this);
 				key index = getKey(armConnector1->_pos);
 				_staticObjects[index] = armConnector1;
 				_sg->addEntity(armConnector1->_geom, armConnector1->_pos, armConnector1->_orientation, armConnector1->_scale);
 			
-				StaticObject* armConnector2 = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(0, 4*CHUNK_SCALE_FULL, -CHUNK_SCALE_FULL), _simulator, this);
+				StaticObject* armConnector2 = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CACTUS), CubeManager::CACTUS, scale, pos + Ogre::Vector3(0, 4*CHUNK_SCALE_FULL, -CHUNK_SCALE_FULL), _simulator, this);
 				key index2 = getKey(armConnector2->_pos);
 				_staticObjects[index2] = armConnector2;
 				_sg->addEntity(armConnector2->_geom, armConnector2->_pos, armConnector2->_orientation, armConnector2->_scale);
 				
 				for (int i = 4; i <= 8; i++) {
-					StaticObject* armBlock = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 2*CHUNK_SCALE_FULL), _simulator, this);
+					StaticObject* armBlock = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CACTUS), CubeManager::CACTUS, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, 2*CHUNK_SCALE_FULL), _simulator, this);
 					key index = getKey(armBlock->_pos);
 					_staticObjects[index] = armBlock;
 					_sg->addEntity(armBlock->_geom, armBlock->_pos, armBlock->_orientation, armBlock->_scale);
 				}
 				for (int i = 4; i <= 9; i++) {
-					StaticObject* armBlock = new StaticObject(_biome->getEntity(Biome::CACTUS), Biome::CACTUS, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, -2*CHUNK_SCALE_FULL), _simulator, this);
+					StaticObject* armBlock = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CACTUS), CubeManager::CACTUS, scale, pos + Ogre::Vector3(0, i*CHUNK_SCALE_FULL, -2*CHUNK_SCALE_FULL), _simulator, this);
 					key index = getKey(armBlock->_pos);
 					_staticObjects[index] = armBlock;
 					_sg->addEntity(armBlock->_geom, armBlock->_pos, armBlock->_orientation, armBlock->_scale);
@@ -566,7 +566,7 @@ bool Chunk::createCloud(const Ogre::Vector3& pos) {
 	Ogre::Vector3 scale(imax*CHUNK_SCALE, CHUNK_SCALE, jmax*CHUNK_SCALE);
 
 	Ogre::Vector3 cloudPos(pos.x, 60*CHUNK_SCALE_FULL, pos.z);
-	StaticObject* cloud = new StaticObject(_biome->getEntity(Biome::CLOUD), Biome::CLOUD, scale, cloudPos, _simulator, this);
+	StaticObject* cloud = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CLOUD), CubeManager::CLOUD, scale, cloudPos, _simulator, this);
 	key index = getKey(cloud->_pos);
 	_staticObjects[index] = cloud;
 	_sg->addEntity(cloud->_geom, cloud->_pos, cloud->_orientation, cloud->_scale);
@@ -584,7 +584,7 @@ Chunk::key Chunk::getKey(const Ogre::Vector3& pos) {
 	return getKey((int)pos.x, (int)pos.y, (int)pos.z);
 }
 
-BlockInfo Chunk::getBlockInfo(key thekey, Biome::BiomeType type) {
+BlockInfo Chunk::getBlockInfo(key thekey, CubeManager::CubeType type) {
 	int x, y, z;
 	std::string delimiter = "_";
 	size_t last = 0; 
@@ -611,10 +611,10 @@ void Chunk::rebuildFromSave(const std::vector<BlockInfo>& blocks) {
 		Ogre::Vector3 scale(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE);
 		key index = getKey(pos);
 
-		if (var.type == Biome::AIR) {
+		if (var.type == CubeManager::AIR) {
 			_staticObjects[index] = air;
 		}
-		else if (var.type == Biome::TORCH) {
+		else if (var.type == CubeManager::TORCH) {
 			scale = Ogre::Vector3(CHUNK_SCALE / 5, 4 * CHUNK_SCALE / 5, CHUNK_SCALE / 5);
 
 			key tkey = "torch_" + getKey(pos);
@@ -629,12 +629,12 @@ void Chunk::rebuildFromSave(const std::vector<BlockInfo>& blocks) {
 				lights[tkey] = light;
 			}
 
-			so = new StaticObject(_biomeMgr->getTerrain(var.type), var.type, scale, pos, _simulator, this);
+			so = new StaticObject(CubeManager::getSingleton()->getEntity(var.type), var.type, scale, pos, _simulator, this);
 			_staticObjects[index] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
 		else {
-			so = new StaticObject(_biomeMgr->getTerrain(var.type), var.type, scale, pos, _simulator, this);
+			so = new StaticObject(CubeManager::getSingleton()->getEntity(var.type), var.type, scale, pos, _simulator, this);
 			_staticObjects[index] = so;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}	

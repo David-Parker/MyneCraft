@@ -1,7 +1,7 @@
 #include "StaticObject.h"
 #include "MultiPlatformHelper.h"
 
-StaticObject::StaticObject(Ogre::Entity* mesh, Biome::BiomeType ot, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator, Chunk* chunk) :
+StaticObject::StaticObject(Ogre::Entity* mesh, CubeManager::CubeType ot, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator, Chunk* chunk) :
 _geom(mesh), _cubeType(ot), _scale(scale), _pos(pos), _simulator(simulator), _mass(1.0f), _friction(0.0f), _restitution(0.0f), _tr(), _chunk(chunk)
 {
 
