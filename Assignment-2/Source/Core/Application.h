@@ -41,6 +41,7 @@
 #include "Player.h"
 #include "Cube.h"
 #include "BlockInfo.h"
+#include "Rand.h"
 
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
@@ -92,7 +93,7 @@ public:
 	int width;
 	int height;
 	int seed;
-	float lastTime;
+	float lastTime = 0.0f;
 
 	std::string magicHeader = "#MCSAVEFILE";
 

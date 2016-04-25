@@ -3,6 +3,7 @@
 #include <random>
 #include <math.h>
 #include <Ogre.h>
+#include "Rand.h"
 
 #include "CubeManager.h"
 

@@ -398,18 +398,19 @@ CubeManager::CubeType Chunk::getGeneratedType(CubeManager::CubeType objType, int
 	switch (objType) {
 		case CubeManager::GRASS :
 		case CubeManager::DIRT :
-			if (rand()%500 < (height + offset))
+			if (Rand::rand()%500 < (height + offset))
 				return CubeManager::DIRT;
-			// would use dirt but don't know how to use blender - Jeremy :)
 			else 
 				return CubeManager::ROCK;
 			break;
+
 		case CubeManager::SAND :
-			if (rand()%500 < (height + offset))
+			if (Rand::rand()%500 < (height + offset))
 				return CubeManager::SAND;
 			else
 				return CubeManager::ROCK;
 			break;
+
 		case CubeManager::SNOW :
 			return CubeManager::DIRT;
 			break;
@@ -427,10 +428,9 @@ bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type) {
 	static const int firHeight = 5;
 	static const int firBreadth = 7;
 	
-
-	if ( type == CubeManager::GRASS && rand()%500 != 5 ) return false;
-	if ( type == CubeManager::SNOW && rand()%3000 != 5 ) return false;
-	if ( type == CubeManager::SAND && rand()%2000 != 5 ) return false;
+	if ( type == CubeManager::GRASS && Rand::rand()%500 != 5 ) return false;
+	if ( type == CubeManager::SNOW && Rand::rand()%3000 != 5 ) return false;
+	if ( type == CubeManager::SAND && Rand::rand()%2000 != 5 ) return false;
 
 	// Describes the shape of the leaves, think of each 5x5 grid as another layer
 	bool leaves[breadth][breadth][breadth] = {	{ { 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 } },
@@ -504,8 +504,9 @@ bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type) {
 				_sg->addEntity(stalk->_geom, stalk->_pos, stalk->_orientation, stalk->_scale);
 			}
 			//Arms
-			if ( rand()%2 ) {
+			if ( Rand::rand()%2 ) {
 				StaticObject* armConnector1 = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::CACTUS), CubeManager::CACTUS, scale, pos + Ogre::Vector3(CHUNK_SCALE_FULL, 4*CHUNK_SCALE_FULL, 0), _simulator, this);
+
 				key index = getKey(armConnector1->_pos);
 				_staticObjects[index] = armConnector1;
 				_sg->addEntity(armConnector1->_geom, armConnector1->_pos, armConnector1->_orientation, armConnector1->_scale);
@@ -558,10 +559,10 @@ bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type) {
 }
 
 bool Chunk::createCloud(const Ogre::Vector3& pos) {
-	if(rand() % 400 != 10) return false;
+	if(Rand::rand() % 400 != 10) return false;
 
-	int imax = rand() % 25 + 5;
-	int jmax = rand() % 25 + 5;
+	int imax = Rand::rand() % 25 + 5;
+	int jmax = Rand::rand() % 25 + 5;
 
 	Ogre::Vector3 scale(imax*CHUNK_SCALE, CHUNK_SCALE, jmax*CHUNK_SCALE);
 

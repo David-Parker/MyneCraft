@@ -10,6 +10,7 @@
 #include "Biome.h"
 #include "CubeManager.h"
 #include "StaticObject.h"
+#include "Rand.h"
 
 // TODO Put in its own file
 template <class T>

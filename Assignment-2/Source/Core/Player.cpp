@@ -206,14 +206,6 @@ void Player::update(OISManager* ois) {
 	OIS::KeyCode lastkey;
 	bool moved = false;
 
-	// if(!_body) assert(!"Body cannot be null!");
-	
-	// if (_body->isDead) {
-	// 	_body->setVelocity(0, 0, 0);
-	// 	_body->setPosition(0, 1500, 0);
-	// 	_body->isDead = false;
-	// }
-
 	if (ois->isKeyDown(OIS::KC_LSHIFT)) {
 		speed = 2500;
 	}
@@ -410,6 +402,4 @@ void Player::constrainSpeed() {
         velocity *= maxSpeed/lspeed;
         _body->setVelocity(velocity.x(), velocity.y(), velocity.z());
     }
-
-	// std::cout << "Speed: " << _body->getBody()->getLinearVelocity().length() << std::endl;
 }
