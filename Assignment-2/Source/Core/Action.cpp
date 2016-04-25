@@ -33,7 +33,7 @@ bool Action::playAction() {
 		assert(!"Block was null");
 	}
 
-	_sceneNode->translate(translation);
+	_sceneNode->translate(translation, Ogre::Node::TransformSpace::TS_LOCAL);
 	
 	++_currentActionIndex;
 
