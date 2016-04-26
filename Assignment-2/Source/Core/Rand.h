@@ -1,16 +1,18 @@
 #pragma once
+#include <iostream>
 
-namespace Rand {
-	static unsigned long next = 1;
+class Rand {
+private:
+	Rand();
+	static int next;
 
-	/* RAND_MAX assumed to be 32767 */
-	inline int rand(void) {
-	    next = next * 1103515245 + 12345;
+public:
+	static int rand() {
+		next = next * 1103515245 + 12345;
 	    return((unsigned)(next/65536) % 32768);
 	}
 
-	inline void srand(unsigned seed) {
-	    next = seed;
-	    std::cout << "Seed: " << seed << std::endl;
+	static void srand(unsigned seed) {
+		next = seed;
 	}
-}
+};
