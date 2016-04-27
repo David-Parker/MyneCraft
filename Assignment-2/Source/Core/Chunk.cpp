@@ -31,10 +31,122 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 				Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
 				key index = getKey(pos);
-				StaticObject* so;
+				StaticObject* so = nullptr;
 				CubeManager::CubeType tempType;
 
-				if (y >= 15 && curBiome != nullptr) {
+				int height = 8;
+				int cave = (int)((perlin->getPerlin(fi+66, fj+66)) * steepness);
+				int heightTop = (int)((perlin->getPerlin(fi+99, fj+99)) * steepness) - 20;
+				Ogre::Vector3 posCaveTop(i*scale.x * 2, heightTop*scale.y * 2, j*scale.z * 2);
+				Ogre::Vector3 posCaveBottom = posCaveTop - Ogre::Vector3(0, height*100, 0);
+				key indexTop = getKey(posCaveTop);
+				key indexBottom = getKey(posCaveBottom);
+
+				int rnd = Rand::rand()%10;
+				CubeManager::CubeType rndCube;
+				if ( rnd < 3 )
+					rndCube = CubeManager::DIRT;
+				else
+					rndCube = CubeManager::ROCK;
+
+
+				if ( (cave > -2  && cave < 3) ) {
+					//if ( y == heightTop && !_staticObjects[index] )
+					//	so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
+					
+					if ( y > heightTop ) {
+						if ( !_staticObjects[index] ) {
+							so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
+							_staticObjects[getKey(so->_pos)] = so;
+							key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+							_staticObjects[airIndex] = air;
+							_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+							so = nullptr;
+						}
+						if ( !_staticObjects[indexTop] ) {
+							so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, posCaveTop, sim, this);
+							_staticObjects[indexTop] = so;
+							key airIndex = getKey(so->_pos - Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+							_staticObjects[airIndex] = air;
+							_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+							so = nullptr;
+						}						
+						if ( !_staticObjects[indexBottom] ) {
+							so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, posCaveBottom, sim, this);
+							_staticObjects[indexBottom] = so;
+							key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+							_staticObjects[airIndex] = air;
+							_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+							so = nullptr;
+						}
+					}
+					else if ( y+height > heightTop ) {
+						if ( !_staticObjects[indexBottom] ) {
+							so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, posCaveBottom, sim, this);
+							_staticObjects[indexBottom] = so;
+							key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+							_staticObjects[airIndex] = air;
+							_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+							so = nullptr;
+						}
+					}
+					else {
+						if ( !_staticObjects[index] ) {
+							so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
+						}
+					}
+				}
+				else if ( (cave == -2 || cave == 3) ) {
+					bool topDrawn = false;
+					for ( int kk = 0 ; kk < height+1 ; kk++ ) {
+						Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,100*kk,0);
+						key innerWall = getKey(caveAirPos);
+						if ( y > heightTop-kk ) {
+							if ( !topDrawn ) {
+								topDrawn = true;
+								so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, caveAirPos, sim, this);
+								_staticObjects[innerWall] = so;
+								_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+								so = nullptr;
+							}
+							else if ( !_staticObjects[innerWall] ) {
+								_staticObjects[innerWall] = air;
+							}
+						}
+					}
+					so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, posCaveBottom, sim, this);
+					_staticObjects[indexBottom] = so;
+					_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+					so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
+
+				}
+				else if ( (cave == -3 || cave == 4) ) {
+					for ( int kk = 0 ; kk < height+1 ; kk++ ) {
+						if ( y > heightTop-kk ) {
+							Ogre::Vector3 caveWallPos = posCaveTop-Ogre::Vector3(0,100*kk,0);
+							key wallKey = getKey(caveWallPos);
+							if ( !_staticObjects[wallKey] ) {
+								rnd = Rand::rand()%10;
+								if ( rnd < 3 )
+									rndCube = CubeManager::DIRT;
+								else
+									rndCube = CubeManager::ROCK;
+								so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, caveWallPos, sim, this);
+								_staticObjects[wallKey] = so;
+								_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+								so = nullptr;
+							}
+						}
+					}
+					//if ( !_staticObjects[index] )
+					so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
+				}
+				else {
+					//if ( !_staticObjects[index] )
+					so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
+				}
+
+				/*if (y >= 15 && curBiome != nullptr) {
 					if (curBiome->getType() != CubeManager::SAND) {
 						Ogre::Entity* type = curBiome->getCubeEntity(i, j, y, tempType);
 						so = new StaticObject(type, tempType, scale, pos, sim, this);
@@ -43,23 +155,17 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				if (curBiome != nullptr) {
 					Ogre::Entity* type = curBiome->getCubeEntity(i, j, y, tempType);
 					so = new StaticObject(type, tempType, scale, pos, sim, this);
+				}*/
+				if ( so != nullptr && !_staticObjects[index]) {
+					_staticObjects[index] = so;
+					// Create tree returns true if a tree was created in this position.
+					if ( !createTree(so->_pos, so->_cubeType, cave) ) {
+						key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+						_staticObjects[airIndex] = air;
+					}
+					_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 				}
-
-				else {
-					so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
-				}
-
-				_staticObjects[index] = so;
-
-				// Create tree returns true if a tree was created in this position.
-				if (!createTree(pos, so->_cubeType)) {
-					key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
-					_staticObjects[airIndex] = air;
-				}
-
 				createCloud(pos);
-
-				_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 			}
 		}
 
@@ -422,11 +528,13 @@ CubeManager::CubeType Chunk::getGeneratedType(CubeManager::CubeType objType, int
 	}
 }
 
-bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type) {
+bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type, bool cave) {
 
 	static const int breadth = 5;
 	static const int firHeight = 5;
 	static const int firBreadth = 7;
+
+	if ( cave ) return false;
 	
 	if ( type == CubeManager::GRASS && Rand::rand()%500 != 5 ) return false;
 	if ( type == CubeManager::SNOW && Rand::rand()%3000 != 5 ) return false;

@@ -31,7 +31,7 @@ private:
 
 	std::unordered_map<key, Ogre::Light*> lights;
 
-	bool createTree(const Ogre::Vector3&, CubeManager::CubeType);
+	bool createTree(const Ogre::Vector3&, CubeManager::CubeType, bool);
 	bool createCloud(const Ogre::Vector3& pos);
 	key getKey(int x, int y, int z);
 	key getKey(const Ogre::Vector3& pos);
@@ -44,6 +44,7 @@ public:
 	~Chunk();
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
+	void addStaticObjectToGeometry(StaticObject*, bool);
 	StaticObject* getBlock(int x, int y, int z);
 	CubeManager::CubeType getGeneratedType(CubeManager::CubeType objType, int height);
 	void removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj);
