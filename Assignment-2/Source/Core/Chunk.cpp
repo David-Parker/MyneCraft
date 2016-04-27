@@ -12,7 +12,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 	_xEnd = xStart + CHUNK_SIZE;
 	_yEnd = yStart + CHUNK_SIZE;
 
-	float steepness = 90.0f;
+	float steepness = 40.0f;
 
 	_sg = mSceneManager->createStaticGeometry(_name);
 
@@ -24,11 +24,29 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 			for (int j = yStart; j < _yEnd; ++j) {
 
-				float fi = (float)i / (float)100.0f;
-				float fj = (float)j / (float)100.0f;
+				float fi = (float)i / (float)CHUNK_SCALE_FULL;
+				float fj = (float)j / (float)CHUNK_SCALE_FULL;
 
-				int y = (int)((perlin->getPerlin(fi, fj)) * steepness);
+				float y1 = (perlin->getPerlin(fi/3.0, fj/3.0)*steepness);
+				float y2 = 0.5 * (perlin->getPerlin(2*fi/3.0,2*fj/3.0)*steepness);
+				float y3 = 0.25 * (perlin->getPerlin( 4*fi/3.0, 4*fj/3.0)*steepness);
+				float y4 = 0.125 * (perlin->getPerlin( 8*fi/3.0, 8*fj/3.0)*steepness);
 
+				float pval = y1 + y2 + y3 + y4;
+
+				bool neg = false;
+				if(pval < 0) {
+					neg = true;
+					pval = -pval;
+				}
+			
+				float e = pow(pval, 1.3);
+
+				if(neg) {
+					e = -e;
+				}
+
+				int y = (int)e;
 				Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
 				key index = getKey(pos);
 				StaticObject* so;
@@ -55,15 +73,18 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				if (!createTree(pos, so->_cubeType)) {
 					key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
 					_staticObjects[airIndex] = air;
+
+					key airIndex2 = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*2, 0));
+					_staticObjects[airIndex2] = air;
 				}
 
 				createCloud(pos);
 
 				_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+				_sg->setRegionDimensions(Ogre::Vector3(3000, 1000, 3000));
 			}
 		}
 
-		_sg->setRegionDimensions(Ogre::Vector3(3000, 300, 3000));
 		_sg->build();
 	}
 }

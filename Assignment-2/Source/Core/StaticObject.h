@@ -27,7 +27,7 @@ class Chunk;
 class StaticObject {
 protected:
 	Simulator* _simulator;
-	btCollisionShape* _shape;
+	static btCollisionShape* _shape;
 	btTransform _tr;
 	btVector3 _inertia;
 	btCollisionObject* _collisionObject = nullptr;
