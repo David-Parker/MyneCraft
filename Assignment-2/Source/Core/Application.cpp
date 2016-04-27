@@ -247,6 +247,21 @@ bool Application::update(const FrameEvent &evt) {
 		setState(HOME);
 	}
 
+	switch (gameState) {
+		case HOME:
+			handleGUI(evt);
+			return true;
+			break;
+		case SERVER:
+			updateServer(evt);
+			break;
+		case CLIENT:
+			updateClient(evt);
+			break;
+		case SINGLE:
+			break;
+	}
+
 	if (int delta = _oisManager->getMouseWheel()) {
 		int index = player->getWeapon() + delta;
 		index = index % (Player::NUM_WEP+1);
@@ -381,7 +396,37 @@ bool Application::updateServer(const FrameEvent &evt) {
 	if ( netManager->pollForActivity(1) ) {
 		previousTime = t1->getMilliseconds();
 		// Only accept one connection at a time.
-		netManager->denyConnections();
+		if (otherPlayer == nullptr) {
+			GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
+			otherPlayer = new Player(playerCam, playerObj, mSceneManager);
+		}
+		netManager->denyConnections();	
+
+		std::unordered_map<std::string, char*> pairs = dataParser(netManager->udpClientData[0]->output);
+
+		if(pairs["PDW"] == NULL || pairs["PDX"] == NULL || pairs["PDY"] == NULL || 
+		   pairs["PDZ"] == NULL || pairs["PPX"] == NULL || pairs["PPY"] == NULL || 
+		   pairs["PPZ"] == NULL ) {
+		   		std::cout << "Paddle data integrity was not guaranteed." << std::endl;
+		   		setState(HOME);
+		   		return true;
+		}
+		else {
+			float w = atof(pairs["PDW"]);
+			float x = atof(pairs["PDX"]);
+			float y = atof(pairs["PDY"]);
+			float z = atof(pairs["PDZ"]);
+			float playerX = atof(pairs["PPX"]);
+			float playerY = atof(pairs["PPY"]);
+			float playerZ = atof(pairs["PPZ"]);
+
+			Ogre::Quaternion qt(w,x,y,z);
+			otherPlayer->_body->setOrientation(qt);
+			otherPlayer->_body->setPosition(-playerX, playerY, -playerZ);
+
+			std::string playerCoords = player->getCoordinates();
+			netManager->messageClients(PROTOCOL_UDP, playerCoords.c_str(), playerCoords.length() + 1);
+		}
 	}
 	else {
 		float dt = t1->getMilliseconds() - previousTime;
@@ -398,15 +443,44 @@ bool Application::updateClient(const FrameEvent &evt) {
 	static float previousTime = t1->getMilliseconds();
 	
 	if ( netManager->pollForActivity(1)) {
+		std::unordered_map<std::string, char*> pairs = dataParser(netManager->udpClientData[0]->output);
 
+		if (otherPlayer == nullptr) {
+			GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
+			otherPlayer = new Player(playerCam, playerObj, mSceneManager);
+		}
+
+		if(pairs["PDW"] == NULL || pairs["PDX"] == NULL || pairs["PDY"] == NULL || 
+		   pairs["PDZ"] == NULL || pairs["PPX"] == NULL || pairs["PPY"] == NULL || 
+		   pairs["PPZ"] == NULL ) {
+		   		std::cout << "Player data integrity was not guaranteed." << std::endl;
+		   		setState(HOME);
+		   		return true;
+		}
+		else {
+			float w = atof(pairs["PDW"]);
+			float x = atof(pairs["PDX"]);
+			float y = atof(pairs["PDY"]);
+			float z = atof(pairs["PDZ"]);
+			float playerX = atof(pairs["PPX"]);
+			float playerY = atof(pairs["PPY"]);
+			float playerZ = atof(pairs["PPZ"]);
+
+			Ogre::Quaternion qt(w,x,y,z);
+			otherPlayer->_body->setOrientation(qt);
+			otherPlayer->_body->setPosition(-playerX, playerY, -playerZ);
+		}
+		
 	}
 
-	std::string t = "";
+	std::string t = player->getCoordinates();
 
 	if(t.length() - 1 > NetManager::MESSAGE_LENGTH) {
 		std::cout << "Message was too large." << std::endl;
 		return error();
 	}
+
+	netManager->messageServer(PROTOCOL_UDP, t.c_str(), t.length() + 1);
 
     return true;
 }
@@ -604,11 +678,36 @@ void Application::setupCEGUI(void) {
 		CEGUI::UVector2(CEGUI::UDim(0.7f, 0), CEGUI::UDim(0.4f, 0))));
 	singlePlayerButton->setText("Single Player");
 
+	hostServerButton = wmgr.createWindow("AlfiskoSkin/Button", "HostButton");
+	hostServerButton->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.3f, 0), CEGUI::UDim(0.4f, 0)),
+		CEGUI::UVector2(CEGUI::UDim(0.7f, 0), CEGUI::UDim(0.45f, 0))));
+	hostServerButton->setText("Host Game");
+
+	ipText = wmgr.createWindow("AlfiskoSkin/Label", "Ip Label");
+	ipText->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.525f, 0), CEGUI::UDim(0.45f, 0)),
+		CEGUI::UVector2(CEGUI::UDim(0.725f, 0), CEGUI::UDim(0.5f, 0))));
+	ipText->setText("IP Address");
+
+	ipBox = wmgr.createWindow("AlfiskoSkin/Editbox", "Ip Box");
+	ipBox->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.3f, 0), CEGUI::UDim(0.45f, 0)),
+		CEGUI::UVector2(CEGUI::UDim(0.7f, 0), CEGUI::UDim(0.5f, 0))));
+
+	joinServerButton = wmgr.createWindow("AlfiskoSkin/Button", "JoinButton");
+	joinServerButton->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.3f, 0), CEGUI::UDim(0.5f, 0)),
+		CEGUI::UVector2(CEGUI::UDim(0.7f, 0), CEGUI::UDim(0.55f, 0))));
+	joinServerButton->setText("Join Game");
+
 	sheet->addChild(quitButton);
 	sheet->addChild(singlePlayerButton);
+	sheet->addChild(hostServerButton);
+	sheet->addChild(ipText);
+	sheet->addChild(ipBox);
+	sheet->addChild(joinServerButton);
 
 	singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::StartSinglePlayer, this));
 	quitButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::Quit, this));
+	hostServerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::StartServer, this));
+	joinServerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::JoinServer, this));
 }
 
 void Application::setupCameras(void) {
@@ -668,6 +767,7 @@ void Application::createObjects(void) {
 
 	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj, mSceneManager);
+	otherPlayer = nullptr;
 	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
 
 	setupWorld();
@@ -692,6 +792,37 @@ bool Application::StartSinglePlayer(const CEGUI::EventArgs& e) {
 	}
 	setState(SINGLE);
 	return true;
+}
+
+bool Application::StartServer(const CEGUI::EventArgs& e) {
+
+	begin = true;
+	setState(SERVER);
+
+	if (!setupNetwork(gameState == SERVER)) {
+		return error();
+	}
+	else {
+		// Server will not bind connecting UDP clients without this method
+		createGame();
+		netManager->acceptConnections();
+		return true;
+	}
+}
+
+bool Application::JoinServer(const CEGUI::EventArgs& e) {
+
+	begin = true;
+	setState(CLIENT);
+
+	if(!setupNetwork(gameState == SERVER)) {
+		setState(HOME);
+		return true;
+	}
+	else {
+		createGame();
+		return true;
+	}
 }
 /* 
 * End CEGUI Button Callbacks 
@@ -770,12 +901,21 @@ void Application::hideGui() {
 	CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
 	quitButton->hide();
 	singlePlayerButton->hide();
+	ipBox->hide();
+	ipText->hide();
+	hostServerButton->hide();
+	joinServerButton->hide();
 }
 
 void Application::showGui() {
 	CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().show();
 	quitButton->show();
 	singlePlayerButton->show();
+	ipBox->show();
+	ipText->show();
+	singlePlayerButton->show();
+	hostServerButton->show();
+	joinServerButton->show();
 }
 
 void Application::resetNetManager() {
@@ -798,11 +938,13 @@ void Application::setState(State state) {
 			break;
 		case SERVER:
 			resetNetManager();
+			_oisManager->setupCameraMan(playerCam);
 			hideGui();
 			gameState = SERVER;
 			break;
 		case CLIENT:
 			resetNetManager();
+			_oisManager->setupCameraMan(playerCam);
 			hideGui();
 			gameState = CLIENT;
 			break;

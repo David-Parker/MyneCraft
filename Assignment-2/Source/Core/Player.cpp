@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) : _body(body), _playerCam(camera), _sceneManager(sm) {
-	_body->getNode()->setVisible(false);
+	// _body->getNode()->setVisible(false);
 	_body->getBody()->setAngularFactor(btVector3(0, 0, 0));
 
 	for(int i = 0; i < averageSize; i++) {
@@ -402,4 +402,21 @@ void Player::constrainSpeed() {
         velocity *= maxSpeed/lspeed;
         _body->setVelocity(velocity.x(), velocity.y(), velocity.z());
     }
+}
+
+std::string Player::getCoordinates() {
+	Ogre::Quaternion orient(_body->getNode()->getOrientation());
+	std::string ow = std::to_string(orient.w);
+	std::string ox = std::to_string(orient.x);
+	std::string oy = std::to_string(orient.y);
+	std::string oz = std::to_string(orient.z);
+
+	Ogre::Vector3 pos(_body->getNode()->getPosition());
+	std::string px = std::to_string(pos.x);
+	std::string py = std::to_string(pos.y);
+	std::string pz = std::to_string(pos.z);
+
+	std::string str = "PDW " + ow + "\nPDX " + ox + "\nPDY " + oy + "\nPDZ " + oz + "\nPPX " + px + "\nPPY " + py + "\nPPZ " + pz;
+	
+	return str;
 }
