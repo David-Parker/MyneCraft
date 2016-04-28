@@ -30,6 +30,7 @@ private:
 	BiomeManager* _biomeMgr;
 
 	int heights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
+	int waterLevel = -10;
 
 	std::unordered_map<key, Ogre::Light*> lights;
 

@@ -101,6 +101,14 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 				createCloud(pos);
 
+				if(y <= waterLevel) {
+					Ogre::Vector3 waterLine(pos.x, waterLevel*scale.y * 2 - CHUNK_SCALE, pos.z);
+					key newIndex = getKey(waterLine);
+					StaticObject* sos = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, scale, waterLine, sim, this);
+					_staticObjects[newIndex] = sos;
+					_sg->addEntity(sos->_geom, sos->_pos, sos->_orientation, sos->_scale);
+				}
+
 				_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 				_sg->setRegionDimensions(Ogre::Vector3(3000, 1000, 3000));
 			}
@@ -473,6 +481,7 @@ bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type) {
 	if ( type == CubeManager::GRASS && Rand::rand()%500 != 5 ) return false;
 	if ( type == CubeManager::SNOW && Rand::rand()%3000 != 5 ) return false;
 	if ( type == CubeManager::SAND && Rand::rand()%2000 != 5 ) return false;
+	if(pos.y <= waterLevel*CHUNK_SCALE_FULL) return false;
 
 	// Describes the shape of the leaves, think of each 5x5 grid as another layer
 	bool leaves[breadth][breadth][breadth] = {	{ { 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 } },
