@@ -41,6 +41,7 @@ private:
 	StaticObject* getObjFromChunks(const std::vector<Chunk*>& chunks, key index);
 	void createAirNeighbors(const std::vector<Chunk*>& chunks, StaticObject* obj);
 	int computeMinNeighbor(int x, int y);
+	int computeMaxNeighbor(int x, int y);
 
 public:
 	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*, bool generate);

@@ -45,10 +45,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				heights[i][j] = y;
 			}
 		}
-	}
 
-	// Does this chunk generate new terrain?
-	if (generate) {
+		// Does this chunk generate new terrain?
 		for (int i = 0; i < CHUNK_SIZE; ++i) {
 
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
@@ -81,8 +79,12 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 				// Create tree returns true if a tree was created in this position.
 				if (!createTree(pos, so->_cubeType)) {
-					key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
-					_staticObjects[airIndex] = air;
+					int numAir = computeMaxNeighbor(i+1, j+1);
+
+					for(int i = 0 ; i < numAir; i++) {
+						key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*(i+1), 0));
+						_staticObjects[airIndex] = air;
+					}
 				}
 
 				int interpolate = computeMinNeighbor(i+1, j+1);
@@ -708,5 +710,33 @@ int Chunk::computeMinNeighbor(int x, int y) {
 	}
 	else {
 		return 0;
+	}
+}
+
+// returns the number of air blocks to create above us
+int Chunk::computeMaxNeighbor(int x, int y) {
+	int max = -99999999;
+	int distance = 0;
+	int height = heights[x][y];
+
+	// up
+	distance = heights[x][y + 1] - height;
+	if(distance > max) max = distance;
+	// down
+	distance = heights[x][y - 1] - height;
+	if(distance > max) max = distance;
+	// left
+	distance = heights[x - 1][y] - height;
+	if(distance > max) max = distance;
+	// right
+	distance = heights[x + 1][y] - height;
+	if(distance > max) max = distance;
+
+	// A block is is lower than 1 block below us
+	if(max > 1) {
+		return max;
+	}
+	else {
+		return 1;
 	}
 }
