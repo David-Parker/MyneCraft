@@ -41,7 +41,10 @@ void Application::init()
 		setupOIS();
 
 		netManager = new NetManager();
+
+#if defined __linux__ || defined _DEBUG
 		setupCEGUI();
+#endif
 
 		setupGM();
 
@@ -60,7 +63,7 @@ void Application::init()
 
 void Application::createGame() {
 	try {
-		sg = mSceneManager->createStaticGeometry("CubeArea");
+		//sg = mSceneManager->createStaticGeometry("CubeArea");
 		createObjects();
 	}
 	catch (Exception e) {
@@ -165,7 +168,7 @@ void Application::saveWorld() {
 bool Application::frameRenderingQueued(const FrameEvent &evt) {
 
 	static float dTime = t1->getMilliseconds();
-#if _DEBUG
+#if defined __linux__ || defined _DEBUG
 	CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 #endif
 	if (!mRunning)
@@ -190,7 +193,17 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 	// All logic is now controlled by a state machine
 	switch(gameState) {
 		case HOME:
+#if defined __linux__ || defined _DEBUG
 			handleGUI(evt);
+#else
+			if (!begin) {
+				begin = true;
+				createGame();
+			}
+			setState(SINGLE);
+			return true;
+#endif
+
 			return true;
 			break;
 		case SERVER:
@@ -747,12 +760,9 @@ void Application::setupLighting(void) {
 void Application::createObjects(void) {
 	mSceneManager->setSkyDome(true, "day-night", 5, 8);
 
-	int xmax = 128;
-	int ymax = xmax;
-	int rndmax = 8;
 	float density = 1.8f; // 1 is very steep, 10 is pretty flat.
 
-	perlin = new Perlin(xmax, ymax, rndmax, density);
+	perlin = new Perlin(density);
 
 	biomeManager = new BiomeManager(mSceneManager);
 
@@ -921,8 +931,10 @@ void Application::setState(State state) {
 		case HOME:
 			resetNetManager();
 			states.clear();
+#if defined __linux__ || defined _DEBUG
 			hideGui();
 			showGui();
+#endif
 			_oisManager->setupCameraMan(nullptr);
 			gameState = HOME;
 			break;
@@ -940,7 +952,9 @@ void Application::setState(State state) {
 			break;
 		case SINGLE:
 			_oisManager->setupCameraMan(playerCam);
+#if defined __linux__ || defined _DEBUG
 			hideGui();
+#endif
 			gameState = SINGLE;
 			break;
 		case ENDGAME:
