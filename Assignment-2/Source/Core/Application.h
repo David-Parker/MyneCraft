@@ -64,7 +64,8 @@ public:
 	Ogre::Timer* t1;
 	BiomeManager* biomeManager;
 	Player* player;
-	Player* otherPlayer;
+	Player* otherPlayer = NULL;
+	GameObject* otherPlayerObj;
 	Cube* highlight;
 	Ogre::Light* sun;
 

@@ -194,10 +194,10 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 			return true;
 			break;
 		case SERVER:
+			updateServer(evt);
 			break;
 		case CLIENT:
-			break;
-		case SINGLE:
+			updateClient(evt);
 			break;
 		case ENDGAME:
 			return true;
@@ -245,21 +245,6 @@ bool Application::update(const FrameEvent &evt) {
 	}
 	else if(lastKey == OIS::KC_P) {
 		setState(HOME);
-	}
-
-	switch (gameState) {
-		case HOME:
-			handleGUI(evt);
-			return true;
-			break;
-		case SERVER:
-			updateServer(evt);
-			break;
-		case CLIENT:
-			updateClient(evt);
-			break;
-		case SINGLE:
-			break;
 	}
 
 	if (int delta = _oisManager->getMouseWheel()) {
@@ -392,14 +377,19 @@ bool Application::handleGUI(const FrameEvent &evt) {
 bool Application::updateServer(const FrameEvent &evt) {
 	
 	static float previousTime = t1->getMilliseconds();
+	static int index = 0;
 
 	if ( netManager->pollForActivity(1) ) {
 		previousTime = t1->getMilliseconds();
 		// Only accept one connection at a time.
-		if (otherPlayer == nullptr) {
-			GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
-			otherPlayer = new Player(playerCam, playerObj, mSceneManager);
+		
+		if (otherPlayer == NULL) {
+			otherPlayerObj = createPlayerObject("Player2", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, true, _simulator);
+			otherPlayer = new Player(nullptr, otherPlayerObj, mSceneManager);
 		}
+
+		
+
 		netManager->denyConnections();	
 
 		std::unordered_map<std::string, char*> pairs = dataParser(netManager->udpClientData[0]->output);
@@ -422,7 +412,7 @@ bool Application::updateServer(const FrameEvent &evt) {
 
 			Ogre::Quaternion qt(w,x,y,z);
 			otherPlayer->_body->setOrientation(qt);
-			otherPlayer->_body->setPosition(-playerX, playerY, -playerZ);
+			otherPlayer->_body->setPosition(playerX, playerY, playerZ);
 
 			std::string playerCoords = player->getCoordinates();
 			netManager->messageClients(PROTOCOL_UDP, playerCoords.c_str(), playerCoords.length() + 1);
@@ -434,6 +424,7 @@ bool Application::updateServer(const FrameEvent &evt) {
 			return false;
 		}
 	}
+	
 	return true;
 }
 
@@ -443,11 +434,11 @@ bool Application::updateClient(const FrameEvent &evt) {
 	static float previousTime = t1->getMilliseconds();
 	
 	if ( netManager->pollForActivity(1)) {
-		std::unordered_map<std::string, char*> pairs = dataParser(netManager->udpClientData[0]->output);
+		std::unordered_map<std::string, char*> pairs = dataParser(netManager->udpServerData[0].output);
 
-		if (otherPlayer == nullptr) {
-			GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
-			otherPlayer = new Player(playerCam, playerObj, mSceneManager);
+		if (otherPlayer == NULL) {
+			otherPlayerObj = createPlayerObject("Player2", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, true, _simulator);
+			otherPlayer = new Player(nullptr, otherPlayerObj, mSceneManager);
 		}
 
 		if(pairs["PDW"] == NULL || pairs["PDX"] == NULL || pairs["PDY"] == NULL || 
@@ -468,7 +459,7 @@ bool Application::updateClient(const FrameEvent &evt) {
 
 			Ogre::Quaternion qt(w,x,y,z);
 			otherPlayer->_body->setOrientation(qt);
-			otherPlayer->_body->setPosition(-playerX, playerY, -playerZ);
+			otherPlayer->_body->setPosition(playerX, playerY, playerZ);
 		}
 		
 	}
@@ -765,9 +756,8 @@ void Application::createObjects(void) {
 
 	biomeManager = new BiomeManager(mSceneManager);
 
-	GameObject* playerObj = createPlayerObject("Player", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
+	GameObject* playerObj = createPlayerObject("Player1", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj, mSceneManager);
-	otherPlayer = nullptr;
 	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
 
 	setupWorld();
@@ -838,7 +828,7 @@ bool Application::setupNetwork(bool isServer) {
 	}
 	else {
 		// Opens a connection on port 51215
-		netManager->addNetworkInfo(PROTOCOL_UDP, isServer ? NULL : "localghost :P", 51215);
+		netManager->addNetworkInfo(PROTOCOL_UDP, isServer ? NULL : ipBox->getText().c_str(), 51215);
 	}
 	if (isServer) {
 		if(!netManager->startServer()) {

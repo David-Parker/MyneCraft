@@ -4,6 +4,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	// _body->getNode()->setVisible(false);
 	_body->getBody()->setAngularFactor(btVector3(0, 0, 0));
 
+
 	for(int i = 0; i < averageSize; i++) {
 		camAvg[i] = Ogre::Vector3::ZERO;
 	}
@@ -11,22 +12,27 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	Ogre::SceneNode* node;
 	Ogre::SceneNode* rotNode;
 
-	item = _sceneManager->createEntity("Pickaxe", "Mynecraft-Pickaxe.mesh");
+	Ogre::String nme = body->getName();
+
+	
+
+	item = _sceneManager->createEntity("Pickaxe"+nme, "Mynecraft-Pickaxe.mesh");
 	item->setCastShadows(true);
-	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Pickaxe");
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Pickaxe"+nme);
 	node->attachObject(item);
 	node->setDirection(Ogre::Vector3(0, 1 ,0));
 	node->setScale(3, 3, 3);
 	node->setVisible(false);
 
+
 	_animation.createPickaxeAnimation(node);
 
 	inventory.push_back(node);
 
-	item = _sceneManager->createEntity("Sword", "Mynecraft-Sword.mesh");
+	item = _sceneManager->createEntity("Sword"+nme, "Mynecraft-Sword.mesh");
 	item->setCastShadows(true);
-	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Sword");
-	rotNode = node->createChildSceneNode("SwordNode");
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Sword"+nme);
+	rotNode = node->createChildSceneNode("SwordNode"+nme);
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(-2, 6, 10));
 	rotNode->roll(Ogre::Degree(90));
@@ -36,19 +42,20 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	_animation.createSwordAnimation(node);
 
+
 	inventory.push_back(node);
 
-	item = CubeManager::getSingleton()->getEntity(CubeManager::TORCH);
+	item = CubeManager::getSingleton()->getNewEntity(CubeManager::TORCH);
 	item->setCastShadows(true);
-	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Light");
-	rotNode = node->createChildSceneNode("LightNode");
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("Light"+nme);
+	rotNode = node->createChildSceneNode("LightNode"+nme);
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(0, 0, 3));
 	rotNode->roll(Ogre::Degree(-60));
 	rotNode->setDirection(Ogre::Vector3(0, -1 , 0));
 	node->setScale(2, 10, 2);
 
-	Ogre::Light* light = _sceneManager->createLight("torch");
+	Ogre::Light* light = _sceneManager->createLight("torch"+nme);
 	light->setDiffuseColour(1, .6, .05);
 	light->setType(Ogre::Light::LT_POINT);
 	float range = 5000.0f;
@@ -60,10 +67,10 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = CubeManager::getSingleton()->getEntity(CubeManager::GRASS);
+	item = CubeManager::getSingleton()->getNewEntity(CubeManager::GRASS);
 	item->setCastShadows(true);
-	node = _sceneManager->getRootSceneNode()->createChildSceneNode("GrassCube");
-	rotNode = node->createChildSceneNode("GrassCubeNode");
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("GrassCube"+nme);
+	rotNode = node->createChildSceneNode("GrassCubeNode"+nme);
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(0, 0, 2));
 	rotNode->roll(Ogre::Degree(90));
@@ -75,10 +82,10 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = CubeManager::getSingleton()->getEntity(CubeManager::ROCK);
+	item = CubeManager::getSingleton()->getNewEntity(CubeManager::ROCK);
 	item->setCastShadows(true);
-	node = _sceneManager->getRootSceneNode()->createChildSceneNode("RockCube");
-	rotNode = node->createChildSceneNode("RockCubeNode");
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("RockCube"+nme);
+	rotNode = node->createChildSceneNode("RockCubeNode"+nme);
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(0, 0, 2));
 	rotNode->roll(Ogre::Degree(90));
@@ -90,10 +97,10 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = CubeManager::getSingleton()->getEntity(CubeManager::SNOW);
+	item = CubeManager::getSingleton()->getNewEntity(CubeManager::SNOW);
 	item->setCastShadows(true);
-	node = _sceneManager->getRootSceneNode()->createChildSceneNode("SnowCube");
-	rotNode = node->createChildSceneNode("SnowCubeNode");
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("SnowCube"+nme);
+	rotNode = node->createChildSceneNode("SnowCubeNode"+nme);
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(0, 0, 2));
 	rotNode->roll(Ogre::Degree(90));
@@ -105,10 +112,10 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = CubeManager::getSingleton()->getEntity(CubeManager::SAND);
+	item = CubeManager::getSingleton()->getNewEntity(CubeManager::SAND);
 	item->setCastShadows(true);
-	node = _sceneManager->getRootSceneNode()->createChildSceneNode("SandCube");
-	rotNode = node->createChildSceneNode("SandCubeNode");
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("SandCube"+nme);
+	rotNode = node->createChildSceneNode("SandCubeNode"+nme);
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(0, 0, 2));
 	rotNode->roll(Ogre::Degree(90));
@@ -120,10 +127,10 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = CubeManager::getSingleton()->getEntity(CubeManager::DIRT);
+	item = CubeManager::getSingleton()->getNewEntity(CubeManager::DIRT);
 	item->setCastShadows(true);
-	node = _sceneManager->getRootSceneNode()->createChildSceneNode("DirtCube");
-	rotNode = node->createChildSceneNode("DirtCubeNode");
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("DirtCube"+nme);
+	rotNode = node->createChildSceneNode("DirtCubeNode"+nme);
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(0, 0, 2));
 	rotNode->roll(Ogre::Degree(90));
@@ -135,10 +142,10 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = CubeManager::getSingleton()->getEntity(CubeManager::PLANK);
+	item = CubeManager::getSingleton()->getNewEntity(CubeManager::PLANK);
 	item->setCastShadows(true);
-	node = _sceneManager->getRootSceneNode()->createChildSceneNode("PlankCube");
-	rotNode = node->createChildSceneNode("PlankCubeNode");
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("PlankCube"+nme);
+	rotNode = node->createChildSceneNode("PlankCubeNode"+nme);
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(0, 0, 2));
 	rotNode->roll(Ogre::Degree(90));
@@ -150,10 +157,10 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	inventory.push_back(node);
 
-	item = CubeManager::getSingleton()->getEntity(CubeManager::GLASS);
+	item = CubeManager::getSingleton()->getNewEntity(CubeManager::GLASS);
 	item->setCastShadows(true);
-	node = _sceneManager->getRootSceneNode()->createChildSceneNode("GlassCube");
-	rotNode = node->createChildSceneNode("GlassCubeNode");
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("GlassCube"+nme);
+	rotNode = node->createChildSceneNode("GlassCubeNode"+nme);
 	rotNode->attachObject(item);
 	rotNode->setPosition(Ogre::Vector3(0, 0, 2));
 	rotNode->roll(Ogre::Degree(90));
@@ -166,6 +173,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 	inventory.push_back(node);
 
 	equippedItem = -1;
+
+	std::cout << "Finished creating player" << std::endl;
 }
 
 void Player::setWeapon ( int i ) {
