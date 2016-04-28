@@ -29,6 +29,10 @@ private:
 	Biome* _biome;
 	BiomeManager* _biomeMgr;
 
+	int heights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
+	int topHeights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
+	int caves[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
+
 	std::unordered_map<key, Ogre::Light*> lights;
 
 	bool createTree(const Ogre::Vector3&, CubeManager::CubeType, bool);
@@ -38,13 +42,16 @@ private:
 
 	StaticObject* getObjFromChunks(const std::vector<Chunk*>& chunks, key index);
 	void createAirNeighbors(const std::vector<Chunk*>& chunks, StaticObject* obj);
+	void interpolateBlock(int, int, Ogre::Vector3&);
+	int computeMinNeighbor(int x, int y);
+	int computeMaxNeighbor(int x, int y);
 
 public:
 	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*, bool generate);
 	~Chunk();
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
-	void addStaticObjectToGeometry(StaticObject*, bool);
+	void addStaticObjectToGeometry(StaticObject*);
 	StaticObject* getBlock(int x, int y, int z);
 	CubeManager::CubeType getGeneratedType(CubeManager::CubeType objType, int height);
 	void removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj);

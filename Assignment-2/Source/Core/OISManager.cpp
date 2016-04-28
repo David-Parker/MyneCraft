@@ -194,9 +194,11 @@ OIS::Keyboard* OISManager::getKeyboard( void ) {
 bool OISManager::keyPressed( const OIS::KeyEvent &e ) {
     mKeyPressed = e.key;
 
+#if defined __linux__ || defined _DEBUG
     CEGUI::GUIContext& cxt = CEGUI::System::getSingleton().getDefaultGUIContext();
     cxt.injectKeyDown((CEGUI::Key::Scan)e.key);
     cxt.injectChar((CEGUI::Key::Scan)e.text);
+#endif
 
     return true;
 }
@@ -236,13 +238,9 @@ bool OISManager::mouseMoved( const OIS::MouseEvent &e ) {
     mouseXAxis = (e.state.X.abs) - e.state.width/2;
     mouseYAxis = (e.state.Y.abs) - e.state.height/2;
 	mouseWheel = e.state.Z.rel / 120.0f;
-
+#if defined __linux__ || defined _DEBUG
     CEGUI::System &sys = CEGUI::System::getSingleton();
     sys.getDefaultGUIContext().injectMousePosition(e.state.X.abs, e.state.Y.abs);
-#ifdef _DEBUG
-    //// Scroll wheel.
-    //if (e.state.Z.rel)
-    //    sys.getDefaultGUIContext().injectMouseWheelChange(e.state.Z.rel / 120.0f);
 #endif
 
     return true;
@@ -253,14 +251,18 @@ void OISManager::resetWheel() {
 }
  
 bool OISManager::mousePressed( const OIS::MouseEvent &e, OIS::MouseButtonID id ) {
+#if defined __linux__ || defined _DEBUG
     CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertButton(id));
+#endif
 
     mouseClicked  = true;
     return true;
 }
  
 bool OISManager::mouseReleased( const OIS::MouseEvent &e, OIS::MouseButtonID id ) {
+#if defined __linux__ || defined _DEBUG
     CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertButton(id));
+#endif
 
     mouseClicked  = false;
     return true;
