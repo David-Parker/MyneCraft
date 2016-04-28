@@ -11,7 +11,6 @@ private:
 	const static int yMax = 256;
 	int size;
 	float density; /* Density domain is (0, 10+). 0 is unpopulated 10 is extremely dense. */
-	//std::vector<std::vector<std::vector<float>>> gradient;
 	float gradient[xMax][yMax][2];
 
 public:

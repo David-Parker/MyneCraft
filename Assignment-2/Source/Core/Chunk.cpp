@@ -12,8 +12,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 	_xEnd = xStart + CHUNK_SIZE;
 	_yEnd = yStart + CHUNK_SIZE;
 
-	float steepness = 40.0f;
-
 	_sg = mSceneManager->createStaticGeometry(_name);
 
 	Biome* curBiome = biomeMgr->inBiome(_xStart, _yStart);
@@ -29,6 +27,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 				float worldScale = 2.0;
 
+				float steepness = (perlin->getPerlin((fi + 10000.0f) / worldScale, (fj + 10000.0f) / worldScale) * 150);
+
 				float y1 = (perlin->getPerlin(fi / worldScale, fj / worldScale)*steepness);
 				float y2 = 1.0f / 2.0f * (perlin->getPerlin(2 * fi / worldScale, 2 * fj / worldScale)*steepness);
 				float y3 = 1.0f / 4.0f * (perlin->getPerlin(4 * fi / worldScale, 4 * fj / worldScale)*steepness);
@@ -36,20 +36,10 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				float y5 = 1.0f / 16.0f * (perlin->getPerlin(16 * fi / worldScale, 16 * fj / worldScale)*steepness);
 
 				float pval = y1 + y2 + y3 + y4 + y5;
-
-				bool neg = false;
-				if(pval < 0) {
-					neg = true;
-					pval = -pval;
-				}
 			
-				float e = pow(pval, 1.3);
+				pval *= 2.5;
 
-				if(neg) {
-					e = -e;
-				}
-
-				int y = (int)e;
+				int y = (int)pval;
 				Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
 				key index = getKey(pos);
 				StaticObject* so;

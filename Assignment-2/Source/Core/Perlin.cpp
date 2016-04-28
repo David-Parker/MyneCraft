@@ -28,8 +28,8 @@ float Perlin::dotGridGradient(int ix, int iy, float x, float y) {
 	float dx = x - (float)ix;
 	float dy = y - (float)iy;
 
-	ix = ix % xMax;
-	iy = iy % yMax;
+	ix = abs(ix % xMax);
+	iy = abs(iy % yMax);
 
 	// Compute the dot-product
 	return (dx*gradient[iy][ix][0] + dy*gradient[iy][ix][1]);
@@ -38,9 +38,6 @@ float Perlin::dotGridGradient(int ix, int iy, float x, float y) {
 
 // Compute Perlin noise at coordinates x, y
 float Perlin::getPerlin(float x, float y) {
-
-	x = x < 0 ? -x : x;
-	y = y < 0 ? -y : y;
 
 	// Determine grid cell coordinates
 	int x0 = (x >= 0.0 ? (int)x : (int)x - 1);

@@ -670,9 +670,6 @@ void Application::setupLighting(void) {
 void Application::createObjects(void) {
 	mSceneManager->setSkyDome(true, "day-night", 5, 8);
 
-	//int xmax = 4;
-	//int ymax = xmax;
-	//int rndmax = 8;
 	float density = 1.8f; // 1 is very steep, 10 is pretty flat.
 
 	perlin = new Perlin(density);
