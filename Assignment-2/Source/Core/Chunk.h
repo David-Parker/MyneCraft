@@ -29,6 +29,8 @@ private:
 	Biome* _biome;
 	BiomeManager* _biomeMgr;
 
+	int heights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
+
 	std::unordered_map<key, Ogre::Light*> lights;
 
 	bool createTree(const Ogre::Vector3&, CubeManager::CubeType);
@@ -38,6 +40,7 @@ private:
 
 	StaticObject* getObjFromChunks(const std::vector<Chunk*>& chunks, key index);
 	void createAirNeighbors(const std::vector<Chunk*>& chunks, StaticObject* obj);
+	int computeMinNeighbor(int x, int y);
 
 public:
 	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*, bool generate);

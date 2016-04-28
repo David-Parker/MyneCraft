@@ -16,16 +16,17 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 	Biome* curBiome = biomeMgr->inBiome(_xStart, _yStart);
 
-	// Does this chunk generate new terrain?
-	if (generate) {
-		for (int i = xStart; i < _xEnd; ++i) {
+	float worldScale = 2.0;
 
-			for (int j = yStart; j < _yEnd; ++j) {
+	// Precompute perlin values
+	if(generate) {
+		for(int i = 0; i < CHUNK_SIZE + 2; i++) {
+			for(int j = 0; j < CHUNK_SIZE + 2; j++) {
+				int chunkx = xStart + i - 1;
+				int chunky = yStart + j - 1;
 
-				float fi = (float)i / (float)CHUNK_SCALE_FULL;
-				float fj = (float)j / (float)CHUNK_SCALE_FULL;
-
-				float worldScale = 2.0;
+				float fi = (float)chunkx / (float)CHUNK_SCALE_FULL;
+				float fj = (float)chunky / (float)CHUNK_SCALE_FULL;
 
 				float steepness = (perlin->getPerlin((fi + 10000.0f) / worldScale, (fj + 10000.0f) / worldScale) * 150);
 
@@ -40,19 +41,35 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				pval *= 2.5;
 
 				int y = (int)pval;
-				Ogre::Vector3 pos(i*scale.x * 2, y*scale.y * 2, j*scale.z * 2);
+
+				heights[i][j] = y;
+			}
+		}
+	}
+
+	// Does this chunk generate new terrain?
+	if (generate) {
+		for (int i = 0; i < CHUNK_SIZE; ++i) {
+
+			for (int j = 0; j < CHUNK_SIZE; ++j) {
+
+				int chunkx = i + xStart;
+				int chunky = j + yStart;
+
+				int y = heights[i + 1][j + 1];
+				Ogre::Vector3 pos(chunkx*scale.x * 2, y*scale.y * 2, chunky*scale.z * 2);
 				key index = getKey(pos);
 				StaticObject* so;
 				CubeManager::CubeType tempType;
 
 				if (y >= 15 && curBiome != nullptr) {
 					if (curBiome->getType() != CubeManager::SAND) {
-						Ogre::Entity* type = curBiome->getCubeEntity(i, j, y, tempType);
+						Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
 						so = new StaticObject(type, tempType, scale, pos, sim, this);
 					}
 				}
 				if (curBiome != nullptr) {
-					Ogre::Entity* type = curBiome->getCubeEntity(i, j, y, tempType);
+					Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
 					so = new StaticObject(type, tempType, scale, pos, sim, this);
 				}
 
@@ -66,9 +83,18 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				if (!createTree(pos, so->_cubeType)) {
 					key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
 					_staticObjects[airIndex] = air;
+				}
 
-					key airIndex2 = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*2, 0));
-					_staticObjects[airIndex2] = air;
+				int interpolate = computeMinNeighbor(i+1, j+1);
+
+				if(interpolate > 0) {
+					for(int i = 0; i < interpolate; i++) {
+						Ogre::Vector3 newPos = pos - Ogre::Vector3(0, CHUNK_SCALE_FULL*(i+1), 0);
+						key newIndex = getKey(newPos);
+						StaticObject* sos = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::DIRT), CubeManager::DIRT, scale, newPos, sim, this);
+						_staticObjects[newIndex] = sos;
+						_sg->addEntity(sos->_geom, sos->_pos, sos->_orientation, sos->_scale);
+					}	
 				}
 
 				createCloud(pos);
@@ -655,4 +681,32 @@ void Chunk::rebuildFromSave(const std::vector<BlockInfo>& blocks) {
 		}	
 	}
 	_sg->build();
+}
+
+// returns the number of blocks to create below us
+int Chunk::computeMinNeighbor(int x, int y) {
+	int min = 99999999;
+	int distance = 0;
+	int height = heights[x][y];
+
+	// up
+	distance = heights[x][y + 1] - height;
+	if(distance < min) min = distance;
+	// down
+	distance = heights[x][y - 1] - height;
+	if(distance < min) min = distance;
+	// left
+	distance = heights[x - 1][y] - height;
+	if(distance < min) min = distance;
+	// right
+	distance = heights[x + 1][y] - height;
+	if(distance < min) min = distance;
+
+	// A block is is lower than 1 block below us
+	if(min < -1) {
+		return abs(min + 1);
+	}
+	else {
+		return 0;
+	}
 }
