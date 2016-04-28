@@ -64,6 +64,8 @@ public:
 	Ogre::Timer* t1;
 	BiomeManager* biomeManager;
 	Player* player;
+	Player* otherPlayer = NULL;
+	GameObject* otherPlayerObj;
 	Cube* highlight;
 	Ogre::Light* sun;
 
@@ -77,6 +79,10 @@ public:
 	
 	CEGUI::Window* quitButton;
     CEGUI::Window* singlePlayerButton;
+    CEGUI::Window* hostServerButton;
+    CEGUI::Window* ipText;
+    CEGUI::Window* ipBox;
+    CEGUI::Window* joinServerButton;
 
 	std::vector<Ogre::Camera*> cameras;
 	std::list<GameState> states;
@@ -135,8 +141,11 @@ public:
 	void setupLighting(void);
 	void createGame(void);
 	void createObjects(void);
+
 	bool Quit(const CEGUI::EventArgs&);
 	bool StartSinglePlayer(const CEGUI::EventArgs&);
+	bool StartServer(const CEGUI::EventArgs&);
+	bool JoinServer(const CEGUI::EventArgs&);
 
 	bool setupNetwork(bool);
 	bool error();

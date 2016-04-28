@@ -53,3 +53,22 @@ Ogre::Entity* CubeManager::getEntity(CubeType type) {
 		default: return nullptr;
 	}
 }
+
+Ogre::Entity* CubeManager::getNewEntity(CubeType type) {
+	switch ( type ) {
+		case CACTUS: return mSceneManager->createEntity("Cube-Cactus.mesh");
+		case CLOUD: return mSceneManager->createEntity("Cube-Cloud.mesh");
+		case DIRT: return mSceneManager->createEntity("Cube-Dirt.mesh");
+		case ICE: return mSceneManager->createEntity("Cube-Ice.mesh");
+		case GLASS: return mSceneManager->createEntity("Cube-Glass.mesh");
+		case GRASS: return mSceneManager->createEntity("Cube-Grass.mesh");
+		case LEAF: return mSceneManager->createEntity("Cube-Leaves.mesh");
+		case PLANK: return mSceneManager->createEntity("Cube-Plank.mesh");
+		case ROCK: return mSceneManager->createEntity("Cube-Rock.mesh");
+		case SAND: return mSceneManager->createEntity("Cube-Sand.mesh");
+		case SNOW: return mSceneManager->createEntity("Cube-Snow.mesh");
+		case TORCH: return mSceneManager->createEntity("Cube-Torch.mesh");
+		case WOOD: return mSceneManager->createEntity("Cube-Wood.mesh");
+		default: return nullptr;
+	}
+}
