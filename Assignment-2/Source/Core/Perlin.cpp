@@ -2,22 +2,19 @@
 
 /* PsuedoCode taken from https://en.wikipedia.org/wiki/Perlin_noise */
 
-Perlin::Perlin(int xMx, int yMx, int rndMx, float dnsty) : xMax(xMx), yMax(yMx), randomMax(rndMx), density(dnsty), size(xMx*yMx) {
+Perlin::Perlin(float dnsty) : density(dnsty) {
 	size = xMax * yMax;
-	std::vector<std::vector<std::vector<float>>> tmp(xMax, std::vector<std::vector<float>>(yMax, std::vector<float>(2, 0)));
-	gradient = tmp;
 	density = (density > 0.0f ? density : 0.1f);
 	generateGradientTrivial();
 }
 void Perlin::generateGradientTrivial() {
-	static float moTWO = randomMax / 2;
+
 	for (int i = 0; i < xMax; i++) {
 		for (int j = 0; j < yMax; j++) {
-			gradient[i][j][0] = float(Rand::rand() % randomMax) / moTWO;
-			gradient[i][j][1] = float(Rand::rand() % randomMax) / moTWO;
+			gradient[i][j][0] = float(Rand::rand()) / (Rand::RANDMAX/2) - 1.0f;
+			gradient[i][j][1] = float(Rand::rand()) / (Rand::RANDMAX/2) - 1.0f;
 		}
 	}
-
 }
 // Function to linearly interpolate between a0 and a1
 // Weight w should be in the range [0.0, 1.0]
@@ -27,11 +24,12 @@ float Perlin::lerp(float a0, float a1, float w) {
 
 // Computes the dot product of the distance and gradient vectors.
 float Perlin::dotGridGradient(int ix, int iy, float x, float y) {
-	ix = ix % xMax;
-	iy = iy % yMax;
 	// Compute the distance vector
 	float dx = x - (float)ix;
 	float dy = y - (float)iy;
+
+	ix = ix % xMax;
+	iy = iy % yMax;
 
 	// Compute the dot-product
 	return (dx*gradient[iy][ix][0] + dy*gradient[iy][ix][1]);

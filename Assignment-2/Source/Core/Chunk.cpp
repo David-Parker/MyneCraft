@@ -27,12 +27,15 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				float fi = (float)i / (float)CHUNK_SCALE_FULL;
 				float fj = (float)j / (float)CHUNK_SCALE_FULL;
 
-				float y1 = (perlin->getPerlin(fi/3.0, fj/3.0)*steepness);
-				float y2 = 0.5 * (perlin->getPerlin(2*fi/3.0,2*fj/3.0)*steepness);
-				float y3 = 0.25 * (perlin->getPerlin( 4*fi/3.0, 4*fj/3.0)*steepness);
-				float y4 = 0.125 * (perlin->getPerlin( 8*fi/3.0, 8*fj/3.0)*steepness);
+				float worldScale = 2.0;
 
-				float pval = y1 + y2 + y3 + y4;
+				float y1 = (perlin->getPerlin(fi / worldScale, fj / worldScale)*steepness);
+				float y2 = 1.0f / 2.0f * (perlin->getPerlin(2 * fi / worldScale, 2 * fj / worldScale)*steepness);
+				float y3 = 1.0f / 4.0f * (perlin->getPerlin(4 * fi / worldScale, 4 * fj / worldScale)*steepness);
+				float y4 = 1.0f / 8.0f * (perlin->getPerlin(8 * fi / worldScale, 8 * fj / worldScale)*steepness);
+				float y5 = 1.0f / 16.0f * (perlin->getPerlin(16 * fi / worldScale, 16 * fj / worldScale)*steepness);
+
+				float pval = y1 + y2 + y3 + y4 + y5;
 
 				bool neg = false;
 				if(pval < 0) {
