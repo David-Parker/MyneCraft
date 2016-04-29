@@ -31,6 +31,8 @@ private:
 
 	int heights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
 	int topHeights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
+	int bottomHeights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
+	int caveHeights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
 	int caves[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
 
 	std::unordered_map<key, Ogre::Light*> lights;
@@ -42,9 +44,9 @@ private:
 
 	StaticObject* getObjFromChunks(const std::vector<Chunk*>& chunks, key index);
 	void createAirNeighbors(const std::vector<Chunk*>& chunks, StaticObject* obj);
-	void interpolateBlock(int, int, Ogre::Vector3&);
-	int computeMinNeighbor(int x, int y);
-	int computeMaxNeighbor(int x, int y);
+	void interpolateBlock(int, int, int[CHUNK_SIZE+2][CHUNK_SIZE+2], Ogre::Vector3&);
+	int computeMinNeighbor(int, int, int[CHUNK_SIZE+2][CHUNK_SIZE+2]);
+	int computeMaxNeighbor(int, int, int[CHUNK_SIZE+2][CHUNK_SIZE+2]);
 
 public:
 	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*, bool generate);
