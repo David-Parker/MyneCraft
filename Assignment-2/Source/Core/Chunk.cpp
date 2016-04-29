@@ -85,9 +85,10 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				StaticObject* so = nullptr;
 				CubeManager::CubeType tempType;
 
-				int height = ((perlin->getPerlin((fi + 10000.0f) / worldScale, (fj + 10000.0f) / worldScale) * 150)/2+15)/3+5;
+				int height = (perlin->getPerlin((fi + 512.0f) / worldScale, (fj + 512.0f) / worldScale) * 25)+12;
 				int cave = caves[i+1][j+1];
 				int heightTop = topHeights[i+1][j+1];
+				int heightBottom = heightTop - height;
 				Ogre::Vector3 posCaveTop(chunkx*scale.x * 2, heightTop*scale.y * 2, chunky*scale.z * 2);
 				Ogre::Vector3 posCaveBottom = posCaveTop - Ogre::Vector3(0, height*100, 0);
 				key indexTop = getKey(posCaveTop);
@@ -102,47 +103,38 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 
 				if ( (cave > -2  && cave < 3) ) {
-					//if ( y == heightTop && !_staticObjects[index] )
+					if ( y == heightTop && !_staticObjects[index] ) {
+						addBlockToStaticGeometry(CubeManager::GRASS, pos, index);
+						interpolateBlock(i, j, pos);
+					}
 					//	so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
 					
 					if ( y > heightTop ) {
 						if ( !_staticObjects[index] ) {
-							so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
-							_staticObjects[getKey(so->_pos)] = so;
-							key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+							addBlockToStaticGeometry(CubeManager::GRASS, pos, index);
+							interpolateBlock(i, j, pos);
+							key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
 							_staticObjects[airIndex] = air;
-							_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-							interpolateBlock(i, j, so->_pos);
-							so = nullptr;
 						}
 						if ( !_staticObjects[indexTop] ) {
-							so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, posCaveTop, sim, this);
-							_staticObjects[indexTop] = so;
-							key airIndex = getKey(so->_pos - Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+							addBlockToStaticGeometry(rndCube, posCaveTop, indexTop);
+							interpolateBlock(i, j, posCaveTop);
+							key airIndex = getKey(posCaveTop - Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
 							_staticObjects[airIndex] = air;
-							_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-							interpolateBlock(i, j, so->_pos);
-							so = nullptr;
 						}						
 						if ( !_staticObjects[indexBottom] ) {
-							so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, posCaveBottom, sim, this);
-							_staticObjects[indexBottom] = so;
-							key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+							addBlockToStaticGeometry(rndCube, posCaveBottom, indexBottom);
+							interpolateBlock(i, j, posCaveBottom);
+							key airIndex = getKey(posCaveBottom + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
 							_staticObjects[airIndex] = air;
-							_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-							interpolateBlock(i, j, so->_pos);
-							so = nullptr;
 						}
 					}
-					else if ( y+height > heightTop ) {
+					else if ( y > heightBottom ) {
 						if ( !_staticObjects[indexBottom] ) {
-							so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, posCaveBottom, sim, this);
-							_staticObjects[indexBottom] = so;
-							key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+							addBlockToStaticGeometry(rndCube, posCaveBottom, indexBottom);
+							interpolateBlock(i, j, posCaveBottom);
+							key airIndex = getKey(posCaveBottom + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
 							_staticObjects[airIndex] = air;
-							_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-							interpolateBlock(i, j, so->_pos);
-							so = nullptr;
 						}
 					}
 					else {
@@ -151,8 +143,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 						}
 					}
 				}
-				
-				// ABOVE TERRAIN CAVE GENERATION BUG HERE
 				else if ( (cave == -2 || cave == 3) ) {
 					bool topDrawn = false;
 					for ( int kk = 0 ; kk < height+1 ; kk++ ) {
@@ -161,21 +151,18 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 						if ( y > heightTop-kk ) {
 							if ( !topDrawn ) {
 								topDrawn = true;
-								so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, caveAirPos, sim, this);
-								_staticObjects[innerWall] = so;
-								_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-								interpolateBlock(i, j, so->_pos);
-								so = nullptr;
+								addBlockToStaticGeometry(rndCube, caveAirPos, innerWall);
+								interpolateBlock(i, j, caveAirPos);
 							}
 							else if ( !_staticObjects[innerWall] ) {
 								_staticObjects[innerWall] = air;
 							}
 						}
 					}
-					so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, posCaveBottom, sim, this);
-					_staticObjects[indexBottom] = so;
-					_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-					interpolateBlock(i, j, so->_pos);
+					if ( y > heightBottom ) {
+						addBlockToStaticGeometry(rndCube, posCaveBottom, indexBottom);
+						interpolateBlock(i, j, posCaveBottom);
+					}
 					so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
 
 				}
@@ -190,11 +177,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 									rndCube = CubeManager::DIRT;
 								else
 									rndCube = CubeManager::ROCK;
-								so = new StaticObject(CubeManager::getSingleton()->getEntity(rndCube), rndCube, scale, caveWallPos, sim, this);
-								_staticObjects[wallKey] = so;
-								_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-								interpolateBlock(i, j, so->_pos);
-								so = nullptr;
+								addBlockToStaticGeometry(rndCube, caveWallPos, wallKey);
+								interpolateBlock(i, j, caveWallPos);
 							}
 						}
 					}
@@ -271,6 +255,12 @@ void Chunk::addChunksToSimulator() {
 		if(var.second != nullptr && var.second != air)
 			var.second->addToSimulator();
 	}
+}
+
+void Chunk::addBlockToStaticGeometry(CubeManager::CubeType cubeType, Ogre::Vector3 position, key index) {
+	StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(cubeType), cubeType, _scale, position, _simulator, this);
+	_staticObjects[index] = so;
+	_sg->addEntity(so->_geom, position, so->_orientation, so->_scale);
 }
 
 void Chunk::interpolateBlock(int i, int j, Ogre::Vector3& pos) {

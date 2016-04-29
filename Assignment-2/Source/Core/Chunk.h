@@ -51,6 +51,7 @@ public:
 	~Chunk();
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
+	void addBlockToStaticGeometry(CubeManager::CubeType, Ogre::Vector3, key);
 	void addStaticObjectToGeometry(StaticObject*);
 	StaticObject* getBlock(int x, int y, int z);
 	CubeManager::CubeType getGeneratedType(CubeManager::CubeType objType, int height);
