@@ -79,6 +79,8 @@ void Application::setupWorld() {
 	std::string line;
 	getline(saveFile, line);
 
+	std::cout << "In Setup World" << std::endl;
+
 	if (line != magicHeader) {
 		// New save
 		saveFile.close();
@@ -758,6 +760,37 @@ void Application::setupLighting(void) {
 }
 
 void Application::createObjects(void) {
+	_simulator->removeStaticObjects();
+	_simulator->removeObjects();
+
+	if (player != NULL) {
+		delete player;
+		player = NULL;
+		playerObj = NULL;
+	}
+
+	if (otherPlayer != NULL) {
+		delete otherPlayer;
+		otherPlayer = NULL;
+		otherPlayerObj = NULL;
+	}
+
+	if (highlight != NULL)
+		delete highlight;
+
+	for(auto& var : prevChunks) {
+		if (!modifiedChunks[var.first]) {
+			delete var.second;
+			var.second = nullptr;
+		}
+	}
+	for(auto& var : modifiedChunks) {
+		if (var.second != nullptr)
+			delete var.second;
+		var.second = nullptr;
+	}
+	prevChunks.clear();
+	modifiedChunks.clear();
 	mSceneManager->setSkyDome(true, "day-night", 5, 8);
 
 	float density = 1.8f; // 1 is very steep, 10 is pretty flat.
@@ -766,9 +799,12 @@ void Application::createObjects(void) {
 
 	biomeManager = new BiomeManager(mSceneManager);
 
-	GameObject* playerObj = createPlayerObject("Player1", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
+	playerObj = createPlayerObject("Player1", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
 	player = new Player(playerCam, playerObj, mSceneManager);
+	
 	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
+	
+	
 
 	setupWorld();
 }

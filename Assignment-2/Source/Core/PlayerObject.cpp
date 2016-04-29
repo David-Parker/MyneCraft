@@ -8,6 +8,14 @@ GameObject(nme, tp, scnMgr, ssm, node, ent, ms, sim, mss, rest, frict, scal, kin
 	shape = new btCapsuleShape(65, 255);
 }
 
+PlayerObject::~PlayerObject() {
+	rootNode->detachObject(geom);
+	sceneMgr->destroyEntity(geom);
+	rootNode->removeAndDestroyAllChildren();
+	sceneMgr->destroySceneNode(rootNode);
+	std::cout << "Deleted playerObjecT" << std::endl;
+}
+
 void PlayerObject::update() {
 	if(context->hit) {
 		int x = round(context->normal.x());

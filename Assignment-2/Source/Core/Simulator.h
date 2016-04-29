@@ -36,7 +36,8 @@ public:
        void addObject(GameObject* o); 
        void addObject(StaticObject* o); 
        bool removeObject(GameObject* o); 
-       void stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps = 1, const Ogre::Real fixedTimestep = 1.0f/60.0f); 
+       void stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps = 1, const Ogre::Real fixedTimestep = 1.0f/60.0f);
+	   void removeObjects(); 
        void removeStaticObjects();
        bool rayHit(const btVector3& start, const btVector3& end, StaticObject*& obj, btVector3& hitNormal);
        GameObject* outer;

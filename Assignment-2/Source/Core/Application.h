@@ -63,10 +63,11 @@ public:
 	Ogre::Camera* playerCam;
 	Ogre::Timer* t1;
 	BiomeManager* biomeManager;
-	Player* player;
+	Player* player = NULL;
+	GameObject* playerObj = NULL;
 	Player* otherPlayer = NULL;
-	GameObject* otherPlayerObj;
-	Cube* highlight;
+	GameObject* otherPlayerObj = NULL;
+	Cube* highlight = NULL;
 	Ogre::Light* sun;
 
 	NetManager* netManager = nullptr;
