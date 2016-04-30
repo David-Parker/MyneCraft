@@ -37,7 +37,9 @@ private:
 
 	std::unordered_map<key, Ogre::Light*> lights;
 
-	bool createTree(const Ogre::Vector3&, CubeManager::CubeType, bool);
+	StaticObject* createBlockColumn(int, int);
+	void buildCaveBlock(int, int, key, Ogre::Vector3&, int, CubeManager::CubeType, int[CHUNK_SIZE+2][CHUNK_SIZE+2]); 
+	bool createTree(const Ogre::Vector3&, CubeManager::CubeType);
 	bool createCloud(const Ogre::Vector3& pos);
 	key getKey(int x, int y, int z);
 	key getKey(const Ogre::Vector3& pos);

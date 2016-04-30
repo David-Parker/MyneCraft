@@ -14,8 +14,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 	_sg = mSceneManager->createStaticGeometry(_name);
 
-	Biome* curBiome = biomeMgr->inBiome(_xStart, _yStart);
-
 	float worldScale = 2.0;
 
 	// Precompute perlin values
@@ -30,8 +28,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 				float steepnessY = (perlin->getPerlin((fi + 10000.0f) / worldScale, (fj + 10000.0f) / worldScale) * 150);
 				float steepnessZ = (perlin->getPerlin((fi + 1000.0f) / worldScale, (fj + 1000.0f) / worldScale) * 150);
-				float steepnessCaves = (perlin->getPerlin((fi + 100.0f) / worldScale, (fj + 100.0f) / worldScale) * 150);
-				int caveHeight = (perlin->getPerlin((fi + 512.0f) / worldScale, (fj + 512.0f) / worldScale) * 25)+12;
+				float steepnessCaves = (perlin->getPerlin((fi + 100.0f) / worldScale, (fj + 100.0f) / worldScale) * 101);
+				int caveHeight = (perlin->getPerlin((fi + 512.0f) / worldScale, (fj + 512.0f) / worldScale) * 17)+9;
 
 				float y1 = (perlin->getPerlin(fi / worldScale, fj / worldScale)*steepnessY);
 				float y2 = 1.0f / 2.0f * (perlin->getPerlin(2 * fi / worldScale, 2 * fj / worldScale)*steepnessY);
@@ -65,7 +63,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				topHeights[i][j] = z - 20;
 				bottomHeights[i][j] = topHeights[i][j] - caveHeight;
 				caveHeights[i][j] = caveHeight;
-				caves[i][j] = steepnessCaves*0.75;
+				caves[i][j] = steepnessCaves;
 			}
 		}
 
@@ -85,148 +83,27 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				int y = heights[i + 1][j + 1];
 				Ogre::Vector3 pos(chunkx*scale.x * 2, y*scale.y * 2, chunky*scale.z * 2);
 				key index = getKey(pos);
-				StaticObject* so = nullptr;
-				CubeManager::CubeType tempType;
+				StaticObject* so = createBlockColumn(i, j);
 
-				int cave = caves[i+1][j+1];
-				int heightTop = topHeights[i+1][j+1];
-				int heightBottom = heightTop - caveHeights[i+1][j+1];
-				Ogre::Vector3 posCaveTop(chunkx*scale.x * 2, heightTop*scale.y * 2, chunky*scale.z * 2);
-				Ogre::Vector3 posCaveBottom = posCaveTop - Ogre::Vector3(0, caveHeights[i+1][j+1]*100, 0);
-				key indexTop = getKey(posCaveTop);
-				key indexBottom = getKey(posCaveBottom);
-				bottomHeights[i+1][i+1] = heights[i+1][i+1] - caveHeights[i+1][j+1];
-
-				int rnd = Rand::rand()%10;
-				CubeManager::CubeType rndCube;
-				if ( rnd < 3 )
-					rndCube = CubeManager::DIRT;
-				else
-					rndCube = CubeManager::ROCK;
-
-				if ( (cave > -2  && cave < 3) ) {
-					if ( y == heightTop && !_staticObjects[index] ) {
-						addBlockToStaticGeometry(CubeManager::GRASS, pos, index);
-						interpolateBlock(i, j, topHeights, pos);
-					}
-					//	so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
-					
-					if ( y > heightTop ) {
-						if ( !_staticObjects[index] ) {
-							addBlockToStaticGeometry(CubeManager::GRASS, pos, index);
-							interpolateBlock(i, j, heights, pos);
-							key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
-							_staticObjects[airIndex] = air;
-						}
-						if ( !_staticObjects[indexTop] ) {
-							addBlockToStaticGeometry(rndCube, posCaveTop, indexTop);
-							interpolateBlock(i, j, topHeights, posCaveTop);
-							key airIndex = getKey(posCaveTop - Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
-							_staticObjects[airIndex] = air;
-						}						
-						if ( !_staticObjects[indexBottom] ) {
-							addBlockToStaticGeometry(rndCube, posCaveBottom, indexBottom);
-							interpolateBlock(i, j, bottomHeights, posCaveBottom);
-							key airIndex = getKey(posCaveBottom + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
-							_staticObjects[airIndex] = air;
-						}
-					}
-					else if ( y > heightBottom ) {
-						if ( !_staticObjects[indexBottom] ) {
-							addBlockToStaticGeometry(rndCube, posCaveBottom, indexBottom);
-							interpolateBlock(i, j, bottomHeights, posCaveBottom);
-							key airIndex = getKey(posCaveBottom + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
-							_staticObjects[airIndex] = air;
-						}
-					}
-					else {
-						if ( !_staticObjects[index] ) {
-							so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
-						}
-					}
-				}
-				else if ( (cave == -2 || cave == 3) ) {
-					bool topDrawn = false;
-					for ( int kk = 0 ; kk < caveHeights[i+1][j+1]+1 ; kk++ ) {
-						Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,100*kk,0);
-						key innerWall = getKey(caveAirPos);
-						if ( y > heightTop-kk ) {
-							if ( !topDrawn ) {
-								topDrawn = true;
-								addBlockToStaticGeometry(rndCube, caveAirPos, innerWall);
-								interpolateBlock(i, j, heights, caveAirPos);
-							}
-							else if ( !_staticObjects[innerWall] ) {
-								_staticObjects[innerWall] = air;
-							}
-						}
-					}
-					if ( y > heightBottom ) {
-						addBlockToStaticGeometry(rndCube, posCaveBottom, indexBottom);
-						interpolateBlock(i, j, bottomHeights, posCaveBottom);
-					}
-					so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
-
-				}
-				else if ( (cave == -3 || cave == 4) ) {
-					for ( int kk = 0 ; kk < caveHeights[i+1][j+1]+1 ; kk++ ) {
-						if ( y > heightTop-kk ) {
-							Ogre::Vector3 caveWallPos = posCaveTop-Ogre::Vector3(0,100*kk,0);
-							key wallKey = getKey(caveWallPos);
-							if ( !_staticObjects[wallKey] ) {
-								rnd = Rand::rand()%10;
-								if ( rnd < 3 )
-									rndCube = CubeManager::DIRT;
-								else
-									rndCube = CubeManager::ROCK;
-								addBlockToStaticGeometry(rndCube, caveWallPos, wallKey);
-								interpolateBlock(i, j, bottomHeights, caveWallPos);
-							}
-						}
-					}
-					//if ( !_staticObjects[index] )
-					so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
-				}
-				else {
-					//if ( !_staticObjects[index] )
-					so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
-				}
-
-				/*if (y >= 15 && curBiome != nullptr) {
-					if (curBiome->getType() != CubeManager::SAND) {
-						Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
-						so = new StaticObject(type, tempType, scale, pos, sim, this);
-					}
-				}
-				if (curBiome != nullptr) {
-					Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
-					so = new StaticObject(type, tempType, scale, pos, sim, this);
-				}*/
-				if ( so != nullptr && !_staticObjects[index]) {
+				if ( so != nullptr ) {
 					_staticObjects[index] = so;
+
 					// Create tree returns true if a tree was created in this position.
-					if ( !createTree(so->_pos, so->_cubeType, false) ) {
-						key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
-						_staticObjects[airIndex] = air;
+					if ( !createTree(so->_pos, so->_cubeType) ) {
+						int numAir = computeMaxNeighbor(i+1, j+1, heights);
+
+						for(int i = 0 ; i < numAir; i++) {
+							key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*(i+1), 0));
+							_staticObjects[airIndex] = air;
+						}
 					}
+
 					_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 					interpolateBlock(i, j, heights, so->_pos);
 				}
-/*
-				// Create tree returns true if a tree was created in this position.
-				if (!createTree(pos, so->_cubeType)) {
-					int numAir = computeMaxNeighbor(i+1, j+1);
-
-					for(int i = 0 ; i < numAir; i++) {
-						key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*(i+1), 0));
-						_staticObjects[airIndex] = air;
-					}
-				}
-*/
 
 				createCloud(pos);
 
-				//_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 				_sg->setRegionDimensions(Ogre::Vector3(3000, 1000, 3000));
 			}
 		}
@@ -272,9 +149,11 @@ void Chunk::interpolateBlock(int i, int j, int hs[CHUNK_SIZE+2][CHUNK_SIZE+2], O
 		for(int i = 0; i < interpolate; i++) {
 			Ogre::Vector3 newPos = pos - Ogre::Vector3(0, CHUNK_SCALE_FULL*(i+1), 0);
 			key newIndex = getKey(newPos);
-			StaticObject* sos = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::DIRT), CubeManager::DIRT, _scale, newPos, _simulator, this);
-			_staticObjects[newIndex] = sos;
-			_sg->addEntity(sos->_geom, sos->_pos, sos->_orientation, sos->_scale);
+			if ( !_staticObjects[newIndex] ) {
+				StaticObject* sos = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::DIRT), CubeManager::DIRT, _scale, newPos, _simulator, this);
+				_staticObjects[newIndex] = sos;
+				_sg->addEntity(sos->_geom, sos->_pos, sos->_orientation, sos->_scale);
+			}
 		}	
 	}
 }
@@ -609,14 +488,141 @@ CubeManager::CubeType Chunk::getGeneratedType(CubeManager::CubeType objType, int
 	}
 }
 
-bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type, bool cave) {
+StaticObject* Chunk::createBlockColumn(int i, int j) {
+
+	StaticObject* so = nullptr;
+	StaticObject* sto = nullptr;
+
+	Biome* curBiome = _biomeMgr->inBiome(_xStart, _yStart);
+	CubeManager::CubeType tempType;
+
+	int chunkx = _xStart + i - 1;
+	int chunky = _yStart + j - 1;
+
+	int y = heights[i+1][j+1];
+	int cave = caves[i+1][j+1];
+	int heightTop = topHeights[i+1][j+1];
+	int heightBottom = heightTop - caveHeights[i+1][j+1];
+
+	Ogre::Vector3 pos(chunkx*_scale.x*2, y*_scale.y*2, chunky*_scale.z*2);
+	Ogre::Vector3 posCaveTop(chunkx*_scale.x*2, heightTop*_scale.y*2, chunky*_scale.z*2);
+	Ogre::Vector3 posCaveBottom = posCaveTop - Ogre::Vector3(0, caveHeights[i+1][j+1]*100, 0);
+
+	key index = getKey(pos);
+	key indexTop = getKey(posCaveTop);
+	key indexBottom = getKey(posCaveBottom);
+	bottomHeights[i+1][i+1] = heights[i+1][i+1] - caveHeights[i+1][j+1];
+
+	if (y >= 15 && curBiome != nullptr) {
+		if (curBiome->getType() != CubeManager::SAND) {
+			Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
+			sto = new StaticObject(type, tempType, _scale, pos, _simulator, this);
+		}
+	}
+	if (curBiome != nullptr) {
+		Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
+		sto = new StaticObject(type, tempType, _scale, pos, _simulator, this);
+	}
+	else {
+		sto = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, _scale, pos, _simulator, this);
+	}
+
+	int rnd = Rand::rand()%10;
+	CubeManager::CubeType rndCube;
+	if ( rnd < 3 )
+		rndCube = CubeManager::DIRT;
+	else
+		rndCube = CubeManager::ROCK;
+
+	// Within Cave Walls
+	if ( (cave > -2  && cave < 3) ) {
+		// Cave is below surface
+		if ( y > heightTop ) {
+			if ( !_staticObjects[index] )
+				buildCaveBlock(i, j, index, pos, 1, sto->_cubeType, heights);
+
+			if ( !_staticObjects[indexTop] )
+				buildCaveBlock(i, j, indexTop, posCaveTop, -1, rndCube, topHeights);	
+
+			for ( int kk = 1 ; kk < caveHeights[i+1][j+1] ; kk++ ) {
+				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+				key innerWall = getKey(caveAirPos);
+				if ( !_staticObjects[innerWall] )
+					_staticObjects[innerWall] = air;
+			}
+
+			if ( !_staticObjects[indexBottom] )
+				buildCaveBlock(i, j, indexBottom, posCaveBottom, 1, rndCube, bottomHeights);
+
+			// Cave top is close enough to surface to cause tearing. Fill in the tearing
+			if ( y-3 <= heightTop ) {
+				for ( int kk = 1 ; kk < y-heightTop ; kk++ ) {
+					Ogre::Vector3 posAboveCave = posCaveTop+Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+					key aboveKey = getKey(posAboveCave);
+					//if ( !_staticObjects[aboveKey] ) 
+					addBlockToStaticGeometry(rndCube, posAboveCave, aboveKey);
+				}
+			}
+		}
+		// Cave is partially underground
+		else if ( y >= heightBottom ) {
+			for ( int kk = -1 ; kk < caveHeights[i+1][j+1] ; kk++ ) {
+				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+				key innerWall = getKey(caveAirPos);
+				_staticObjects[innerWall] = air;
+			}
+			if ( !_staticObjects[indexBottom] )
+				buildCaveBlock(i, j, indexBottom, posCaveBottom, 1, rndCube, bottomHeights);
+		}
+		else {
+			so = sto;
+		}
+	}
+	// Coordinates are at the boundary of a cave
+	else if ( (cave == -2 || cave == 3) ) {
+		for ( int kk = -1 ; kk < caveHeights[i+1][j+1]+1 ; kk++ ) {
+			Ogre::Vector3 caveWallPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+			if ( y > heightTop-kk ) {
+				rnd = Rand::rand()%10;
+				if ( rnd < 3 )
+					rndCube = CubeManager::DIRT;
+				else
+					rndCube = CubeManager::ROCK;
+				addBlockToStaticGeometry(rndCube, caveWallPos, getKey(caveWallPos));
+				interpolateBlock(i, j, bottomHeights, caveWallPos);
+			}
+			else {
+				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+				key innerWall = getKey(caveAirPos);
+				if ( !_staticObjects[innerWall] )
+					_staticObjects[innerWall] = air;
+			}
+		}
+		so = sto;
+	}
+	else {
+		so = sto;
+	}
+
+	if ( so == nullptr )
+		delete sto;
+
+	return so;
+}
+
+void Chunk::buildCaveBlock(int i, int j, key index, Ogre::Vector3& pos, int offset, CubeManager::CubeType type, int hs[CHUNK_SIZE+2][CHUNK_SIZE+2] ) {
+	addBlockToStaticGeometry(type, pos, index);
+	interpolateBlock(i, j, hs, pos);
+	key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*offset, 0));
+	_staticObjects[airIndex] = air;
+}
+
+bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type) {
 
 	static const int breadth = 5;
 	static const int firHeight = 5;
 	static const int firBreadth = 7;
 
-	if ( cave ) return false;
-	
 	if ( type == CubeManager::GRASS && Rand::rand()%500 != 5 ) return false;
 	if ( type == CubeManager::SNOW && Rand::rand()%3000 != 5 ) return false;
 	if ( type == CubeManager::SAND && Rand::rand()%2000 != 5 ) return false;
