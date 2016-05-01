@@ -39,7 +39,7 @@ private:
 
 	std::unordered_map<key, Ogre::Light*> lights;
 
-	StaticObject* createTerrainColumn(int, int, Ogre::Vector3&);
+	bool createTerrainColumn(int, int, Ogre::Vector3&);
 	void buildWaterBlock(int, Ogre::Vector3&);
 	void buildCaveBlock(int, int, key, Ogre::Vector3&, int, CubeManager::CubeType, int[CHUNK_SIZE+2][CHUNK_SIZE+2]); 
 	bool createTree(const Ogre::Vector3&, CubeManager::CubeType);
