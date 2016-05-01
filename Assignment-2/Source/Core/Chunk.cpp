@@ -69,22 +69,20 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 		// Does this chunk generate new terrain?
 		for (int i = 0; i < CHUNK_SIZE; ++i) {
-
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
 
 				int chunkx = xStart + i - 1;
 				int chunky = yStart + j - 1;
+				int y = heights[i + 1][j + 1];
 
 				float fi = (float)chunkx / (float)CHUNK_SCALE_FULL;
 				float fj = (float)chunky / (float)CHUNK_SCALE_FULL;
 
-				float steepness = (perlin->getPerlin((fi + 10000.0f) / worldScale, (fj + 10000.0f) / worldScale) * 150);
-
-				int y = heights[i + 1][j + 1];
 				Ogre::Vector3 pos(chunkx*scale.x * 2, y*scale.y * 2, chunky*scale.z * 2);
 				key index = getKey(pos);
-				StaticObject* so = createBlockColumn(i, j);
 
+				StaticObject* so = createTerrainColumn(i, j, pos);
+				
 				if ( so != nullptr ) {
 					_staticObjects[index] = so;
 
@@ -103,6 +101,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				}
 
 				createCloud(pos);
+
+				buildWaterBlock(y, pos);
 
 				_sg->setRegionDimensions(Ogre::Vector3(3000, 1000, 3000));
 			}
@@ -488,7 +488,7 @@ CubeManager::CubeType Chunk::getGeneratedType(CubeManager::CubeType objType, int
 	}
 }
 
-StaticObject* Chunk::createBlockColumn(int i, int j) {
+StaticObject* Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 
 	StaticObject* so = nullptr;
 	StaticObject* sto = nullptr;
@@ -504,7 +504,12 @@ StaticObject* Chunk::createBlockColumn(int i, int j) {
 	int heightTop = topHeights[i+1][j+1];
 	int heightBottom = heightTop - caveHeights[i+1][j+1];
 
-	Ogre::Vector3 pos(chunkx*_scale.x*2, y*_scale.y*2, chunky*_scale.z*2);
+	/* Flags for cave drawing based on water level. */
+	bool underwater = y > waterLevel && heightBottom > waterLevel;
+	bool drawCave = y > heightTop; /* Below surface */
+	bool drawMouth = heightBottom >= waterLevel; /* Above water level */
+	bool drawWalls = drawCave || drawMouth; /* Cave walls drawn if either of the previous conditions were satisfied. */
+
 	Ogre::Vector3 posCaveTop(chunkx*_scale.x*2, heightTop*_scale.y*2, chunky*_scale.z*2);
 	Ogre::Vector3 posCaveBottom = posCaveTop - Ogre::Vector3(0, caveHeights[i+1][j+1]*100, 0);
 
@@ -513,7 +518,7 @@ StaticObject* Chunk::createBlockColumn(int i, int j) {
 	key indexBottom = getKey(posCaveBottom);
 	bottomHeights[i+1][i+1] = heights[i+1][i+1] - caveHeights[i+1][j+1];
 
-	if (y >= 15 && curBiome != nullptr) {
+	if (y >= snowLevel && curBiome != nullptr) {
 		if (curBiome->getType() != CubeManager::SAND) {
 			Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
 			sto = new StaticObject(type, tempType, _scale, pos, _simulator, this);
@@ -527,6 +532,7 @@ StaticObject* Chunk::createBlockColumn(int i, int j) {
 		sto = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, _scale, pos, _simulator, this);
 	}
 
+	/* Maybe replace with a cave cube. */
 	int rnd = Rand::rand()%10;
 	CubeManager::CubeType rndCube;
 	if ( rnd < 3 )
@@ -534,10 +540,10 @@ StaticObject* Chunk::createBlockColumn(int i, int j) {
 	else
 		rndCube = CubeManager::ROCK;
 
-	// Within Cave Walls
+	/* Within Cave Walls */
 	if ( (cave > -2  && cave < 3) ) {
-		// Cave is below surface
-		if ( y > heightTop ) {
+		/* Cave is below surface */
+		if ( drawCave ) {
 			if ( !_staticObjects[index] )
 				buildCaveBlock(i, j, index, pos, 1, sto->_cubeType, heights);
 
@@ -553,18 +559,8 @@ StaticObject* Chunk::createBlockColumn(int i, int j) {
 
 			if ( !_staticObjects[indexBottom] )
 				buildCaveBlock(i, j, indexBottom, posCaveBottom, 1, rndCube, bottomHeights);
-
-			// Cave top is close enough to surface to cause tearing. Fill in the tearing
-			if ( y-3 <= heightTop ) {
-				for ( int kk = 1 ; kk < y-heightTop ; kk++ ) {
-					Ogre::Vector3 posAboveCave = posCaveTop+Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
-					key aboveKey = getKey(posAboveCave);
-					//if ( !_staticObjects[aboveKey] ) 
-					addBlockToStaticGeometry(rndCube, posAboveCave, aboveKey);
-				}
-			}
 		}
-		// Cave is partially underground
+		/* Cave is partially underground */
 		else if ( y >= heightBottom ) {
 			for ( int kk = -1 ; kk < caveHeights[i+1][j+1] ; kk++ ) {
 				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
@@ -582,7 +578,7 @@ StaticObject* Chunk::createBlockColumn(int i, int j) {
 	else if ( (cave == -2 || cave == 3) ) {
 		for ( int kk = -1 ; kk < caveHeights[i+1][j+1]+1 ; kk++ ) {
 			Ogre::Vector3 caveWallPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
-			if ( y > heightTop-kk ) {
+			if ( drawWalls && y > heightTop-kk ) {
 				rnd = Rand::rand()%10;
 				if ( rnd < 3 )
 					rndCube = CubeManager::DIRT;
@@ -607,7 +603,27 @@ StaticObject* Chunk::createBlockColumn(int i, int j) {
 	if ( so == nullptr )
 		delete sto;
 
+	/* Cave top is close enough to surface to cause tearing. Fill in the tearing */
+	if ( drawCave && y-3 <= heightTop ) {
+		for ( int kk = 1 ; kk < y-heightTop ; kk++ ) {
+			Ogre::Vector3 posAboveCave = posCaveTop+Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+			key aboveKey = getKey(posAboveCave);
+			addBlockToStaticGeometry(rndCube, posAboveCave, aboveKey);
+		}
+	}
 	return so;
+}
+
+void Chunk::buildWaterBlock(int height, Ogre::Vector3& pos) {
+	if ( height <= waterLevel ) {
+		Ogre::Vector3 waterLine(pos.x, waterLevel*_scale.y * 2 - CHUNK_SCALE, pos.z);
+		key newIndex = getKey(waterLine);
+		if ( !_staticObjects[newIndex] ) {
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, waterLine, _simulator, this);
+			_staticObjects[newIndex] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+		}
+	}
 }
 
 void Chunk::buildCaveBlock(int i, int j, key index, Ogre::Vector3& pos, int offset, CubeManager::CubeType type, int hs[CHUNK_SIZE+2][CHUNK_SIZE+2] ) {
@@ -626,6 +642,7 @@ bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type) {
 	if ( type == CubeManager::GRASS && Rand::rand()%500 != 5 ) return false;
 	if ( type == CubeManager::SNOW && Rand::rand()%3000 != 5 ) return false;
 	if ( type == CubeManager::SAND && Rand::rand()%2000 != 5 ) return false;
+	if(pos.y <= waterLevel*CHUNK_SCALE_FULL) return false;
 
 	// Describes the shape of the leaves, think of each 5x5 grid as another layer
 	bool leaves[breadth][breadth][breadth] = {	{ { 0, 0, 0, 0, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 } },

@@ -34,24 +34,27 @@ private:
 	int bottomHeights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
 	int caveHeights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
 	int caves[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
+	int snowLevel = 15;
+	int waterLevel = -10;
 
 	std::unordered_map<key, Ogre::Light*> lights;
 
-	StaticObject* createBlockColumn(int, int);
+	StaticObject* createTerrainColumn(int, int, Ogre::Vector3&);
+	void buildWaterBlock(int, Ogre::Vector3&);
 	void buildCaveBlock(int, int, key, Ogre::Vector3&, int, CubeManager::CubeType, int[CHUNK_SIZE+2][CHUNK_SIZE+2]); 
 	bool createTree(const Ogre::Vector3&, CubeManager::CubeType);
-	bool createCloud(const Ogre::Vector3& pos);
+	bool createCloud(const Ogre::Vector3&);
 	key getKey(int x, int y, int z);
-	key getKey(const Ogre::Vector3& pos);
+	key getKey(const Ogre::Vector3&);
 
-	StaticObject* getObjFromChunks(const std::vector<Chunk*>& chunks, key index);
-	void createAirNeighbors(const std::vector<Chunk*>& chunks, StaticObject* obj);
+	StaticObject* getObjFromChunks(const std::vector<Chunk*>&, key);
+	void createAirNeighbors(const std::vector<Chunk*>&, StaticObject*);
 	void interpolateBlock(int, int, int[CHUNK_SIZE+2][CHUNK_SIZE+2], Ogre::Vector3&);
 	int computeMinNeighbor(int, int, int[CHUNK_SIZE+2][CHUNK_SIZE+2]);
 	int computeMaxNeighbor(int, int, int[CHUNK_SIZE+2][CHUNK_SIZE+2]);
 
 public:
-	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*, bool generate);
+	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*, bool);
 	~Chunk();
 	bool pointInChunk(float x, float y);
 	void addChunksToSimulator();
