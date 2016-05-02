@@ -17,7 +17,8 @@ Biome* BiomeManager::inBiome(int x, int y) {
 		int cX = pair.first * biomeGridSize + biomeGridSize/2 + (Rand::rand()%positionVariance) - positionVariance/2;
 		int cY = pair.second * biomeGridSize + biomeGridSize/2 + (Rand::rand()%positionVariance) - positionVariance/2;
 		int rad = Rand::rand()%biomeRadiusVariance + minBiomeRadius;
-		int rndType = Rand::rand()%3;
+		/* Range for rndType is the number of distinct biomes that can be chosen from. */
+		int rndType = Rand::rand()%2;
 		
 		biomeGrid[pair] = createBiome((CubeManager::CubeType)(rndType), cX, cY, rad);
 		return biomeGrid[pair];

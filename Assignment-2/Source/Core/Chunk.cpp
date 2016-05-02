@@ -28,7 +28,10 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				float fi = (float)chunkx / (float)CHUNK_SCALE_FULL;
 				float fj = (float)chunky / (float)CHUNK_SCALE_FULL;
 
-				float steepness = (perlin->getPerlin((fi + 10000.0f) / worldScale, (fj + 10000.0f) / worldScale) * 150);
+				float steepnessY = (perlin->getPerlin((fi + 10000.0f) / worldScale, (fj + 10000.0f) / worldScale) * 150);
+				float steepnessZ = (perlin->getPerlin((fi + 1000.0f) / worldScale, (fj + 1000.0f) / worldScale) * 150);
+				float steepnessCaves = (perlin->getPerlin((fi + 100.0f) / worldScale, (fj + 100.0f) / worldScale) * 101);
+				int caveHeight = (perlin->getPerlin((fi + 512.0f) / worldScale, (fj + 512.0f) / worldScale) * 15)+9;
 
 				// Sand biome is less steep
 				/* We must make sure not to change steepness for adjacent chunk blocks because it could be in a different biome
@@ -37,91 +40,78 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				if (curBiome->getType() == CubeManager::SAND && curBiome->inRadius(chunkx, chunky)) {
 					float steepnessDivider = curBiome->getSteepnessDivider(chunkx, chunky);
 					if (steepnessDivider < 1) steepnessDivider = 1;
-					steepness /= steepnessDivider;
+					steepnessY /= steepnessDivider;
 				}
 
-				float y1 = (perlin->getPerlin(fi / worldScale, fj / worldScale)*steepness);
-				float y2 = 1.0f / 2.0f * (perlin->getPerlin(2 * fi / worldScale, 2 * fj / worldScale)*steepness);
-				float y3 = 1.0f / 4.0f * (perlin->getPerlin(4 * fi / worldScale, 4 * fj / worldScale)*steepness);
-				float y4 = 1.0f / 8.0f * (perlin->getPerlin(8 * fi / worldScale, 8 * fj / worldScale)*steepness);
-				float y5 = 1.0f / 16.0f * (perlin->getPerlin(16 * fi / worldScale, 16 * fj / worldScale)*steepness);
+				float y1 = (perlin->getPerlin(fi / worldScale, fj / worldScale)*steepnessY);
+				float y2 = 1.0f / 2.0f * (perlin->getPerlin(2 * fi / worldScale, 2 * fj / worldScale)*steepnessY);
+				float y3 = 1.0f / 4.0f * (perlin->getPerlin(4 * fi / worldScale, 4 * fj / worldScale)*steepnessY);
+				float y4 = 1.0f / 8.0f * (perlin->getPerlin(8 * fi / worldScale, 8 * fj / worldScale)*steepnessY);
+				float y5 = 1.0f / 16.0f * (perlin->getPerlin(16 * fi / worldScale, 16 * fj / worldScale)*steepnessY);
 
-				float pval = y1 + y2 + y3 + y4 + y5;
-			
-				pval *= 2.5;
+				float z1 = (perlin->getPerlin((fi+99), (fj+99))*steepnessZ);
+				float z2 = 1.0f / 2.0f * (perlin->getPerlin(2 * (fi+99) / worldScale, 2 * (fj+99) / worldScale)*steepnessZ);
+				float z3 = 1.0f / 4.0f * (perlin->getPerlin(4 * (fi+99) / worldScale, 4 * (fj+99) / worldScale)*steepnessZ);
+				float z4 = 1.0f / 8.0f * (perlin->getPerlin(8 * (fi+99) / worldScale, 8 * (fj+99) / worldScale)*steepnessZ);
+				float z5 = 1.0f / 16.0f * (perlin->getPerlin(16 * (fi+99) / worldScale, 16 * (fj+99) / worldScale)*steepnessZ);
 
-				int y = (int)pval;
+				float c1 = (perlin->getPerlin((fi+33), (fj+33))*steepnessCaves);
+				float c2 = 1.0f / 2.0f * (perlin->getPerlin(2 * (fi+33) / worldScale, 2 * (fj+33) / worldScale)*steepnessCaves);
+				float c3 = 1.0f / 4.0f * (perlin->getPerlin(4 * (fi+33) / worldScale, 4 * (fj+33) / worldScale)*steepnessCaves);
+				float c4 = 1.0f / 8.0f * (perlin->getPerlin(8 * (fi+33) / worldScale, 8 * (fj+33) / worldScale)*steepnessCaves);
+				float c5 = 1.0f / 16.0f * (perlin->getPerlin(16 * (fi+33) / worldScale, 16 * (fj+33) / worldScale)*steepnessCaves);
+
+				float pvaly = y1 + y2 + y3 + y4 + y5;
+				float pvalz = z1;
+
+
+				pvaly *= 2.5;
+				pvalz *= 2.5;
+
+				int y = (int)pvaly;
+				int z = (int)pvalz;
 
 				heights[i][j] = y;
+				topHeights[i][j] = z - 13;
+				bottomHeights[i][j] = topHeights[i][j] - caveHeight;
+				caveHeights[i][j] = caveHeight;
+				caves[i][j] = steepnessCaves;
 			}
 		}
 
 		// Does this chunk generate new terrain?
 		for (int i = 0; i < CHUNK_SIZE; ++i) {
-
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
 
-				int chunkx = i + xStart;
-				int chunky = j + yStart;
-
+				int chunkx = xStart + i - 1;
+				int chunky = yStart + j - 1;
 				int y = heights[i + 1][j + 1];
+
+				float fi = (float)chunkx / (float)CHUNK_SCALE_FULL;
+				float fj = (float)chunky / (float)CHUNK_SCALE_FULL;
+
 				Ogre::Vector3 pos(chunkx*scale.x * 2, y*scale.y * 2, chunky*scale.z * 2);
 				key index = getKey(pos);
-				StaticObject* so;
-				CubeManager::CubeType tempType;
+				
 
-				if (y >= 15 && curBiome != nullptr) {
-					if (curBiome->getType() != CubeManager::SAND) {
-						Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
-						so = new StaticObject(type, tempType, scale, pos, sim, this);
+				/* If the surface terrain was created a tree can be placed at that location. */
+				if ( createTerrainColumn(i, j, pos) ) {
+					StaticObject* so = _staticObjects[index];
+					/* Create tree returns true if a tree was created in this position. */
+					if ( !createTree(so->_pos, so->_cubeType) ) {
+						int numAir = computeMaxNeighbor(i+1, j+1, heights);
+
+						for(int i = 0 ; i < numAir; i++) {
+							key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*(i+1), 0));
+							_staticObjects[airIndex] = air;
+						}
 					}
-				}
-				if (curBiome != nullptr) {
-					Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
-					so = new StaticObject(type, tempType, scale, pos, sim, this);
-				}
-
-				else {
-					so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, scale, pos, sim, this);
-				}
-
-				_staticObjects[index] = so;
-
-				// Create tree returns true if a tree was created in this position.
-				if (!createTree(pos, so->_cubeType)) {
-					int numAir = computeMaxNeighbor(i+1, j+1);
-
-					for(int i = 0 ; i < numAir; i++) {
-						key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*(i+1), 0));
-						_staticObjects[airIndex] = air;
-					}
-				}
-
-				int interpolate = computeMinNeighbor(i+1, j+1);
-
-				if(interpolate > 0) {
-					CubeManager::CubeType interpolateType = CubeManager::DIRT;
-					for(int i = 0; i < interpolate; i++) {
-						if (i > 1) interpolateType = CubeManager::STONE;
-						Ogre::Vector3 newPos = pos - Ogre::Vector3(0, CHUNK_SCALE_FULL*(i+1), 0);
-						key newIndex = getKey(newPos);
-						StaticObject* sos = new StaticObject(CubeManager::getSingleton()->getEntity(interpolateType), interpolateType, scale, newPos, sim, this);
-						_staticObjects[newIndex] = sos;
-						_sg->addEntity(sos->_geom, sos->_pos, sos->_orientation, sos->_scale);
-					}	
 				}
 
 				createCloud(pos);
 
-				if(y <= waterLevel) {
-					Ogre::Vector3 waterLine(pos.x, waterLevel*scale.y * 2 - CHUNK_SCALE, pos.z);
-					key newIndex = getKey(waterLine);
-					StaticObject* sos = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, scale, waterLine, sim, this);
-					_staticObjects[newIndex] = sos;
-					_sg->addEntity(sos->_geom, sos->_pos, sos->_orientation, sos->_scale);
-				}
+				buildWaterBlock(y, pos);
 
-				_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 				_sg->setRegionDimensions(Ogre::Vector3(3000, 1000, 3000));
 			}
 		}
@@ -138,13 +128,6 @@ Chunk::~Chunk() {
 	}
 	_staticObjects.clear();
 	_mSceneManager->destroyStaticGeometry(_sg);
-
-	for (auto& var : lights) {
-		if (var.second == nullptr) continue;
-		_mSceneManager->destroyMovableObject(var.second);
-	}
-
-	lights.clear();
 }
 
 bool Chunk::pointInChunk(float x, float y) {
@@ -158,6 +141,30 @@ void Chunk::addChunksToSimulator() {
 	for (auto& var : _staticObjects) {
 		if(var.second != nullptr && var.second != air)
 			var.second->addToSimulator();
+	}
+}
+
+void Chunk::addBlockToStaticGeometry(CubeManager::CubeType cubeType, Ogre::Vector3 position, key index) {
+	StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(cubeType), cubeType, _scale, position, _simulator, this);
+	_staticObjects[index] = so;
+	_sg->addEntity(so->_geom, position, so->_orientation, so->_scale);
+}
+
+void Chunk::interpolateBlock(int i, int j, int hs[CHUNK_SIZE+2][CHUNK_SIZE+2], Ogre::Vector3& pos) {
+	int interpolate = computeMinNeighbor(i+1, j+1, hs);
+
+	if(interpolate > 0) {
+		CubeManager::CubeType interpolateType = CubeManager::DIRT;
+		for(int i = 0; i < interpolate; i++) {
+			if (i > 0) interpolateType = CubeManager::STONE;
+			Ogre::Vector3 newPos = pos - Ogre::Vector3(0, CHUNK_SCALE_FULL*(i+1), 0);
+			key newIndex = getKey(newPos);
+			if ( !_staticObjects[newIndex] ) {
+				StaticObject* sos = new StaticObject(CubeManager::getSingleton()->getEntity(interpolateType), interpolateType, _scale, newPos, _simulator, this);
+				_staticObjects[newIndex] = sos;
+				_sg->addEntity(sos->_geom, sos->_pos, sos->_orientation, sos->_scale);
+			}
+		}	
 	}
 }
 
@@ -491,12 +498,166 @@ CubeManager::CubeType Chunk::getGeneratedType(CubeManager::CubeType objType, int
 	}
 }
 
+bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
+
+	Biome* curBiome = _biomeMgr->inBiome(_xStart, _yStart);
+	CubeManager::CubeType tempType;
+
+	int chunkx = _xStart + i - 1;
+	int chunky = _yStart + j - 1;
+
+	int y = heights[i+1][j+1];
+	int cave = caves[i+1][j+1];
+	int heightTop = topHeights[i+1][j+1];
+	int heightBottom = heightTop - caveHeights[i+1][j+1];
+
+	/* Flags for cave drawing. */
+	bool buildTerrain = false;
+	bool underwater = y > waterLevel && heightBottom > waterLevel;
+	bool drawCave = y >= heightTop; /* Below surface */
+	bool drawMouth = heightBottom >= waterLevel; /* Above water level */
+	bool drawWalls = drawCave || drawMouth; /* Cave walls drawn if either of the previous conditions were satisfied. */
+
+	Ogre::Vector3 posCaveTop(chunkx*_scale.x*2, heightTop*_scale.y*2, chunky*_scale.z*2);
+	Ogre::Vector3 posCaveBottom = posCaveTop - Ogre::Vector3(0, caveHeights[i+1][j+1]*100, 0);
+
+	key index = getKey(pos);
+	key indexTop = getKey(posCaveTop);
+	key indexBottom = getKey(posCaveBottom);
+	bottomHeights[i+1][i+1] = heights[i+1][i+1] - caveHeights[i+1][j+1];
+
+	/* Replace with a cave cube. */
+	int rnd = Rand::rand()%10;
+	CubeManager::CubeType rndCube;
+	if ( rnd < 3 )
+		rndCube = CubeManager::DIRT;
+	else
+		rndCube = CubeManager::ROCK;
+
+	/* Within Cave Walls */
+	if ( (cave > -2  && cave < 3) ) {
+		/* Cave is below surface */
+		if ( drawCave ) {
+			if ( !_staticObjects[index] )
+				buildTerrain = true;
+
+			if ( !_staticObjects[indexTop] )
+				buildCaveBlock(i, j, indexTop, posCaveTop, -1, rndCube, topHeights);
+
+			for ( int kk = 1 ; kk < caveHeights[i+1][j+1] ; kk++ ) {
+				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+				key innerWall = getKey(caveAirPos);
+				if ( !_staticObjects[innerWall] )
+					_staticObjects[innerWall] = air;
+			}
+
+			if ( !_staticObjects[indexBottom] ) {
+				buildCaveBlock(i, j, indexBottom, posCaveBottom, 1, rndCube, bottomHeights);
+			}
+		}
+		/* Cave is partially underground */
+		else if ( y > heightBottom ) {
+			for ( int kk = -1 ; kk < caveHeights[i+1][j+1] ; kk++ ) {
+				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+				key innerWall = getKey(caveAirPos);
+				_staticObjects[innerWall] = air;
+			}
+			if ( !_staticObjects[indexBottom] ) {
+				buildCaveBlock(i, j, indexBottom, posCaveBottom, 1, rndCube, bottomHeights);
+			}
+		}
+		else {
+			buildTerrain = true;
+		}
+	}
+	// Coordinates are at the boundary of a cave
+	else if ( (cave == -2 || cave == 3) ) {
+		for ( int kk = -1 ; kk < caveHeights[i+1][j+1]+1 ; kk++ ) {
+			Ogre::Vector3 caveWallPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+			if ( y > heightTop-kk || ( y > heightTop-kk && heightTop < waterLevel) ) {
+				rnd = Rand::rand()%10;
+				if ( rnd < 3 )
+					rndCube = CubeManager::DIRT;
+				else
+					rndCube = CubeManager::ROCK;
+				addBlockToStaticGeometry(rndCube, caveWallPos, getKey(caveWallPos));
+			}
+			else {
+				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+				key innerWall = getKey(caveAirPos);
+				if ( !_staticObjects[innerWall] )
+					_staticObjects[innerWall] = air;
+			}
+		}
+		buildTerrain = true;
+	}
+	else {
+		buildTerrain = true;
+	}
+
+	/* Cave top is close enough to surface to cause tearing. Fill in the tearing */
+	if ( drawCave && y-3 < heightTop ) {
+		for ( int kk = 1 ; kk < y-heightTop ; kk++ ) {
+			Ogre::Vector3 posAboveCave = posCaveTop+Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
+			key aboveKey = getKey(posAboveCave);
+			addBlockToStaticGeometry(rndCube, posAboveCave, aboveKey);
+		}
+	}
+
+	/* Build the surface terrain if necessary */
+	if ( buildTerrain ) {
+		StaticObject* so;
+
+		if (y >= snowLevel && curBiome != nullptr) {
+			if (curBiome->getType() != CubeManager::SAND) {
+				Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
+				so = new StaticObject(type, tempType, _scale, pos, _simulator, this);
+			}
+		}
+		if (curBiome != nullptr) {
+			Ogre::Entity* type = curBiome->getCubeEntity(chunkx, chunky, y, tempType);
+			so = new StaticObject(type, tempType, _scale, pos, _simulator, this);
+		}
+		else {
+			so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::GRASS), CubeManager::GRASS, _scale, pos, _simulator, this);
+		}
+		
+		_staticObjects[index] = so;
+		_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+		interpolateBlock(i, j, heights, so->_pos);
+
+		key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0));
+		_staticObjects[airIndex] = air;
+	}
+
+	return buildTerrain;
+}
+
+void Chunk::buildWaterBlock(int height, Ogre::Vector3& pos) {
+	if ( height <= waterLevel ) {
+		Ogre::Vector3 waterLine(pos.x, waterLevel*_scale.y * 2 - CHUNK_SCALE, pos.z);
+		key newIndex = getKey(waterLine);
+		if ( !_staticObjects[newIndex] ) {
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, waterLine, _simulator, this);
+			_staticObjects[newIndex] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+		}
+	}
+}
+
+void Chunk::buildCaveBlock(int i, int j, key index, Ogre::Vector3& pos, int offset, CubeManager::CubeType type, int hs[CHUNK_SIZE+2][CHUNK_SIZE+2] ) {
+	addBlockToStaticGeometry(type, pos, index);
+	interpolateBlock(i, j, hs, pos);
+	key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*offset, 0));
+	_staticObjects[airIndex] = air;
+}
+
 bool Chunk::createTree(const Ogre::Vector3& pos, CubeManager::CubeType type) {
 
 	static const int breadth = 5;
 	static const int firHeight = 5;
 	static const int firBreadth = 7;
-	
+
 	if ( type == CubeManager::GRASS && Rand::rand()%500 != 5 ) return false;
 	if ( type == CubeManager::SNOW && Rand::rand()%3000 != 5 ) return false;
 	if ( type == CubeManager::SAND && Rand::rand()%2000 != 5 ) return false;
@@ -714,22 +875,22 @@ void Chunk::rebuildFromSave(const std::vector<BlockInfo>& blocks) {
 }
 
 // returns the number of blocks to create below us
-int Chunk::computeMinNeighbor(int x, int y) {
+int Chunk::computeMinNeighbor(int x, int y, int hs[CHUNK_SIZE+2][CHUNK_SIZE+2]) {
 	int min = 99999999;
 	int distance = 0;
-	int height = heights[x][y];
+	int height = hs[x][y];
 
 	// up
-	distance = heights[x][y + 1] - height;
+	distance = hs[x][y + 1] - height;
 	if(distance < min) min = distance;
 	// down
-	distance = heights[x][y - 1] - height;
+	distance = hs[x][y - 1] - height;
 	if(distance < min) min = distance;
 	// left
-	distance = heights[x - 1][y] - height;
+	distance = hs[x - 1][y] - height;
 	if(distance < min) min = distance;
 	// right
-	distance = heights[x + 1][y] - height;
+	distance = hs[x + 1][y] - height;
 	if(distance < min) min = distance;
 
 	// A block is is lower than 1 block below us
@@ -742,22 +903,22 @@ int Chunk::computeMinNeighbor(int x, int y) {
 }
 
 // returns the number of air blocks to create above us
-int Chunk::computeMaxNeighbor(int x, int y) {
+int Chunk::computeMaxNeighbor(int x, int y, int hs[CHUNK_SIZE+2][CHUNK_SIZE+2]) {
 	int max = -99999999;
 	int distance = 0;
-	int height = heights[x][y];
+	int height = hs[x][y];
 
 	// up
-	distance = heights[x][y + 1] - height;
+	distance = hs[x][y + 1] - height;
 	if(distance > max) max = distance;
 	// down
-	distance = heights[x][y - 1] - height;
+	distance = hs[x][y - 1] - height;
 	if(distance > max) max = distance;
 	// left
-	distance = heights[x - 1][y] - height;
+	distance = hs[x - 1][y] - height;
 	if(distance > max) max = distance;
 	// right
-	distance = heights[x + 1][y] - height;
+	distance = hs[x + 1][y] - height;
 	if(distance > max) max = distance;
 
 	// A block is is lower than 1 block below us
