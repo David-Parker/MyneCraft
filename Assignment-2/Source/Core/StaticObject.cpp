@@ -24,6 +24,11 @@ void StaticObject::addToSimulator() {
 	 _collisionObject->setCollisionShape(_shape);
 	 _collisionObject->setWorldTransform(_tr);
 	 _collisionObject->setCollisionFlags(_collisionObject->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+
+	 if(_cubeType == CubeManager::WATER) {
+	 	 _collisionObject->setCollisionFlags(_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	 }
+
 	 _collisionObject->setFriction(_friction);
 	 _collisionObject->setRestitution(_restitution);
 
