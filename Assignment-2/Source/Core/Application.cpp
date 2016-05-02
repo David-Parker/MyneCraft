@@ -763,6 +763,7 @@ void Application::createObjects(void) {
 	_simulator->removeStaticObjects();
 	_simulator->removeObjects();
 
+	Rand::srand(seed);
 	if (player != NULL) {
 		delete player;
 		player = NULL;

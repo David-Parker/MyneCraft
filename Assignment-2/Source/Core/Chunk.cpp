@@ -126,6 +126,13 @@ Chunk::~Chunk() {
 	}
 	_staticObjects.clear();
 	_mSceneManager->destroyStaticGeometry(_sg);
+
+	for (auto& var : lights) {
+		if (var.second == nullptr) continue;
+		_mSceneManager->destroyMovableObject(var.second);
+	}
+
+	lights.clear();
 }
 
 bool Chunk::pointInChunk(float x, float y) {
