@@ -31,7 +31,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				float steepnessY = (perlin->getPerlin((fi + 10000.0f) / worldScale, (fj + 10000.0f) / worldScale) * 150);
 				float steepnessZ = (perlin->getPerlin((fi + 1000.0f) / worldScale, (fj + 1000.0f) / worldScale) * 150);
 				float steepnessCaves = (perlin->getPerlin((fi + 100.0f) / worldScale, (fj + 100.0f) / worldScale) * 101);
-				int caveHeight = (perlin->getPerlin((fi + 512.0f) / worldScale, (fj + 512.0f) / worldScale) * 17)+9;
+				int caveHeight = (perlin->getPerlin((fi + 512.0f) / worldScale, (fj + 512.0f) / worldScale) * 15)+9;
 
 				// Sand biome is less steep
 				/* We must make sure not to change steepness for adjacent chunk blocks because it could be in a different biome
@@ -93,6 +93,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				Ogre::Vector3 pos(chunkx*scale.x * 2, y*scale.y * 2, chunky*scale.z * 2);
 				key index = getKey(pos);
 				
+
 				/* If the surface terrain was created a tree can be placed at that location. */
 				if ( createTerrainColumn(i, j, pos) ) {
 					StaticObject* so = _staticObjects[index];
@@ -539,7 +540,6 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 		if ( drawCave ) {
 			if ( !_staticObjects[index] )
 				buildTerrain = true;
-				//buildCaveBlock(i, j, index, pos, 1, sto->_cubeType, heights);*/
 
 			if ( !_staticObjects[indexTop] )
 				buildCaveBlock(i, j, indexTop, posCaveTop, -1, rndCube, topHeights);	
@@ -551,18 +551,22 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 					_staticObjects[innerWall] = air;
 			}
 
-			if ( !_staticObjects[indexBottom] )
+			if ( !_staticObjects[indexBottom] ) {
 				buildCaveBlock(i, j, indexBottom, posCaveBottom, 1, rndCube, bottomHeights);
+				interpolateBlock(i, j, bottomHeights, posCaveBottom);
+			}
 		}
 		/* Cave is partially underground */
-		else if ( y >= heightBottom ) {
+		else if ( y > heightBottom ) {
 			for ( int kk = -1 ; kk < caveHeights[i+1][j+1] ; kk++ ) {
 				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
 				key innerWall = getKey(caveAirPos);
 				_staticObjects[innerWall] = air;
 			}
-			if ( !_staticObjects[indexBottom] )
+			if ( !_staticObjects[indexBottom] ) {
 				buildCaveBlock(i, j, indexBottom, posCaveBottom, 1, rndCube, bottomHeights);
+				interpolateBlock(i, j, bottomHeights, posCaveBottom);
+			}
 		}
 		else {
 			buildTerrain = true;
@@ -572,14 +576,13 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 	else if ( (cave == -2 || cave == 3) ) {
 		for ( int kk = -1 ; kk < caveHeights[i+1][j+1]+1 ; kk++ ) {
 			Ogre::Vector3 caveWallPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
-			if ( y > heightTop-kk ) {
+			if ( y > heightTop-kk || ( y > heightTop-kk && heightTop < waterLevel) ) {
 				rnd = Rand::rand()%10;
 				if ( rnd < 3 )
 					rndCube = CubeManager::DIRT;
 				else
 					rndCube = CubeManager::ROCK;
 				addBlockToStaticGeometry(rndCube, caveWallPos, getKey(caveWallPos));
-				interpolateBlock(i, j, bottomHeights, caveWallPos);
 			}
 			else {
 				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
@@ -595,7 +598,7 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 	}
 
 	/* Cave top is close enough to surface to cause tearing. Fill in the tearing */
-	if ( drawCave && y-3 <= heightTop ) {
+	if ( drawCave && y-3 < heightTop ) {
 		for ( int kk = 1 ; kk < y-heightTop ; kk++ ) {
 			Ogre::Vector3 posAboveCave = posCaveTop+Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
 			key aboveKey = getKey(posAboveCave);
@@ -646,7 +649,7 @@ void Chunk::buildWaterBlock(int height, Ogre::Vector3& pos) {
 
 void Chunk::buildCaveBlock(int i, int j, key index, Ogre::Vector3& pos, int offset, CubeManager::CubeType type, int hs[CHUNK_SIZE+2][CHUNK_SIZE+2] ) {
 	addBlockToStaticGeometry(type, pos, index);
-	interpolateBlock(i, j, hs, pos);
+	//interpolateBlock(i, j, hs, pos);
 	key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*offset, 0));
 	_staticObjects[airIndex] = air;
 }
