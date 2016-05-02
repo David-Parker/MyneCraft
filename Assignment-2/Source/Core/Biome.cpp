@@ -13,7 +13,18 @@ bool Biome::inRadius(float x, float y) {
 	Ogre::Vector2 center(centerX, centerY);
 	Ogre::Vector2 pos(x, y);
 
-	return pos.distance(center) <= (2*radius / 3);
+	return pos.distance(center) < radius;
+}
+
+float Biome::getSteepnessDivider(float x, float y) {
+	Ogre::Vector2 center(centerX, centerY);
+	Ogre::Vector2 pos(x, y);
+
+	float d = (radius - pos.distance(center)) / 200.0f;
+
+	if (d < 0) return 1;
+
+	return pow(d, 1.5);
 }
 
 Ogre::Entity* Biome::getCubeEntity(int x, int y, int h, CubeManager::CubeType& type) {

@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, GameManager* gm) : _body(body), _playerCam(camera), _sceneManager(sm), _gm(gm) {
-	// _body->getNode()->setVisible(false);
+	 _body->getNode()->setVisible(false);
 	_body->getBody()->setAngularFactor(btVector3(0, 0, 0));
 
 

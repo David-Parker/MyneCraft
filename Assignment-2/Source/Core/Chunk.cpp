@@ -35,7 +35,9 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				 and it would compute its height for its biome which won't be congruent with our values here. Thus the interpolation will think everything is okay
 				 and not interpolate correctly. */
 				if (curBiome->getType() == CubeManager::SAND && curBiome->inRadius(chunkx, chunky)) {
-					steepness /= 2;
+					float steepnessDivider = curBiome->getSteepnessDivider(chunkx, chunky);
+					if (steepnessDivider < 1) steepnessDivider = 1;
+					steepness /= steepnessDivider;
 				}
 
 				float y1 = (perlin->getPerlin(fi / worldScale, fj / worldScale)*steepness);
