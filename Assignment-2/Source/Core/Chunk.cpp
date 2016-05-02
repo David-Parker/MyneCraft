@@ -128,13 +128,6 @@ Chunk::~Chunk() {
 	}
 	_staticObjects.clear();
 	_mSceneManager->destroyStaticGeometry(_sg);
-
-	for (auto& var : lights) {
-		if (var.second == nullptr) continue;
-		_mSceneManager->destroyMovableObject(var.second);
-	}
-
-	lights.clear();
 }
 
 bool Chunk::pointInChunk(float x, float y) {
@@ -549,7 +542,7 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 				buildTerrain = true;
 
 			if ( !_staticObjects[indexTop] )
-				buildCaveBlock(i, j, indexTop, posCaveTop, -1, rndCube, topHeights);	
+				buildCaveBlock(i, j, indexTop, posCaveTop, -1, rndCube, topHeights);
 
 			for ( int kk = 1 ; kk < caveHeights[i+1][j+1] ; kk++ ) {
 				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
@@ -560,7 +553,6 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 
 			if ( !_staticObjects[indexBottom] ) {
 				buildCaveBlock(i, j, indexBottom, posCaveBottom, 1, rndCube, bottomHeights);
-				interpolateBlock(i, j, bottomHeights, posCaveBottom);
 			}
 		}
 		/* Cave is partially underground */
@@ -572,7 +564,6 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 			}
 			if ( !_staticObjects[indexBottom] ) {
 				buildCaveBlock(i, j, indexBottom, posCaveBottom, 1, rndCube, bottomHeights);
-				interpolateBlock(i, j, bottomHeights, posCaveBottom);
 			}
 		}
 		else {
@@ -656,7 +647,7 @@ void Chunk::buildWaterBlock(int height, Ogre::Vector3& pos) {
 
 void Chunk::buildCaveBlock(int i, int j, key index, Ogre::Vector3& pos, int offset, CubeManager::CubeType type, int hs[CHUNK_SIZE+2][CHUNK_SIZE+2] ) {
 	addBlockToStaticGeometry(type, pos, index);
-	//interpolateBlock(i, j, hs, pos);
+	interpolateBlock(i, j, hs, pos);
 	key airIndex = getKey(pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*offset, 0));
 	_staticObjects[airIndex] = air;
 }
