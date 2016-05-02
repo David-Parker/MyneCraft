@@ -37,6 +37,13 @@ void Simulator::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, co
 	}
 }
 
+void Simulator::removeObjects() {
+	for (auto& var : objList) {
+		dynamicsWorld->removeCollisionObject(var->getBody());
+	}
+	objList.clear();
+}
+
 void Simulator::removeStaticObjects() {
 	for (auto& var : objListStatic) {
 		dynamicsWorld->removeCollisionObject(var->getBody());

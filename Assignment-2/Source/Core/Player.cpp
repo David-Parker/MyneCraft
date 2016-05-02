@@ -27,6 +27,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	_animation.createPickaxeAnimation(node);
 
 	inventory.push_back(node);
+	inventoryEntities.push_back(item);
 
 	item = _sceneManager->createEntity("Sword"+nme, "Mynecraft-Sword.mesh");
 	item->setCastShadows(true);
@@ -40,9 +41,9 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	node->setVisible(false);
 
 	_animation.createSwordAnimation(node);
-
-
 	inventory.push_back(node);
+	inventoryEntities.push_back(item);
+	rotNodes.push_back(rotNode);
 
 	item = CubeManager::getSingleton()->getNewEntity(CubeManager::TORCH);
 	item->setCastShadows(true);
@@ -65,6 +66,10 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	_animation.createSwordAnimation(node);
 
 	inventory.push_back(node);
+	inventoryEntities.push_back(item);
+	inventoryEntities.push_back(light);
+	rotNodes.push_back(rotNode);
+
 
 	item = CubeManager::getSingleton()->getNewEntity(CubeManager::GRASS);
 	item->setCastShadows(true);
@@ -80,6 +85,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	_animation.createBlockAnimation(node);
 
 	inventory.push_back(node);
+	inventoryEntities.push_back(item);
+	rotNodes.push_back(rotNode);
 
 	item = CubeManager::getSingleton()->getNewEntity(CubeManager::ROCK);
 	item->setCastShadows(true);
@@ -95,6 +102,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	_animation.createBlockAnimation(node);
 
 	inventory.push_back(node);
+	inventoryEntities.push_back(item);
+	rotNodes.push_back(rotNode);
 
 	item = CubeManager::getSingleton()->getNewEntity(CubeManager::SNOW);
 	item->setCastShadows(true);
@@ -110,6 +119,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	_animation.createBlockAnimation(node);
 
 	inventory.push_back(node);
+	inventoryEntities.push_back(item);
+	rotNodes.push_back(rotNode);
 
 	item = CubeManager::getSingleton()->getNewEntity(CubeManager::SAND);
 	item->setCastShadows(true);
@@ -125,6 +136,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	_animation.createBlockAnimation(node);
 
 	inventory.push_back(node);
+	inventoryEntities.push_back(item);
+	rotNodes.push_back(rotNode);
 
 	item = CubeManager::getSingleton()->getNewEntity(CubeManager::DIRT);
 	item->setCastShadows(true);
@@ -140,6 +153,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	_animation.createBlockAnimation(node);
 
 	inventory.push_back(node);
+	inventoryEntities.push_back(item);
+	rotNodes.push_back(rotNode);
 
 	item = CubeManager::getSingleton()->getNewEntity(CubeManager::PLANK);
 	item->setCastShadows(true);
@@ -155,6 +170,8 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	_animation.createBlockAnimation(node);
 
 	inventory.push_back(node);
+	inventoryEntities.push_back(item);
+	rotNodes.push_back(rotNode);
 
 	item = CubeManager::getSingleton()->getNewEntity(CubeManager::GLASS);
 	item->setCastShadows(true);
@@ -170,10 +187,35 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	_animation.createBlockAnimation(node);
 
 	inventory.push_back(node);
+	inventoryEntities.push_back(item);
+	rotNodes.push_back(rotNode);
 
 	equippedItem = -1;
 
 	std::cout << "Finished creating player" << std::endl;
+}
+
+Player::~Player() {
+	for (int i = 0; i < rotNodes.size(); ++i) {
+		rotNodes.at(i)->detachAllObjects();
+	}
+	for (int i = 0; i < inventory.size(); ++i) {
+		inventory.at(i)->detachAllObjects();
+	}
+	for (int i = 0; i < inventoryEntities.size(); ++i) {
+		_sceneManager->destroyMovableObject(inventoryEntities.at(i));
+	}
+	for (int i = 0; i < rotNodes.size(); ++i) {
+		_sceneManager->destroySceneNode(rotNodes.at(i));
+	}
+	for (int i = 0; i < inventory.size(); ++i) {
+		_sceneManager->destroySceneNode(inventory.at(i));
+	}
+	inventory.clear();
+	inventoryEntities.clear();
+	rotNodes.clear();
+	delete _body;
+	std::cout << "Deleted Player" << std::endl;
 }
 
 void Player::setWeapon ( int i ) {
