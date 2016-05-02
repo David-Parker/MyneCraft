@@ -28,11 +28,22 @@ SoundManager::SoundManager(void) {
 	/* Load music & sound effects */
 
 #ifdef __linux__
-	music = Mix_LoadMUS( "../Assets/music.wav" ); 
+	std::string relative = "../Assets/";
 #endif
 #ifdef _WIN32
-	music = Mix_LoadMUS( "../../../Mynecraft/Assignment-2/Assets/music.wav" ); 
+	std::string relative = "../../../Mynecraft/Assignment-2/Assets/";
 #endif
+
+	music = Mix_LoadMUS((relative + "music.wav").c_str());
+	gameSounds[GLASS_BREAK] = Mix_LoadWAV((relative + "glass-break.wav").c_str());
+	gameSounds[GRASS_BREAK] = Mix_LoadWAV((relative + "grass-break.wav").c_str());
+	gameSounds[SAND_BREAK] = Mix_LoadWAV((relative + "sand-break.wav").c_str());
+	gameSounds[SNOW_BREAK] = Mix_LoadWAV((relative + "snow-break.wav").c_str());
+	gameSounds[STONE_BREAK] = Mix_LoadWAV((relative + "stone-break.wav").c_str());
+	gameSounds[WOOD_BREAK] = Mix_LoadWAV((relative + "wood-break.wav").c_str());
+	gameSounds[POP] = Mix_LoadWAV((relative + "pop.wav").c_str());
+	gameSounds[STEP] = Mix_LoadWAV((relative + "step.wav").c_str());
+	
 }
 
 /* Sound Functions */

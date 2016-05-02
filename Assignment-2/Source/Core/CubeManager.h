@@ -30,5 +30,6 @@ public:
 	static void injectSceneManager(Ogre::SceneManager*);
 	static CubeManager* getSingleton();
 	Ogre::Entity* getEntity(CubeType);
+	Ogre::Entity* getNewEntity(CubeType);
 
 };

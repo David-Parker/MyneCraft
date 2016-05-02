@@ -19,10 +19,15 @@ private:
 	Ogre::SceneManager* _sceneManager;
 	int equippedItem;
 	std::vector<Ogre::SceneNode*> inventory;
+	std::vector<Ogre::MovableObject*> inventoryEntities;
+	std::vector<Ogre::SceneNode*> rotNodes;
 	void getNeighborChunks(std::vector<Chunk*>& chunklist, int x, int z, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, Chunk* chunk);
 	Animation _animation;
+	GameManager* _gm;
 public:
-	Player(Ogre::Camera*, GameObject* body, Ogre::SceneManager* sm);
+	Player(Ogre::Camera*, GameObject* body, Ogre::SceneManager* sm, GameManager* gm);
+	~Player();
+
 	Ogre::Camera* _playerCam;
 	GameObject* _body;
 
@@ -36,4 +41,6 @@ public:
 	void cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, CubeManager::CubeType type);
 	int getWeapon();
 	void constrainSpeed();
+	std::string getCoordinates();
+	void playHitSound(StaticObject* hitobj);
 };
