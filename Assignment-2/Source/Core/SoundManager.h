@@ -9,10 +9,12 @@
 #include <SDL/SDL_mixer.h>
 #endif
 
+#include <string>
+
 
 class SoundManager {
 public:
-	enum { SOUND, NUM_SOUNDS } sounds;
+	enum { SOUND, GLASS_BREAK, GRASS_BREAK, SAND_BREAK, SNOW_BREAK, STONE_BREAK, WOOD_BREAK, POP, STEP, HURT, NUM_SOUNDS } sounds;
 
 	SoundManager(void);
 	~SoundManager(void);

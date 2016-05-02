@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) : _body(body), _playerCam(camera), _sceneManager(sm) {
+Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, GameManager* gm) : _body(body), _playerCam(camera), _sceneManager(sm), _gm(gm) {
 	// _body->getNode()->setVisible(false);
 	_body->getBody()->setAngularFactor(btVector3(0, 0, 0));
 
@@ -14,7 +14,6 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm) :
 
 	Ogre::String nme = body->getName();
 
-	
 
 	item = _sceneManager->createEntity("Pickaxe"+nme, "Mynecraft-Pickaxe.mesh");
 	item->setCastShadows(true);
@@ -289,6 +288,7 @@ bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::
 	if (equippedItem == PICKAXE) {
 		pickaxeAction(hitObj, chunks, modifiedChunks);
 		_animation.setActionLock(PICKAXE);
+		playHitSound(hitObj);
 		return true;
 	}
 	if (equippedItem == SWORD) {
@@ -298,41 +298,49 @@ bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::
 	if (equippedItem == TORCH_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::TORCH);
 		_animation.setActionLock(TORCH_CUBE);
+		_gm->playSound(GameManager::POP);
 		return true;
 	}
 	if (equippedItem == GRASS_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::GRASS);
 		_animation.setActionLock(GRASS_CUBE);
+		_gm->playSound(GameManager::POP);
 		return true;
 	}
 	if (equippedItem == ROCK_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::ROCK);
 		_animation.setActionLock(ROCK_CUBE);
+		_gm->playSound(GameManager::POP);
 		return true;
 	}
 	if (equippedItem == SNOW_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::SNOW);
 		_animation.setActionLock(SNOW_CUBE);
+		_gm->playSound(GameManager::POP);
 		return true;
 	}
 	if (equippedItem == SAND_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::SAND);
 		_animation.setActionLock(SAND_CUBE);
+		_gm->playSound(GameManager::POP);
 		return true;
 	}
 	if (equippedItem == DIRT_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::DIRT);
 		_animation.setActionLock(DIRT_CUBE);
+		_gm->playSound(GameManager::POP);
 		return true;
 	}
 	if (equippedItem == PLANK_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::PLANK);
 		_animation.setActionLock(PLANK_CUBE);
+		_gm->playSound(GameManager::POP);
 		return true;
 	}
 	if (equippedItem == GLASS_CUBE) {
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::GLASS);
 		_animation.setActionLock(GLASS_CUBE);
+		_gm->playSound(GameManager::POP);
 		return true;
 	}
 	return false;
@@ -428,4 +436,30 @@ std::string Player::getCoordinates() {
 	std::string str = "PDW " + ow + "\nPDX " + ox + "\nPDY " + oy + "\nPDZ " + oz + "\nPPX " + px + "\nPPY " + py + "\nPPZ " + pz;
 	
 	return str;
+}
+
+void Player::playHitSound(StaticObject* hitobj) {
+	CubeManager::CubeType type = hitobj->_cubeType;
+
+	if (type == CubeManager::GLASS) {
+		_gm->playSound(GameManager::GLASS_BREAK);
+	}
+	else if (type == CubeManager::GRASS) {
+		_gm->playSound(GameManager::GRASS_BREAK);
+	}
+	else if (type == CubeManager::SAND) {
+		_gm->playSound(GameManager::SAND_BREAK);
+	}
+	else if (type == CubeManager::SNOW || type == CubeManager::DIRT) {
+		_gm->playSound(GameManager::SNOW_BREAK);
+	}
+	else if (type == CubeManager::STONE) {
+		_gm->playSound(GameManager::STONE_BREAK);
+	}
+	else if (type == CubeManager::WOOD || type == CubeManager::PLANK) {
+		_gm->playSound(GameManager::WOOD_BREAK);
+	}
+	else {
+		_gm->playSound(GameManager::STONE_BREAK);
+	}
 }

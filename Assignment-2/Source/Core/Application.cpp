@@ -398,10 +398,8 @@ bool Application::updateServer(const FrameEvent &evt) {
 		
 		if (otherPlayer == NULL) {
 			otherPlayerObj = createPlayerObject("Player2", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, true, _simulator);
-			otherPlayer = new Player(nullptr, otherPlayerObj, mSceneManager);
+			otherPlayer = new Player(nullptr, otherPlayerObj, mSceneManager, gameManager);
 		}
-
-		
 
 		netManager->denyConnections();	
 
@@ -451,7 +449,7 @@ bool Application::updateClient(const FrameEvent &evt) {
 
 		if (otherPlayer == NULL) {
 			otherPlayerObj = createPlayerObject("Player2", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, true, _simulator);
-			otherPlayer = new Player(nullptr, otherPlayerObj, mSceneManager);
+			otherPlayer = new Player(nullptr, otherPlayerObj, mSceneManager, gameManager);
 		}
 
 		if(pairs["PDW"] == NULL || pairs["PDX"] == NULL || pairs["PDY"] == NULL || 
@@ -767,7 +765,7 @@ void Application::createObjects(void) {
 	biomeManager = new BiomeManager(mSceneManager);
 
 	GameObject* playerObj = createPlayerObject("Player1", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, false, _simulator);
-	player = new Player(playerCam, playerObj, mSceneManager);
+	player = new Player(playerCam, playerObj, mSceneManager, gameManager);
 	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
 
 	setupWorld();

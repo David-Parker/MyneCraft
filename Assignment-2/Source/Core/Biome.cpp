@@ -9,6 +9,13 @@ bool Biome::inBiome(int x, int y) {
 	return (abs((x < 0 ? -x : x) - (centerX < 0 ? -centerX : centerX)) < radius || abs((y < 0 ? -y : y) - (centerY < 0 ? -centerY : centerY)) < radius);
 }
 
+bool Biome::inRadius(float x, float y) {
+	Ogre::Vector2 center(centerX, centerY);
+	Ogre::Vector2 pos(x, y);
+
+	return pos.distance(center) <= (2*radius / 3);
+}
+
 Ogre::Entity* Biome::getCubeEntity(int x, int y, int h, CubeManager::CubeType& type) {
 	int dSq = ((centerX - x) * (centerX - x)) + ((centerY - y) * (centerY - y));
 	float rSQoN = radius * radius / 9;
