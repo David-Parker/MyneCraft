@@ -37,6 +37,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				/* We must make sure not to change steepness for adjacent chunk blocks because it could be in a different biome
 				 and it would compute its height for its biome which won't be congruent with our values here. Thus the interpolation will think everything is okay
 				 and not interpolate correctly. */
+
 				if (curBiome->getType() == CubeManager::SAND && curBiome->inRadius(chunkx, chunky)) {
 					float steepnessDivider = curBiome->getSteepnessDivider(chunkx, chunky);
 					if (steepnessDivider < 1) steepnessDivider = 1;
@@ -524,7 +525,9 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 	key index = getKey(pos);
 	key indexTop = getKey(posCaveTop);
 	key indexBottom = getKey(posCaveBottom);
-	bottomHeights[i+1][i+1] = heights[i+1][i+1] - caveHeights[i+1][j+1];
+
+	/* This modification of bottomHeights causes large interlopaltion walls at cave boundaries */
+	// bottomHeights[i+1][i+1] = heights[i+1][i+1] - caveHeights[i+1][j+1];
 
 	/* Replace with a cave cube. */
 	int rnd = Rand::rand()%10;
@@ -532,7 +535,7 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 	if ( rnd < 3 )
 		rndCube = CubeManager::DIRT;
 	else
-		rndCube = CubeManager::ROCK;
+		rndCube = CubeManager::STONE;
 
 	/* Within Cave Walls */
 	if ( (cave > -2  && cave < 3) ) {
@@ -579,7 +582,7 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 				if ( rnd < 3 )
 					rndCube = CubeManager::DIRT;
 				else
-					rndCube = CubeManager::ROCK;
+					rndCube = CubeManager::STONE;
 				addBlockToStaticGeometry(rndCube, caveWallPos, getKey(caveWallPos));
 			}
 			else {
@@ -634,12 +637,16 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 }
 
 void Chunk::buildWaterBlock(int height, Ogre::Vector3& pos) {
+
 	if ( height <= waterLevel ) {
 		Ogre::Vector3 waterLine(pos.x, waterLevel*_scale.y * 2 - CHUNK_SCALE, pos.z);
+		Ogre::Vector3 waterAir = waterLine + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0);
 		key newIndex = getKey(waterLine);
+		key newAirIndex = getKey(waterAir);
 		if ( !_staticObjects[newIndex] ) {
 			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, waterLine, _simulator, this);
 			_staticObjects[newIndex] = so;
+			_staticObjects[newAirIndex] = air;
 			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
 	}

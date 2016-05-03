@@ -10,6 +10,7 @@ material Cube-Stone
         {
             ambient 0.800000011920929 0.800000011920929 0.800000011920929 1.0
             diffuse 0.6400000190734865 0.6400000190734865 0.6400000190734865 1.0
+            emissive -.1 -.1 -.1 1.0
 
             alpha_to_coverage off
             colour_write on
