@@ -24,15 +24,6 @@ void PlayerObject::update() {
 
 		if(x == 0 && y == 1 && z == 0)
 			canJump = true;
-
-		static int deathSpeed = 7500;
-
-		// kill the player if their velocity is too high
-		btVector3 velocity = getBody()->getLinearVelocity();
-	    btScalar speed = velocity.length();
-	    if(speed >= deathSpeed) {
-	        isDead = true;
-	    }
 	}
 }
 

@@ -526,9 +526,6 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 	key indexTop = getKey(posCaveTop);
 	key indexBottom = getKey(posCaveBottom);
 
-	/* This modification of bottomHeights causes large interlopaltion walls at cave boundaries */
-	// bottomHeights[i+1][i+1] = heights[i+1][i+1] - caveHeights[i+1][j+1];
-
 	/* Replace with a cave cube. */
 	int rnd = Rand::rand()%10;
 	CubeManager::CubeType rndCube;
@@ -639,16 +636,26 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 void Chunk::buildWaterBlock(int height, Ogre::Vector3& pos) {
 
 	if ( height <= waterLevel ) {
-		Ogre::Vector3 waterLine(pos.x, waterLevel*_scale.y * 2 - CHUNK_SCALE, pos.z);
-		Ogre::Vector3 waterAir = waterLine + Ogre::Vector3(0, CHUNK_SCALE_FULL, 0);
-		key newIndex = getKey(waterLine);
-		key newAirIndex = getKey(waterAir);
-		if ( !_staticObjects[newIndex] ) {
-			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, waterLine, _simulator, this);
-			_staticObjects[newIndex] = so;
-			_staticObjects[newAirIndex] = air;
-			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+		/* Determine number of water blocks to build */
+		int waterColumn = (waterLevel - height) + 1;
+
+		for(int i = 0 ; i < waterColumn; i++) {
+			Ogre::Vector3 waterLine(pos.x, (waterLevel - i)*_scale.y * 2 - CHUNK_SCALE, pos.z);
+			key newIndex = getKey(waterLine);
+			if ( !_staticObjects[newIndex] ) {
+				StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, waterLine, _simulator, this);
+				_staticObjects[newIndex] = so;
+
+				if(i == 0)
+					_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+			}
 		}
+
+		// Build air on surface of water
+		Ogre::Vector3 waterAir = Ogre::Vector3(pos.x, (waterLevel*_scale.y * 2 - CHUNK_SCALE) + CHUNK_SCALE_FULL, pos.z);
+		key newAirIndex = getKey(waterAir);
+		_staticObjects[newAirIndex] = air;
+
 	}
 }
 
