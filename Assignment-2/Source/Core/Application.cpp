@@ -396,14 +396,14 @@ bool Application::updateServer(const FrameEvent &evt) {
 
 	if ( netManager->pollForActivity(1) ) {
 		previousTime = t1->getMilliseconds();
-		// Only accept one connection at a time.
-		
+	
+		// Client has just connected
 		if (otherPlayer == NULL) {
 			otherPlayerObj = createPlayerObject("Player2", GameObject::CUBE_OBJECT, "sphere.mesh", 0, 2500, 0, Ogre::Vector3(0.1, 0.1, 0.1), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 1.0f, 0.0f, 0.0f, true, _simulator);
 			otherPlayer = new Player(nullptr, otherPlayerObj, mSceneManager, gameManager);
+			initializeClient();
+			return true;
 		}
-
-		netManager->denyConnections();	
 
 		std::unordered_map<std::string, char*> pairs = dataParser(netManager->udpClientData[0]->output);
 
@@ -428,6 +428,8 @@ bool Application::updateServer(const FrameEvent &evt) {
 			otherPlayer->_body->setPosition(playerX, playerY, playerZ);
 
 			std::string playerCoords = player->getCoordinates();
+			std::string seed = "\nSEED " + seed;
+			playerCoords = playerCoords + seed;
 			netManager->messageClients(PROTOCOL_UDP, playerCoords.c_str(), playerCoords.length() + 1);
 		}
 	}
@@ -758,38 +760,8 @@ void Application::setupLighting(void) {
 }
 
 void Application::createObjects(void) {
-	_simulator->removeStaticObjects();
-	_simulator->removeObjects();
+	resetWorldState();
 
-	Rand::srand(seed);
-	if (player != NULL) {
-		delete player;
-		player = NULL;
-		playerObj = NULL;
-	}
-
-	if (otherPlayer != NULL) {
-		delete otherPlayer;
-		otherPlayer = NULL;
-		otherPlayerObj = NULL;
-	}
-
-	if (highlight != NULL)
-		delete highlight;
-
-	for(auto& var : prevChunks) {
-		if (!modifiedChunks[var.first]) {
-			delete var.second;
-			var.second = nullptr;
-		}
-	}
-	for(auto& var : modifiedChunks) {
-		if (var.second != nullptr)
-			delete var.second;
-		var.second = nullptr;
-	}
-	prevChunks.clear();
-	modifiedChunks.clear();
 	mSceneManager->setSkyDome(true, "day-night", 5, 8);
 
 	float density = 1.8f; // 1 is very steep, 10 is pretty flat.
@@ -803,7 +775,9 @@ void Application::createObjects(void) {
 
 	highlight = createCube("highlight", GameObject::CUBE_OBJECT, "cube.mesh", 0, 0, 0, Ogre::Vector3(1.01, 1.01, 1.01), Ogre::Degree(0), Ogre::Degree(0), Ogre::Degree(0), mSceneManager, gameManager, 0.0f, 0.0f, 0.0f, true, _simulator);
 	
-	
+	if (gameState == CLIENT) {
+		getServerInitialization();
+	}
 
 	setupWorld();
 }
@@ -1066,4 +1040,72 @@ void Application::loadSeed() {
 	saveFile.close();
 
 	Rand::srand(seed);
+}
+
+void Application::resetWorldState() {
+	_simulator->removeStaticObjects();
+	_simulator->removeObjects();
+
+	Rand::srand(seed);
+
+	if (player != NULL) {
+		delete player;
+		player = NULL;
+		playerObj = NULL;
+	}
+
+	if (otherPlayer != NULL) {
+		delete otherPlayer;
+		otherPlayer = NULL;
+		otherPlayerObj = NULL;
+	}
+
+	if (highlight != NULL)
+		delete highlight;
+
+	for(auto& var : prevChunks) {
+		if (!modifiedChunks[var.first]) {
+			delete var.second;
+			var.second = nullptr;
+		}
+	}
+	for(auto& var : modifiedChunks) {
+		if (var.second != nullptr)
+			delete var.second;
+		var.second = nullptr;
+	}
+
+	prevChunks.clear();
+	modifiedChunks.clear();
+}
+
+bool Application::getServerInitialization() {
+	std::string data = "dummyData";
+
+	netManager->messageServer(PROTOCOL_UDP, data.c_str(), data.length() + 1);
+
+	// Wait for server information
+	if (netManager->pollForActivity(2000)) {
+		std::unordered_map<std::string, char*> pairs = dataParser(netManager->udpServerData[0].output);
+		if (pairs["SEED"] == NULL) {
+			std::cout << "Did not recieve seed" << std::endl;
+			return false;
+		}
+		else {
+			seed = atoi(pairs["SEED"]);
+			std::cout << "Recieved Seed " << seed << std::endl;;
+			return true;
+		}
+	}
+	else {
+		std::cout << "Did not get activity from server" << std::endl;
+		return false;
+	}
+}
+
+void Application::initializeClient() {
+	std::string seedNum = std::to_string(seed);
+	std::string seedStr = "SEED " + seedNum;
+	netManager->messageClients(PROTOCOL_UDP, seedStr.c_str(), seedStr.length() + 1);
+	netManager->denyConnections();	
 }

@@ -160,5 +160,8 @@ public:
 	void recomputeColliders(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int, int);
 	void moveDayTime(float time);
 	void loadSeed();
+	void resetWorldState();
+	bool getServerInitialization();
+	void initializeClient();
 };
 
