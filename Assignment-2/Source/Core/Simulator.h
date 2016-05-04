@@ -29,6 +29,7 @@ protected:
        std::deque<StaticObject*> objListStatic;
 	std::unordered_map<const btCollisionObject*, StaticObject*> invertedObjectHash;
        btCollisionObject* player;
+	   void removeAllColliders();
 public: 
        Simulator(); 
        ~Simulator(); 

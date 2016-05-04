@@ -7,6 +7,7 @@ Simulator::Simulator() : objList(), collisionShapes(), objListStatic() {
   collisionConfiguration = new btDefaultCollisionConfiguration(); 
   dispatcher = new btCollisionDispatcher(collisionConfiguration); 
   overlappingPairCache = new btDbvtBroadphase();
+  //overlappingPairCache = new btSimpleBroadphase();
   //overlappingPairCache = new bt32BitAxisSweep3(btVector3(-15000,-15000,-15000), btVector3(15000, 15000, 15000));
   solver = new btSequentialImpulseConstraintSolver(); 
   dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration); 
@@ -45,10 +46,13 @@ void Simulator::removeObjects() {
 }
 
 void Simulator::removeStaticObjects() {
+
+	removeAllColliders();
+
 	for (auto& var : objListStatic) {
-		dynamicsWorld->removeCollisionObject(var->getBody());
 		var->cleanUpBody();
 	}
+
 	objListStatic.clear();
 	invertedObjectHash.clear();
 }
@@ -75,4 +79,27 @@ bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObjec
 	}
 
 	return ret;
+}
+
+void Simulator::removeAllColliders() {
+	auto& arr = dynamicsWorld->getCollisionObjectArray();
+
+	int j = 0;
+	for (int i = 0; i < arr.size(); i++) {
+		//	Do btDiscreteDynamicsWorld::removeCollisionObject
+		auto collisionObject = arr[i];
+		btRigidBody* body = btRigidBody::upcast(collisionObject);
+		if (body) {
+			arr[j++] = arr[i];
+		}	
+		else {
+			btBroadphaseProxy* bp = collisionObject->getBroadphaseHandle();
+			if (bp) {
+				dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(bp, dispatcher);
+				dynamicsWorld->getBroadphase()->destroyProxy(bp, dispatcher);
+				collisionObject->setBroadphaseHandle(0);
+			}
+		}
+	}
+	arr.resize(j);
 }

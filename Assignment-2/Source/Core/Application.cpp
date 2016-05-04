@@ -1015,6 +1015,7 @@ Chunk* Application::getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& ch
 }
 
 void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int currX, int currZ) {
+
 // Remove the old static objects currently in the simulator
 	_simulator->removeStaticObjects();
 
@@ -1028,8 +1029,10 @@ void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chu
 
 			std::pair<int, int> name(x ,z);
 
-			if (chunks[name]) {
-				chunks[name]->addChunksToSimulator();
+			auto it = chunks.find(name);
+
+			if (it != chunks.end()) {
+				it->second->addChunksToSimulator();
 			}
 		}
 	}
