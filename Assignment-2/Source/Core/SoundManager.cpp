@@ -34,7 +34,8 @@ SoundManager::SoundManager(void) {
 	std::string relative = "../../../Mynecraft/Assignment-2/Assets/";
 #endif
 
-	music = Mix_LoadMUS((relative + "music.wav").c_str());
+	//music = Mix_LoadMUS((relative + "music.wav").c_str());
+	music = Mix_LoadMUS((relative + "MyndlessCrafting.wav").c_str());
 	gameSounds[GLASS_BREAK] = Mix_LoadWAV((relative + "glass-break.wav").c_str());
 	gameSounds[GRASS_BREAK] = Mix_LoadWAV((relative + "grass-break.wav").c_str());
 	gameSounds[SAND_BREAK] = Mix_LoadWAV((relative + "sand-break.wav").c_str());
