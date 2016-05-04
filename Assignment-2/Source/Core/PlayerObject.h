@@ -7,7 +7,8 @@ public:
 	~PlayerObject();
 
 	void update();
-	void updateTransform();
+	virtual void updateTransform();
+	virtual void applyForce(float x, float y, float z);
 private:
 
 };

@@ -5,6 +5,13 @@ GameObject(nme, tp, scnMgr, ssm, node, ent, ms, sim, mss, rest, frict, scal, kin
 	auto var = ent->getBoundingBox();
 	auto size = var.getSize();
 
+	Ogre::Vector3 x(1,0,0);
+	Ogre::Vector3 y(0,1,0);
+	Ogre::Vector3 z(0,0,1);
+	Ogre::Quaternion qt(x,y,z);
+
+	tr.setRotation(btQuaternion(qt.x, qt.y, qt.z, qt.w));
+
 	shape = new btCapsuleShape(65, 255);
 }
 
@@ -24,15 +31,28 @@ void PlayerObject::update() {
 
 		if(x == 0 && y == 1 && z == 0)
 			canJump = true;
+
+		if(context->body) {
+			/* This is sort of a hack, we could look p the collisionobject in the simulator inverted hash but this is faster */
+			if(!context->body->hasContactResponse()) {
+				water = true;
+			}
+			else water = false;
+		}
+
+		// if(water) std::cout << "Water" << std::endl;
+		// else std::cout << "Ground" << std::endl;
 	}
+}
+
+void PlayerObject::applyForce(float x, float y, float z) {
+	body->applyCentralForce(btVector3(x, y, z));
+	updateTransform();
 }
 
 void PlayerObject::updateTransform() {
 	Ogre::Vector3 pos = rootNode->getPosition();
 	tr.setOrigin(btVector3(pos.x, pos.y, pos.z));
-
-	Ogre::Quaternion qt = rootNode->getOrientation();
-	tr.setRotation(btQuaternion(qt.x, qt.y, qt.z, qt.w));
 
 	motionState->updateTransform(tr);
 }
