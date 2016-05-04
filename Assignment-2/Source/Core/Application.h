@@ -79,6 +79,7 @@ public:
     CEGUI::OgreRenderer* mRenderer;
 	
 	CEGUI::Window* quitButton;
+	CEGUI::Window* diamondCount;
     CEGUI::Window* singlePlayerButton;
     CEGUI::Window* hostServerButton;
     CEGUI::Window* ipText;
