@@ -14,6 +14,8 @@
 #include <deque>
 #include <unordered_map>
 
+#include "CubeManager.h"
+
 class GameObject;
 class StaticObject;
 

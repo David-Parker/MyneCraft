@@ -23,9 +23,10 @@ private:
 	Ogre::Entity* cloudCube;
 	Ogre::Entity* stoneCube;
 	Ogre::Entity* waterCube;
+	Ogre::Entity* diamondCube;
 
 public:
-	enum CubeType{ SNOW, SAND, ROCK, GRASS, DIRT, TORCH, ICE, WOOD, LEAF, CACTUS, PLANK, GLASS, CLOUD, STONE, WATER, AIR, NUM_CUBE_TYPES };
+	enum CubeType{ SNOW, SAND, ROCK, GRASS, DIRT, TORCH, ICE, WOOD, LEAF, CACTUS, PLANK, GLASS, CLOUD, STONE, DIAMOND, WATER, AIR, NUM_CUBE_TYPES };
 
 	static void injectSceneManager(Ogre::SceneManager*);
 	static CubeManager* getSingleton();

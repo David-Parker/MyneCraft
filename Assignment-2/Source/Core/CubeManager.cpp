@@ -26,6 +26,7 @@ void CubeManager::injectSceneManager ( Ogre::SceneManager* scnMgr ) {
 	singleton->woodCube = mSceneManager->createEntity("Cube-Wood.mesh");
 	singleton->stoneCube = mSceneManager->createEntity("Cube-Stone.mesh");
 	singleton->waterCube = mSceneManager->createEntity("Cube-Water.mesh");
+	singleton->diamondCube = mSceneManager->createEntity("Cube-Diamond.mesh");
 }
 
 CubeManager* CubeManager::getSingleton ( ) {
@@ -50,6 +51,7 @@ Ogre::Entity* CubeManager::getEntity(CubeType type) {
 		case WOOD: return singleton->woodCube;
 		case STONE: return singleton->stoneCube;
 		case WATER: return singleton->waterCube;
+		case DIAMOND: return singleton->diamondCube;
 		default: return nullptr;
 	}
 }
@@ -69,6 +71,7 @@ Ogre::Entity* CubeManager::getNewEntity(CubeType type) {
 		case SNOW: return mSceneManager->createEntity("Cube-Snow.mesh");
 		case TORCH: return mSceneManager->createEntity("Cube-Torch.mesh");
 		case WOOD: return mSceneManager->createEntity("Cube-Wood.mesh");
+		case DIAMOND: return mSceneManager->createEntity("Cube-Diamond.mesh");
 		default: return nullptr;
 	}
 }

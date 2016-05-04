@@ -68,9 +68,12 @@ bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObjec
 		for(int i = 0 ; i < RayCallback.m_collisionObjects.size(); i++) {
 			auto& var = RayCallback.m_collisionObjects[i];
 			if(var != player) {
+				obj = invertedObjectHash[var];
+				if ( obj->_cubeType == CubeManager::WATER )
+					continue;
+				
 				if(RayCallback.m_hitPointWorld[i].distance(start) < closest.distance(start)) {
 					closest = RayCallback.m_hitPointWorld[i];
-					obj = invertedObjectHash[var];
 					hitNormal = RayCallback.m_hitNormalWorld[i];
 					ret = true;
 				}

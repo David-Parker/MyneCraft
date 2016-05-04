@@ -491,6 +491,7 @@ CubeManager::CubeType Chunk::getGeneratedType(CubeManager::CubeType objType, int
 		case CubeManager::SNOW :
 			return CubeManager::DIRT;
 			break;
+		case CubeManager::DIAMOND :
 		case CubeManager::ROCK :
 			return CubeManager::ROCK;
 			break;
@@ -558,6 +559,8 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 		/* Cave is partially underground */
 		else if ( y > heightBottom ) {
 			for ( int kk = -1 ; kk < caveHeights[i+1][j+1] ; kk++ ) {
+				if ( Rand::rand()%1500 == 7 ) 
+					rndCube = CubeManager::DIAMOND;
 				Ogre::Vector3 caveAirPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
 				key innerWall = getKey(caveAirPos);
 				_staticObjects[innerWall] = air;
