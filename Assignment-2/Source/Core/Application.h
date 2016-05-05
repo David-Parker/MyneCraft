@@ -42,6 +42,7 @@
 #include "Cube.h"
 #include "BlockInfo.h"
 #include "Rand.h"
+#include "HashCombine.h"
 
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
@@ -110,7 +111,7 @@ public:
 	#ifdef _DEBUG
 		int fieldOfView = 5000;
 	#else
-		int fieldOfView = 20000;
+		int fieldOfView = 15000;
 	#endif
 #endif
 #ifdef __linux__

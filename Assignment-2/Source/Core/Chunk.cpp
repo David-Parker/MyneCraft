@@ -51,16 +51,16 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				float y5 = 1.0f / 16.0f * (perlin->getPerlin(16 * fi / worldScale, 16 * fj / worldScale)*steepnessY);
 
 				float z1 = (perlin->getPerlin((fi+99), (fj+99))*steepnessZ);
-				float z2 = 1.0f / 2.0f * (perlin->getPerlin(2 * (fi+99) / worldScale, 2 * (fj+99) / worldScale)*steepnessZ);
-				float z3 = 1.0f / 4.0f * (perlin->getPerlin(4 * (fi+99) / worldScale, 4 * (fj+99) / worldScale)*steepnessZ);
-				float z4 = 1.0f / 8.0f * (perlin->getPerlin(8 * (fi+99) / worldScale, 8 * (fj+99) / worldScale)*steepnessZ);
-				float z5 = 1.0f / 16.0f * (perlin->getPerlin(16 * (fi+99) / worldScale, 16 * (fj+99) / worldScale)*steepnessZ);
+				//float z2 = 1.0f / 2.0f * (perlin->getPerlin(2 * (fi+99) / worldScale, 2 * (fj+99) / worldScale)*steepnessZ);
+				//float z3 = 1.0f / 4.0f * (perlin->getPerlin(4 * (fi+99) / worldScale, 4 * (fj+99) / worldScale)*steepnessZ);
+				//float z4 = 1.0f / 8.0f * (perlin->getPerlin(8 * (fi+99) / worldScale, 8 * (fj+99) / worldScale)*steepnessZ);
+				//float z5 = 1.0f / 16.0f * (perlin->getPerlin(16 * (fi+99) / worldScale, 16 * (fj+99) / worldScale)*steepnessZ);
 
-				float c1 = (perlin->getPerlin((fi+33), (fj+33))*steepnessCaves);
-				float c2 = 1.0f / 2.0f * (perlin->getPerlin(2 * (fi+33) / worldScale, 2 * (fj+33) / worldScale)*steepnessCaves);
-				float c3 = 1.0f / 4.0f * (perlin->getPerlin(4 * (fi+33) / worldScale, 4 * (fj+33) / worldScale)*steepnessCaves);
-				float c4 = 1.0f / 8.0f * (perlin->getPerlin(8 * (fi+33) / worldScale, 8 * (fj+33) / worldScale)*steepnessCaves);
-				float c5 = 1.0f / 16.0f * (perlin->getPerlin(16 * (fi+33) / worldScale, 16 * (fj+33) / worldScale)*steepnessCaves);
+				//float c1 = (perlin->getPerlin((fi+33), (fj+33))*steepnessCaves);
+				//float c2 = 1.0f / 2.0f * (perlin->getPerlin(2 * (fi+33) / worldScale, 2 * (fj+33) / worldScale)*steepnessCaves);
+				//float c3 = 1.0f / 4.0f * (perlin->getPerlin(4 * (fi+33) / worldScale, 4 * (fj+33) / worldScale)*steepnessCaves);
+				//float c4 = 1.0f / 8.0f * (perlin->getPerlin(8 * (fi+33) / worldScale, 8 * (fj+33) / worldScale)*steepnessCaves);
+				//float c5 = 1.0f / 16.0f * (perlin->getPerlin(16 * (fi+33) / worldScale, 16 * (fj+33) / worldScale)*steepnessCaves);
 
 				float pvaly = y1 + y2 + y3 + y4 + y5;
 				float pvalz = z1;
@@ -179,7 +179,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 	_sg->reset();
 	_staticObjects[index] = air;
 
-	key tkey = "torch_" + index;
+	key tkey = index;
 	if (lights[tkey])
 		lights[tkey]->setVisible(false);
 
@@ -384,10 +384,10 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 	}
 
 	if (newType == CubeManager::TORCH) {
-		key tkey = "torch_"+getKey(pos);
+		key tkey = getKey(pos);
 		if (!lights[tkey]) {
 			float range = 5000.0f;
-			Ogre::Light* light = _mSceneManager->createLight(tkey);
+			Ogre::Light* light = _mSceneManager->createLight(getKeyName(tkey));
 			light->setDiffuseColour(0.9, 0.4, 0.2);
 			light->setType(Ogre::Light::LT_POINT);
 			light->setAttenuation(range, 1.0f, .5f/range, 5.0f/(range*range));
@@ -831,9 +831,10 @@ bool Chunk::createCloud(const Ogre::Vector3& pos) {
 }
 
 Chunk::key Chunk::getKey(int x, int y, int z) {
-	char buf[64];
-	sprintf(buf, "%d_%d_%d", x, y, z);
-	return std::string(buf);
+	return std::make_tuple(x, y, z);
+	//char buf[64];
+	//sprintf(buf, "%d_%d_%d", x, y, z);
+	//return std::string(buf);
 }
 
 Chunk::key Chunk::getKey(const Ogre::Vector3& pos) {
@@ -841,23 +842,29 @@ Chunk::key Chunk::getKey(const Ogre::Vector3& pos) {
 }
 
 BlockInfo Chunk::getBlockInfo(key thekey, CubeManager::CubeType type) {
-	int x, y, z;
-	std::string delimiter = "_";
-	size_t last = 0; 
-	size_t next = 0; 
+	//int x, y, z;
+	//std::string delimiter = "_";
+	//size_t last = 0; 
+	//size_t next = 0; 
 
-	next = thekey.find(delimiter, last);
-	x = std::stoi(thekey.substr(last, next - last));
-	last = next + 1;
+	//next = thekey.find(delimiter, last);
+	//x = std::stoi(thekey.substr(last, next - last));
+	//last = next + 1;
 
-	next = thekey.find(delimiter, last);
-	y = std::stoi(thekey.substr(last, next - last));
-	last = next + 1;
+	//next = thekey.find(delimiter, last);
+	//y = std::stoi(thekey.substr(last, next - last));
+	//last = next + 1;
 
-	next = thekey.find(delimiter, last);
-	z = std::stoi(thekey.substr(last));
+	//next = thekey.find(delimiter, last);
+	//z = std::stoi(thekey.substr(last));
 
-	return BlockInfo(x, y, z, type);
+	return BlockInfo(std::get<0>(thekey), std::get<1>(thekey), std::get<2>(thekey), type);
+}
+
+std::string Chunk::getKeyName(key thekey) {
+	char buf[64];
+	sprintf(buf, "%d_%d_%d", std::get<0>(thekey), std::get<1>(thekey), std::get<2>(thekey));
+	return std::string(buf);
 }
 
 void Chunk::rebuildFromSave(const std::vector<BlockInfo>& blocks) {
@@ -877,10 +884,10 @@ void Chunk::rebuildFromSave(const std::vector<BlockInfo>& blocks) {
 		else if (var.type == CubeManager::TORCH) {
 			scale = Ogre::Vector3(CHUNK_SCALE / 5, 4 * CHUNK_SCALE / 5, CHUNK_SCALE / 5);
 
-			key tkey = "torch_" + getKey(pos);
+			key tkey = getKey(pos);
 			if (!lights[tkey]) {
 				float range = 5000.0f;
-				Ogre::Light* light = _mSceneManager->createLight(tkey);
+				Ogre::Light* light = _mSceneManager->createLight(getKeyName(tkey));
 				light->setDiffuseColour(0.9, 0.4, 0.2);
 				light->setType(Ogre::Light::LT_POINT);
 				light->setAttenuation(range, 1.0f, .5f / range, 5.0f / (range*range));

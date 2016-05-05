@@ -11,6 +11,7 @@
 #include "Perlin.h"
 #include "BlockInfo.h"
 #include "Rand.h"
+#include "HashCombine.h"
 
 #define CHUNK_SIZE 16
 #define CHUNK_SCALE 50
@@ -21,7 +22,7 @@ static StaticObject* air = nullptr;
 
 class Chunk {
 private:
-	typedef std::string key;
+	typedef std::tuple<int, int, int> key;
 
 	Ogre::StaticGeometry* _sg;
 	std::string _name;
@@ -70,6 +71,7 @@ public:
 	std::unordered_map<key, StaticObject*> _staticObjects;
 	BlockInfo getBlockInfo(key, CubeManager::CubeType type);
 	void rebuildFromSave(const std::vector<BlockInfo>& blocks);
+	std::string getKeyName(key thekey);
 
 	Ogre::Vector3 _scale;
 	int _xStart = 0;
