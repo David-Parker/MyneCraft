@@ -235,7 +235,8 @@ Player::~Player() {
 }
 
 void Player::setWeapon ( int i ) {
-	if (_animation._inAction)
+	if (_animation._inAction )
+	 if ( equippedItem != DIAMOND_CUBE || diamondCount > 0 )
 		return;
 	if ( equippedItem >= 0 && equippedItem < inventory.size()) {
 		inventory[equippedItem]->setVisible(false);
@@ -418,6 +419,7 @@ bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::
 		_animation.setActionLock(DIAMOND_CUBE);
 		_gm->playSound(GameManager::POP);
 		diamondCount--;
+		setWeapon(GRASS_CUBE);
 		return true;
 	}
 	if (equippedItem == GRASS_CUBE) {
