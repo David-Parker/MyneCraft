@@ -639,19 +639,29 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 void Chunk::buildWaterBlock(int height, Ogre::Vector3& pos) {
 
 	if ( height <= waterLevel ) {
-		/* Determine number of water blocks to build */
-		int waterColumn = (waterLevel - height) + 1;
 
-		for(int i = 0 ; i < waterColumn; i++) {
-			Ogre::Vector3 waterLine(pos.x, (waterLevel - i)*_scale.y * 2 - CHUNK_SCALE, pos.z);
-			key newIndex = getKey(waterLine);
-			if ( !_staticObjects[newIndex] ) {
-				StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, waterLine, _simulator, this);
-				_staticObjects[newIndex] = so;
+		Ogre::Vector3 waterLine(pos.x, waterLevel*_scale.y * 2 - CHUNK_SCALE, pos.z);
+		Ogre::Vector3 waterLineTwo(pos.x, (waterLevel-1)*_scale.y * 2 - CHUNK_SCALE, pos.z);
+		Ogre::Vector3 bottomLine(pos.x, (height+1)*_scale.y * 2, pos.z);
+		key waterIndex = getKey(waterLine);
+		key waterIndexTwo = getKey(waterLineTwo);
+		key bottomIndex = getKey(bottomLine);
 
-				if(i == 0)
-					_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
-			}
+		if ( !_staticObjects[waterIndex] ) { 
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, waterLine, _simulator, this);
+			_staticObjects[waterIndex] = so;
+			_sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+		}
+		if ( !_staticObjects[waterIndexTwo] ) { 
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, waterLineTwo, _simulator, this);
+			_staticObjects[waterIndexTwo] = so;
+			// _sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
+		}
+
+		if ( (!_staticObjects[bottomIndex] || _staticObjects[bottomIndex] == air) && (height+1) < waterLevel) { 
+			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, bottomLine, _simulator, this);
+			_staticObjects[bottomIndex] = so;
+			// _sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
 
 		// Build air on surface of water

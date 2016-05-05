@@ -15,6 +15,7 @@
 #define CHUNK_SIZE 16
 #define CHUNK_SCALE 50
 #define CHUNK_SCALE_FULL 100
+#define WATER_LEVEL -10
 
 static StaticObject* air = nullptr;
 
@@ -35,7 +36,7 @@ private:
 	int caveHeights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
 	int caves[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
 	int snowLevel = 15;
-	int waterLevel = -10;
+	int waterLevel = WATER_LEVEL;
 
 	std::unordered_map<key, Ogre::Light*> lights;
 

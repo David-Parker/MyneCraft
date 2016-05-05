@@ -222,6 +222,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 			break;
 		default: break;
 	}
+	_simulator->stepSimulation(evt.timeSinceLastFrame, 7, 1.0 / fps);
 
 	// Code per frame in fixed FPS
 	float temp = t1->getMilliseconds();
@@ -231,7 +232,6 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 		dTime = temp;
 	}
 
-	_simulator->stepSimulation(evt.timeSinceLastFrame, 7, 1.0 / fps);
 
 	player->constrainSpeed();
 

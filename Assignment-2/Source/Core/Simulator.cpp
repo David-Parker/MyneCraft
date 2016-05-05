@@ -106,3 +106,7 @@ void Simulator::removeAllColliders() {
 	}
 	arr.resize(j);
 }
+
+void Simulator::setGravity(float grav) {
+ 	dynamicsWorld->setGravity(btVector3(0.0, grav, 0.0));
+}
