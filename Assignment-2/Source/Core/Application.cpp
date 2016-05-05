@@ -99,7 +99,8 @@ void Application::setupWorld() {
 		lastTime = std::stof(line);
 
 		getline(saveFile, line);
-		diamonds = std::stoi(line);
+		player->setDiamondCount(std::stoi(line));
+
 
 		while (getline(saveFile, line)) {
 			if (line == "EOF") break;
@@ -147,7 +148,7 @@ void Application::saveWorld() {
 	saveFile << magicHeader << std::endl;
 	saveFile << seed << std::endl;
 	saveFile << lastTime << std::endl;
-	saveFile << diamonds << std::endl;
+	saveFile << player->getDiamondCount() << std::endl;
 
 	for (auto& var : modifiedChunks) {
 		if (var.second == nullptr) continue;
@@ -283,7 +284,7 @@ bool Application::update(const FrameEvent &evt) {
 
 		float fx = (pos.x / CHUNK_SCALE_FULL);
 		float fz = (pos.z / CHUNK_SCALE_FULL);
-		int numChunks = (fieldOfView / (CHUNK_SCALE_FULL*CHUNK_SIZE));
+		int numChunks = (fieldOfView*1.1 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
 
 		int currX = ((int)fx - ((int)fx % CHUNK_SIZE));
 		int currZ = ((int)fz - ((int)fz % CHUNK_SIZE));
@@ -303,8 +304,9 @@ bool Application::update(const FrameEvent &evt) {
 		 		std::pair<int, int> name(x ,z);
 
 				// Object persists
-				if(prevChunks[name]) {
-					chunks[name] = prevChunks[name];
+				Chunk* prevChunk = prevChunks[name];
+				if(prevChunk) {
+					chunks[name] = prevChunk;
 				}
 				else if(!chunks[name]) {
 					if (modifiedChunks[name]) {
@@ -1013,8 +1015,7 @@ void Application::setState(State state) {
 			gameState = SINGLE;
 			break;
 		case WIN:
-			diamonds = 0;
-			player->resetDiamondCount();
+			player->setDiamondCount(0);
 			setState(HOME);
 			break;
 		case HOWTO:

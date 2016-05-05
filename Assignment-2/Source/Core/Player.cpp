@@ -298,7 +298,7 @@ void Player::update(OISManager* ois) {
 	OIS::KeyCode lastkey;
 	bool moved = false;
 
-	float buoyant = 15000.0f;
+	float buoyant = 10000.0f;
 	
 	if(_body->water) {
 		float drag = _body->getBody()->getLinearVelocity().length();
@@ -419,7 +419,7 @@ bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::
 		_animation.setActionLock(DIAMOND_CUBE);
 		_gm->playSound(GameManager::POP);
 		diamondCount--;
-		setWeapon(GRASS_CUBE);
+		setWeapon(PICKAXE);
 		return true;
 	}
 	if (equippedItem == GRASS_CUBE) {
@@ -518,8 +518,8 @@ int Player::getDiamondCount() {
 	return diamondCount;
 }
 
-void Player::resetDiamondCount() {
-	diamondCount = 0;
+void Player::setDiamondCount( int cnt ) {
+	diamondCount = cnt;
 }
 
 void Player::getNeighborChunks(std::vector<Chunk*>& chunklist, int x, int z, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, Chunk* chunk) {
