@@ -56,3 +56,8 @@ void PlayerObject::updateTransform() {
 
 	motionState->updateTransform(tr);
 }
+
+void PlayerObject::setVelocity(float x, float y, float z) {
+	body->setLinearVelocity(btVector3(x, y, z));
+	updateTransform();
+}

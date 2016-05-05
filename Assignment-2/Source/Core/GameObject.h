@@ -77,7 +77,7 @@ public:
 	void applyImpulse(const btVector3& impulse, const btVector3& rel_pos);
 	void setPosition(float x, float y, float z);
 	void setPosition(const Ogre::Vector3& pos);
-	void setVelocity(float x, float y, float z);
+	virtual void setVelocity(float x, float y, float z);
 	void setOrientation(Ogre::Quaternion qt);
 	void reflect();
 	Ogre::SceneNode* getNode();

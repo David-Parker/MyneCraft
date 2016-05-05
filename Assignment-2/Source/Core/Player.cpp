@@ -256,34 +256,17 @@ void Player::update(OISManager* ois) {
 	OIS::KeyCode lastkey;
 	bool moved = false;
 
-	float buoyant = 10000.0f;
+	float buoyant = 15000.0f;
 	
 	if(_body->water) {
-		float drag = 500;
-		// if (std::abs(drag) < 0.001) drag = 0;
+		float drag = _body->getBody()->getLinearVelocity().length();
 
 		float dragVec = -(_body->getBody()->getLinearVelocity().y());
 
-		std::cout << "WTF: " << dragVec << std::endl;
-
-		// Drag is the 
 		dragVec *= drag/200.0f;
-		//std::cout << "X: " << dragVec.x() << " Y: " << dragVec.y() << " Z: " << dragVec.z() << std::endl;
 		_body->applyForce(0, dragVec + buoyant, 0);
 
 		currentY = _body->getBody()->getLinearVelocity().y();
-
-
-
-		// _body->simulator->setGravity(-500);
-
-		/* Just entered water */
-		// if(!lastWater) {
-		// 	currentY = 0;
-		// 	std::cout << "Entered Water" << std::endl;
-		// 	btVector3 lastVel = _body->getBody()->getLinearVelocity();
-		// 	_body->setVelocity(lastVel.x(), currentY, lastVel.z());
-		// }
 	}
 
 	if(_body->getNode()->getPosition().y/CHUNK_SCALE_FULL >= WATER_LEVEL-1) {
@@ -314,11 +297,6 @@ void Player::update(OISManager* ois) {
 		moved = true;
 	}
 	if (ois->isKeyDown(OIS::KC_SPACE) && _body->water) {
-		//buoyant = buoyant;
-		static int i = 0;
-		std::cout << "Trying to leave ocean floor" << i++ << std::endl;
-		/*if ( _body->getBody()->getLinearVelocity().y() == 0 )
-			_body->applyImpulse(btVector3(0, 1500, 0), btVector3(0,0,0));*/
 		_body->applyForce(0, buoyant, 0);
 		currentY = _body->getBody()->getLinearVelocity().y();
 		moved = true;
@@ -370,7 +348,6 @@ void Player::update(OISManager* ois) {
 	}
 
 	_animation.playAnimation();
-
 }
 
 bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks) {

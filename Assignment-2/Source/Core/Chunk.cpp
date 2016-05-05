@@ -65,7 +65,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				float pvaly = y1 + y2 + y3 + y4 + y5;
 				float pvalz = z1;
 
-
 				pvaly *= 2.5;
 				pvalz *= 2.5;
 
@@ -185,7 +184,7 @@ void Chunk::removeBlock(const std::vector<Chunk*>& chunks, StaticObject* obj) {
 		lights[tkey]->setVisible(false);
 
 	for (auto& so : _staticObjects) {
-		if (so.second == air || so.second == nullptr) continue;
+		if (so.second == air || so.second == nullptr || (so.second->_cubeType == CubeManager::WATER && so.second->_pos.y / CHUNK_SCALE_FULL < WATER_LEVEL - 1)) continue;
 		_sg->addEntity(so.second->_geom, so.second->_pos, so.second->_orientation, so.second->_scale);
 	}
 
@@ -288,7 +287,7 @@ void Chunk::addBlock(const std::vector<Chunk*>& chunks, StaticObject* obj, const
 	_sg->reset();
 
 	for (auto& so : _staticObjects) {
-		if (so.second == air || so.second == nullptr) continue;
+		if (so.second == air || so.second == nullptr || (so.second->_cubeType == CubeManager::WATER && so.second->_pos.y/CHUNK_SCALE_FULL < WATER_LEVEL - 1) ) continue;
 		_sg->addEntity(so.second->_geom, so.second->_pos, so.second->_orientation, so.second->_scale);
 	}
 	
@@ -655,13 +654,11 @@ void Chunk::buildWaterBlock(int height, Ogre::Vector3& pos) {
 		if ( !_staticObjects[waterIndexTwo] ) { 
 			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, waterLineTwo, _simulator, this);
 			_staticObjects[waterIndexTwo] = so;
-			// _sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
 
 		if ( (!_staticObjects[bottomIndex] || _staticObjects[bottomIndex] == air) && (height+1) < waterLevel) { 
 			StaticObject* so = new StaticObject(CubeManager::getSingleton()->getEntity(CubeManager::WATER), CubeManager::WATER, _scale, bottomLine, _simulator, this);
 			_staticObjects[bottomIndex] = so;
-			// _sg->addEntity(so->_geom, so->_pos, so->_orientation, so->_scale);
 		}
 
 		// Build air on surface of water
@@ -872,6 +869,10 @@ void Chunk::rebuildFromSave(const std::vector<BlockInfo>& blocks) {
 
 		if (var.type == CubeManager::AIR) {
 			_staticObjects[index] = air;
+		}
+		else if (var.type == CubeManager::WATER && pos.y / CHUNK_SCALE_FULL < WATER_LEVEL - 1) {
+			so = new StaticObject(CubeManager::getSingleton()->getEntity(var.type), var.type, scale, pos, _simulator, this);
+			_staticObjects[index] = so;
 		}
 		else if (var.type == CubeManager::TORCH) {
 			scale = Ogre::Vector3(CHUNK_SCALE / 5, 4 * CHUNK_SCALE / 5, CHUNK_SCALE / 5);

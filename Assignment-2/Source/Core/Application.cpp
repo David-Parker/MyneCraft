@@ -346,19 +346,16 @@ bool Application::update(const FrameEvent &evt) {
 
 		if (_simulator->rayHit(start, end, hitObj, hitNormal)) {
 			if (hitObj != nullptr) {
-				/* TODO: Replace this check with an ignore inside rayhit to allow digging of ground underwater */
-				if(hitObj->_cubeType != CubeManager::WATER) {
-					highlight->getNode()->setVisible(true);
-					highlight->setPosition(hitObj->_pos);
+				highlight->getNode()->setVisible(true);
+				highlight->setPosition(hitObj->_pos);
 
-					if (_oisManager->mouseClicked) {
-						// Return value tells us if we need to recompute the colliders or not
-						if (player->clickAction(hitObj, hitNormal, chunks, modifiedChunks)) {
-							recomputeColliders(chunks, currX, currZ);
-						}
-
-						_oisManager->mouseClicked = false;
+				if (_oisManager->mouseClicked) {
+					// Return value tells us if we need to recompute the colliders or not
+					if (player->clickAction(hitObj, hitNormal, chunks, modifiedChunks)) {
+						recomputeColliders(chunks, currX, currZ);
 					}
+
+					_oisManager->mouseClicked = false;
 				}
 			}
 		}

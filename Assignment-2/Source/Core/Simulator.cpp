@@ -7,12 +7,10 @@ Simulator::Simulator() : objList(), collisionShapes(), objListStatic() {
   collisionConfiguration = new btDefaultCollisionConfiguration(); 
   dispatcher = new btCollisionDispatcher(collisionConfiguration); 
   overlappingPairCache = new btDbvtBroadphase();
-  //overlappingPairCache = new btSimpleBroadphase();
   //overlappingPairCache = new bt32BitAxisSweep3(btVector3(-15000,-15000,-15000), btVector3(15000, 15000, 15000));
   solver = new btSequentialImpulseConstraintSolver(); 
   dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration); 
   dynamicsWorld->setGravity(btVector3(0.0, -10000.0f, 0.0));
-  //Add collision shapes to reuse among rigid bodies
 }
 
 void Simulator::addObject (GameObject* o) { 
@@ -67,13 +65,11 @@ bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObjec
 	if(RayCallback.hasHit()) {
 		for(int i = 0 ; i < RayCallback.m_collisionObjects.size(); i++) {
 			auto& var = RayCallback.m_collisionObjects[i];
-			if(var != player) {
-				obj = invertedObjectHash[var];
-				if ( obj->_cubeType == CubeManager::WATER )
-					continue;
-				
+			StaticObject* temp = invertedObjectHash[var];
+			if(var != player && temp->_cubeType != CubeManager::WATER) {	
 				if(RayCallback.m_hitPointWorld[i].distance(start) < closest.distance(start)) {
 					closest = RayCallback.m_hitPointWorld[i];
+					obj = temp;
 					hitNormal = RayCallback.m_hitNormalWorld[i];
 					ret = true;
 				}

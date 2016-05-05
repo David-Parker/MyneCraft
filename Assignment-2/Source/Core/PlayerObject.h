@@ -9,6 +9,7 @@ public:
 	void update();
 	virtual void updateTransform();
 	virtual void applyForce(float x, float y, float z);
+	virtual void setVelocity(float x, float y, float z);
 private:
 
 };
