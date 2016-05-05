@@ -232,7 +232,6 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 		dTime = temp;
 	}
 
-
 	player->constrainSpeed();
 
 	return true;
@@ -280,7 +279,7 @@ bool Application::update(const FrameEvent &evt) {
 
 		float fx = (pos.x / CHUNK_SCALE_FULL);
 		float fz = (pos.z / CHUNK_SCALE_FULL);
-		int numChunks = (fieldOfView*1.1 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
+		int numChunks = (fieldOfView / (CHUNK_SCALE_FULL*CHUNK_SIZE));
 
 		int currX = ((int)fx - ((int)fx % CHUNK_SIZE));
 		int currZ = ((int)fz - ((int)fz % CHUNK_SIZE));

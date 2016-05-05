@@ -51,16 +51,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				float y5 = 1.0f / 16.0f * (perlin->getPerlin(16 * fi / worldScale, 16 * fj / worldScale)*steepnessY);
 
 				float z1 = (perlin->getPerlin((fi+99), (fj+99))*steepnessZ);
-				//float z2 = 1.0f / 2.0f * (perlin->getPerlin(2 * (fi+99) / worldScale, 2 * (fj+99) / worldScale)*steepnessZ);
-				//float z3 = 1.0f / 4.0f * (perlin->getPerlin(4 * (fi+99) / worldScale, 4 * (fj+99) / worldScale)*steepnessZ);
-				//float z4 = 1.0f / 8.0f * (perlin->getPerlin(8 * (fi+99) / worldScale, 8 * (fj+99) / worldScale)*steepnessZ);
-				//float z5 = 1.0f / 16.0f * (perlin->getPerlin(16 * (fi+99) / worldScale, 16 * (fj+99) / worldScale)*steepnessZ);
-
-				//float c1 = (perlin->getPerlin((fi+33), (fj+33))*steepnessCaves);
-				//float c2 = 1.0f / 2.0f * (perlin->getPerlin(2 * (fi+33) / worldScale, 2 * (fj+33) / worldScale)*steepnessCaves);
-				//float c3 = 1.0f / 4.0f * (perlin->getPerlin(4 * (fi+33) / worldScale, 4 * (fj+33) / worldScale)*steepnessCaves);
-				//float c4 = 1.0f / 8.0f * (perlin->getPerlin(8 * (fi+33) / worldScale, 8 * (fj+33) / worldScale)*steepnessCaves);
-				//float c5 = 1.0f / 16.0f * (perlin->getPerlin(16 * (fi+33) / worldScale, 16 * (fj+33) / worldScale)*steepnessCaves);
 
 				float pvaly = y1 + y2 + y3 + y4 + y5;
 				float pvalz = z1;
@@ -111,8 +101,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				createCloud(pos);
 
 				buildWaterBlock(y, pos);
-
-				_sg->setRegionDimensions(Ogre::Vector3(3000, 1000, 3000));
 			}
 		}
 
@@ -842,22 +830,6 @@ Chunk::key Chunk::getKey(const Ogre::Vector3& pos) {
 }
 
 BlockInfo Chunk::getBlockInfo(key thekey, CubeManager::CubeType type) {
-	//int x, y, z;
-	//std::string delimiter = "_";
-	//size_t last = 0; 
-	//size_t next = 0; 
-
-	//next = thekey.find(delimiter, last);
-	//x = std::stoi(thekey.substr(last, next - last));
-	//last = next + 1;
-
-	//next = thekey.find(delimiter, last);
-	//y = std::stoi(thekey.substr(last, next - last));
-	//last = next + 1;
-
-	//next = thekey.find(delimiter, last);
-	//z = std::stoi(thekey.substr(last));
-
 	return BlockInfo(std::get<0>(thekey), std::get<1>(thekey), std::get<2>(thekey), type);
 }
 

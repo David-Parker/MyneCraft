@@ -6,13 +6,10 @@ btCollisionShape* StaticObject::_shape = new btBoxShape(btVector3(50, 50, 50));
 StaticObject::StaticObject(Ogre::Entity* mesh, CubeManager::CubeType ot, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator, Chunk* chunk) :
 _geom(mesh), _cubeType(ot), _scale(scale), _pos(pos), _simulator(simulator), _mass(1.0f), _friction(0.0f), _restitution(0.0f), _tr(), _chunk(chunk)
 {
-	_inertia.setZero();
-	_motionState = new btDefaultMotionState();
 }
 
 StaticObject::~StaticObject() {
 	cleanUpBody();
-	delete _motionState;
 }
 
 void StaticObject::update() {}

@@ -115,7 +115,7 @@ public:
 	#endif
 #endif
 #ifdef __linux__
-	int fieldOfView = 20000;
+	int fieldOfView = 15000;
 #endif
 
 	bool begin = false;
