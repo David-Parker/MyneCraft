@@ -88,6 +88,7 @@ void Application::setupWorld() {
 		saveFile << magicHeader << std::endl;
 		saveFile << seed << std::endl;
 		saveFile << 0.0 << std::endl;
+		saveFile << 0 << std::endl;
 		saveFile.close();
 	}
 	else {
@@ -96,6 +97,9 @@ void Application::setupWorld() {
 
 		getline(saveFile, line);
 		lastTime = std::stof(line);
+
+		getline(saveFile, line);
+		diamonds = std::stoi(line);
 
 		while (getline(saveFile, line)) {
 			if (line == "EOF") break;
@@ -143,6 +147,7 @@ void Application::saveWorld() {
 	saveFile << magicHeader << std::endl;
 	saveFile << seed << std::endl;
 	saveFile << lastTime << std::endl;
+	saveFile << diamonds << std::endl;
 
 	for (auto& var : modifiedChunks) {
 		if (var.second == nullptr) continue;
@@ -214,7 +219,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 		case CLIENT:
 			updateClient(evt);
 			break;
-		case ENDGAME:
+		case WIN:
 			return true;
 			break;
 		case HOWTO:
@@ -261,13 +266,12 @@ bool Application::update(const FrameEvent &evt) {
 		setState(HOME);
 	}
 
-	if (int delta = _oisManager->getMouseWheel()) {
-		int index = player->getWeapon() + delta;
-		index = index % (Player::NUM_WEP+1);
-		if (index < 0)
-			index += Player::NUM_WEP+1;
+	/* Is the game over? */
+	if ( player->getDiamondCount() >= 7 )
+		setState(WIN);
 
-		player->setWeapon(index);
+	if (int delta = _oisManager->getMouseWheel()) {
+		player->nextWeapon(delta);
 		_oisManager->resetWheel();
 	}
 
@@ -371,6 +375,10 @@ bool Application::update(const FrameEvent &evt) {
 	}
 
 	player->update(_oisManager);
+	
+	std::ostringstream dCnt;
+	dCnt << "Diamonds: " << player->getDiamondCount();
+	diamondCount->setText(dCnt.str());
 
 	return true;
 }
@@ -670,30 +678,17 @@ void Application::setupCEGUI(void) {
 	CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
 	CEGUI::Window *sheet = wmgr.createWindow("DefaultWindow", "_MasterRoot");
 	CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(sheet);
-	
-	/*CEGUI::Imageset* MenuImageset = CEGUI::ImagesetManager::getSingleton().createImagesetFromImageFile("DiamondImageFile","MenuBackground.jpg");
-	CEGUI::Texture* texturePtr = CEGUI::System::getSingleton().getRenderer()->createTexture("Cube-Diamond.jpg", "");
-	CEGUI::Imageset* ButtonsImageset = CEGUI::ImagesetManager::getSingleton().createImageset("DiamondLogo", texturePtr);
-	CEGUI::ButtonsImageset->defineImage("DiamondLogo", Point(0.0f,0.0f), Size( 0.5f, 0.5f ), Point(0.0f,0.0f)); 
-	//CEGUI::ImageManager &imgr = CEGUI::ImageManager*/
 
 	quitButton = wmgr.createWindow("AlfiskoSkin/Button", "QuitButton");
 	quitButton->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.0f, 0), CEGUI::UDim(0.0f, 0)),
 		CEGUI::UVector2(CEGUI::UDim(0.1f, 0), CEGUI::UDim(0.05f, 0))));
 	quitButton->setText("Quit");
 
-	/*CEGUI::Window* diamondImage = wmgr.createWindow("AlfiskoSkin/ImageButton", "DiamondImage");
-	diamondImage->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.94f, 0), CEGUI::UDim(0.0f, 0)),
-		CEGUI::UVector2(CEGUI::UDim(0.97f, 0), CEGUI::UDim(0.05f, 0))));
-	sheet->addChild(diamondImage);
-	//CEGUI::ImageManager::getSingleton().addFromImageFile("DiamondImageFile", "Cube-Diamond.jpg");
-	diamondImage->setProperty("NormalImage", "set:DiamondLogo image:DiamondImage");*/
-
 	diamondCount = wmgr.createWindow("AlfiskoSkin/Editbox", "DiamondCount");
-	diamondCount->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.97f, 0), CEGUI::UDim(0.0f, 0)),
+	diamondCount->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.885f, 0), CEGUI::UDim(0.0f, 0)),
 		CEGUI::UVector2(CEGUI::UDim(1.0f, 0), CEGUI::UDim(0.05f, 0))));
-	diamondCount->setText("0");
 	static_cast<CEGUI::MultiLineEditbox*>(diamondCount)->setReadOnly(true);
+	diamondCount->hide();
 
 	singlePlayerButton = wmgr.createWindow("AlfiskoSkin/Button", "SinglePlayerButton");
 	singlePlayerButton->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.3f, 0), CEGUI::UDim(0.35f, 0)),
@@ -959,6 +954,9 @@ void Application::hideGui() {
 	ipText->hide();
 	hostServerButton->hide();
 	joinServerButton->hide();
+
+	/* Show "Game Only" Components */
+	diamondCount->show();
 }
 
 void Application::showGui() {
@@ -970,6 +968,9 @@ void Application::showGui() {
 	singlePlayerButton->show();
 	hostServerButton->show();
 	joinServerButton->show();
+
+	/* Hide "Game Only" Components */
+	diamondCount->hide();
 }
 
 void Application::resetNetManager() {
@@ -1011,9 +1012,10 @@ void Application::setState(State state) {
 #endif
 			gameState = SINGLE;
 			break;
-		case ENDGAME:
-			hideGui();
-			gameState = ENDGAME;
+		case WIN:
+			diamonds = 0;
+			player->resetDiamondCount();
+			setState(HOME);
 			break;
 		case HOWTO:
 			hideGui();

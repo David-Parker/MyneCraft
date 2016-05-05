@@ -19,7 +19,6 @@ GameObject::GameObject(Ogre::String nme, GameObject::objectType tp, Ogre::SceneM
 }
 
 void GameObject::updateTransform() {
-	std::cout << " Should never be here" << std::endl;
 	Ogre::Vector3 pos = rootNode->getPosition();
 	tr.setOrigin(btVector3(pos.x, pos.y, pos.z));
 	Ogre::Quaternion qt = rootNode->getOrientation();
