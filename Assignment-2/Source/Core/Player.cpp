@@ -298,7 +298,7 @@ void Player::update(OISManager* ois) {
 	OIS::KeyCode lastkey;
 	bool moved = false;
 
-	float buoyant = 15000.0f;
+	float buoyant = 10000.0f;
 	
 	if(_body->water) {
 		float drag = _body->getBody()->getLinearVelocity().length();

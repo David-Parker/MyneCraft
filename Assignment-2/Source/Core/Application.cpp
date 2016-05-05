@@ -283,7 +283,7 @@ bool Application::update(const FrameEvent &evt) {
 
 		float fx = (pos.x / CHUNK_SCALE_FULL);
 		float fz = (pos.z / CHUNK_SCALE_FULL);
-		int numChunks = (fieldOfView / (CHUNK_SCALE_FULL*CHUNK_SIZE));
+		int numChunks = (fieldOfView*1.1 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
 
 		int currX = ((int)fx - ((int)fx % CHUNK_SIZE));
 		int currZ = ((int)fz - ((int)fz % CHUNK_SIZE));
@@ -303,8 +303,9 @@ bool Application::update(const FrameEvent &evt) {
 		 		std::pair<int, int> name(x ,z);
 
 				// Object persists
-				if(prevChunks[name]) {
-					chunks[name] = prevChunks[name];
+				Chunk* prevChunk = prevChunks[name];
+				if(prevChunk) {
+					chunks[name] = prevChunk;
 				}
 				else if(!chunks[name]) {
 					if (modifiedChunks[name]) {

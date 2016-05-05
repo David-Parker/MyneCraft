@@ -14,6 +14,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 	_sg = mSceneManager->createStaticGeometry(_name);
 
+	_sg->setRegionDimensions(Ogre::Vector3(2000, 300, 2000));
+
 	Biome* curBiome = biomeMgr->inBiome(_xStart, _yStart);
 
 	float worldScale = 2.0;
@@ -101,8 +103,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				createCloud(pos);
 
 				buildWaterBlock(y, pos);
-
-				_sg->setRegionDimensions(Ogre::Vector3(2000, 300, 2000));
 			}
 		}
 
