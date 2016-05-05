@@ -17,6 +17,7 @@ class Player {
 private:
 	Ogre::Vector3 camAvg[averageSize];
 	Ogre::SceneManager* _sceneManager;
+	int diamondCount;
 	int equippedItem;
 	std::vector<Ogre::SceneNode*> inventory;
 	std::vector<Ogre::MovableObject*> inventoryEntities;
@@ -31,7 +32,7 @@ public:
 	Ogre::Camera* _playerCam;
 	GameObject* _body;
 
-	enum ITEM_TYPE{ PICKAXE, SWORD, TORCH_CUBE, GRASS_CUBE, ROCK_CUBE, SNOW_CUBE, SAND_CUBE, DIRT_CUBE, PLANK_CUBE, GLASS_CUBE, NUM_WEP };
+	enum ITEM_TYPE{ PICKAXE, SWORD, TORCH_CUBE, DIAMOND_CUBE, GRASS_CUBE, ROCK_CUBE, SNOW_CUBE, SAND_CUBE, DIRT_CUBE, PLANK_CUBE, GLASS_CUBE, NUM_WEP };
 
 	void setWeapon(int);
 	Ogre::SceneNode* getWeaponNode();
@@ -40,7 +41,10 @@ public:
 	void pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks);
 	void cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks, CubeManager::CubeType type);
 	int getWeapon();
+	void nextWeapon(int);
 	void constrainSpeed();
+	int getDiamondCount();
+	void resetDiamondCount();
 	std::string getCoordinates();
 	void playHitSound(StaticObject* hitobj);
 };

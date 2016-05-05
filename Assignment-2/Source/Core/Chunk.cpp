@@ -30,7 +30,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 				float steepnessY = (perlin->getPerlin((fi + 10000.0f) / worldScale, (fj + 10000.0f) / worldScale) * 150);
 				float steepnessZ = (perlin->getPerlin((fi + 1000.0f) / worldScale, (fj + 1000.0f) / worldScale) * 150);
-				float steepnessCaves = (perlin->getPerlin((fi + 100.0f) / worldScale, (fj + 100.0f) / worldScale) * 101);
+				float steepnessCaves = (perlin->getPerlin((fi + 100.0f) / worldScale, (fj + 100.0f) / worldScale) * 150);
 				int caveHeight = (perlin->getPerlin((fi + 512.0f) / worldScale, (fj + 512.0f) / worldScale) * 15)+9;
 
 				// Sand biome is less steep
@@ -62,7 +62,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				int z = (int)pvalz;
 
 				heights[i][j] = y;
-				topHeights[i][j] = z - 13;
+				topHeights[i][j] = z;
 				bottomHeights[i][j] = topHeights[i][j] - caveHeight;
 				caveHeights[i][j] = caveHeight;
 				caves[i][j] = steepnessCaves;
@@ -523,7 +523,7 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 		rndCube = CubeManager::STONE;
 
 	/* Within Cave Walls */
-	if ( (cave > -2  && cave < 3) ) {
+	if ( (cave > -2  && cave < 2) ) {
 		/* Cave is below surface */
 		if ( drawCave ) {
 			if ( !_staticObjects[index] )
@@ -561,7 +561,7 @@ bool Chunk::createTerrainColumn(int i, int j, Ogre::Vector3& pos) {
 		}
 	}
 	// Coordinates are at the boundary of a cave
-	else if ( (cave == -2 || cave == 3) ) {
+	else if ( (cave == -2 || cave == 2) ) {
 		for ( int kk = -1 ; kk < caveHeights[i+1][j+1]+1 ; kk++ ) {
 			Ogre::Vector3 caveWallPos = posCaveTop-Ogre::Vector3(0,CHUNK_SCALE_FULL*kk,0);
 			if ( y > heightTop-kk || ( y > heightTop-kk && heightTop < waterLevel) ) {

@@ -53,7 +53,7 @@ public:
 
 	virtual void init();
 
-	enum State{ HOME, SINGLE, SERVER, CLIENT, ENDGAME, HOWTO };
+	enum State{ HOME, SINGLE, SERVER, CLIENT, WIN, HOWTO };
 	State gameState = HOME;
 
 	Ogre::Root * mRoot;
@@ -98,10 +98,10 @@ public:
 	std::unordered_map<std::pair<int, int>, Chunk*> modifiedChunks;
 	Chunk* currentChunk = nullptr;
 
-	int points;
 	int width;
 	int height;
 	int seed;
+	int diamonds = 0;
 	float lastTime = 0.0f;
 
 	std::string magicHeader = "#MCSAVEFILE";
