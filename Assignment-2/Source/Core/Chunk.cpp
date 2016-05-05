@@ -118,7 +118,7 @@ Chunk::~Chunk() {
 	for(auto& var : _staticObjects) {
 		if (var.second == nullptr || var.second == air) continue;
 		delete var.second;
-		_staticObjects[var.first] = nullptr;
+		var.second = nullptr;
 	}
 	_staticObjects.clear();
 	_mSceneManager->destroyStaticGeometry(_sg);

@@ -309,8 +309,9 @@ bool Application::update(const FrameEvent &evt) {
 					chunks[name] = prevChunk;
 				}
 				else if(!chunks[name]) {
-					if (modifiedChunks[name]) {
-						chunks[name] = modifiedChunks[name];
+					Chunk* mod = modifiedChunks[name];
+					if (mod) {
+						chunks[name] = mod;
 					}
 					else {
 						chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator, true);
@@ -1029,8 +1030,8 @@ void Application::setState(State state) {
 Chunk* Application::getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int x, int z) {
 	std::pair<int, int> name(x,z);
 
-	if (chunks[name]) return chunks[name];
-	else return nullptr;
+	Chunk* toReturn = chunks[name];
+	return toReturn;
 }
 
 void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int currX, int currZ) {
