@@ -101,6 +101,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				createCloud(pos);
 
 				buildWaterBlock(y, pos);
+
+				_sg->setRegionDimensions(Ogre::Vector3(2000, 300, 2000));
 			}
 		}
 
@@ -820,9 +822,6 @@ bool Chunk::createCloud(const Ogre::Vector3& pos) {
 
 Chunk::key Chunk::getKey(int x, int y, int z) {
 	return std::make_tuple(x, y, z);
-	//char buf[64];
-	//sprintf(buf, "%d_%d_%d", x, y, z);
-	//return std::string(buf);
 }
 
 Chunk::key Chunk::getKey(const Ogre::Vector3& pos) {
