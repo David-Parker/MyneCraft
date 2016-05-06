@@ -101,7 +101,6 @@ public:
 	int width;
 	int height;
 	int seed;
-	int diamonds = 0;
 	float lastTime = 0.0f;
 
 	std::string magicHeader = "#MCSAVEFILE";

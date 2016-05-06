@@ -99,7 +99,8 @@ void Application::setupWorld() {
 		lastTime = std::stof(line);
 
 		getline(saveFile, line);
-		diamonds = std::stoi(line);
+		player->setDiamondCount(std::stoi(line));
+
 
 		while (getline(saveFile, line)) {
 			if (line == "EOF") break;
@@ -147,7 +148,7 @@ void Application::saveWorld() {
 	saveFile << magicHeader << std::endl;
 	saveFile << seed << std::endl;
 	saveFile << lastTime << std::endl;
-	saveFile << diamonds << std::endl;
+	saveFile << player->getDiamondCount() << std::endl;
 
 	for (auto& var : modifiedChunks) {
 		if (var.second == nullptr) continue;
@@ -308,8 +309,9 @@ bool Application::update(const FrameEvent &evt) {
 					chunks[name] = prevChunk;
 				}
 				else if(!chunks[name]) {
-					if (modifiedChunks[name]) {
-						chunks[name] = modifiedChunks[name];
+					Chunk* mod = modifiedChunks[name];
+					if (mod) {
+						chunks[name] = mod;
 					}
 					else {
 						chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator, true);
@@ -1016,8 +1018,7 @@ void Application::setState(State state) {
 			gameState = SINGLE;
 			break;
 		case WIN:
-			diamonds = 0;
-			player->resetDiamondCount();
+			player->setDiamondCount(0);
 			setState(HOME);
 			break;
 		case HOWTO:
@@ -1031,8 +1032,8 @@ void Application::setState(State state) {
 Chunk* Application::getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int x, int z) {
 	std::pair<int, int> name(x,z);
 
-	if (chunks[name]) return chunks[name];
-	else return nullptr;
+	Chunk* toReturn = chunks[name];
+	return toReturn;
 }
 
 void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int currX, int currZ) {

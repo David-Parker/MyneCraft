@@ -44,7 +44,7 @@ public:
 	void nextWeapon(int);
 	void constrainSpeed();
 	int getDiamondCount();
-	void resetDiamondCount();
+	void setDiamondCount(int);
 	std::string getCoordinates();
 	void playHitSound(StaticObject* hitobj);
 };
