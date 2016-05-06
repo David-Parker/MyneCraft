@@ -377,9 +377,11 @@ bool Application::update(const FrameEvent &evt) {
 
 	player->update(_oisManager);
 	
+#if defined __linux__ || defined _DEBUG
 	std::ostringstream dCnt;
 	dCnt << "Diamonds: " << player->getDiamondCount();
 	diamondCount->setText(dCnt.str());
+#endif
 
 	return true;
 }
