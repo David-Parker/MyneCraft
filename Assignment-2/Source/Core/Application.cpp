@@ -338,6 +338,8 @@ bool Application::update(const FrameEvent &evt) {
 
 		// Add only the current chunk's static objects to the bullet simulation
 		Chunk* chunk = getChunk(chunks, currX, currZ);
+		if ( !chunk )
+			return false;
 		if (chunk != currentChunk) {
 			recomputeColliders(chunks, currX, currZ);
 			currentChunk = chunk;
