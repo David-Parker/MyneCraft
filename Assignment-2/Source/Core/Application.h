@@ -81,11 +81,8 @@ public:
 	
 	CEGUI::Window* quitButton;
 	CEGUI::Window* diamondCount;
+	CEGUI::Window* winTextBox;
     CEGUI::Window* singlePlayerButton;
-    CEGUI::Window* hostServerButton;
-    CEGUI::Window* ipText;
-    CEGUI::Window* ipBox;
-    CEGUI::Window* joinServerButton;
 
 	std::vector<Ogre::Camera*> cameras;
 	std::list<GameState> states;
@@ -146,15 +143,11 @@ public:
 
 	bool Quit(const CEGUI::EventArgs&);
 	bool StartSinglePlayer(const CEGUI::EventArgs&);
-	bool StartServer(const CEGUI::EventArgs&);
-	bool JoinServer(const CEGUI::EventArgs&);
 
-	bool setupNetwork(bool);
 	bool error();
 	std::unordered_map<std::string, char*> dataParser(char*);
 	void hideGui();
 	void showGui();
-	void resetNetManager();
 	void setState(State state);
 
 	Chunk* getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& chunks,int, int);

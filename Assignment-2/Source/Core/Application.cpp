@@ -200,6 +200,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 
 	// All logic is now controlled by a state machine
 	switch(gameState) {
+		case WIN:
 		case HOME:
 #if defined __linux__ || defined _DEBUG
 			handleGUI(evt);
@@ -212,15 +213,6 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 			return true;
 #endif
 
-			return true;
-			break;
-		case SERVER:
-			updateServer(evt);
-			break;
-		case CLIENT:
-			updateClient(evt);
-			break;
-		case WIN:
 			return true;
 			break;
 		case HOWTO:
@@ -693,44 +685,28 @@ void Application::setupCEGUI(void) {
 	diamondCount->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.885f, 0), CEGUI::UDim(0.0f, 0)),
 		CEGUI::UVector2(CEGUI::UDim(1.0f, 0), CEGUI::UDim(0.05f, 0))));
 	static_cast<CEGUI::MultiLineEditbox*>(diamondCount)->setReadOnly(true);
-	diamondCount->hide();
 
-	singlePlayerButton = wmgr.createWindow("AlfiskoSkin/Button", "SinglePlayerButton");
+	winTextBox = wmgr.createWindow("AlfiskoSkin/Editbox", "WinTextBox");
+	winTextBox->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.45f, 0), CEGUI::UDim(0.3f, 0)),
+		CEGUI::UVector2(CEGUI::UDim(0.555f, 0), CEGUI::UDim(0.35f, 0))));
+	winTextBox->setText("  You Win!");
+	static_cast<CEGUI::MultiLineEditbox*>(winTextBox)->setReadOnly(true);
+
+	singlePlayerButton = wmgr.createWindow("AlfiskoSkin/Button", "NewGame");
 	singlePlayerButton->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.3f, 0), CEGUI::UDim(0.35f, 0)),
 		CEGUI::UVector2(CEGUI::UDim(0.7f, 0), CEGUI::UDim(0.4f, 0))));
-	singlePlayerButton->setText("Single Player");
-
-	hostServerButton = wmgr.createWindow("AlfiskoSkin/Button", "HostButton");
-	hostServerButton->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.3f, 0), CEGUI::UDim(0.4f, 0)),
-		CEGUI::UVector2(CEGUI::UDim(0.7f, 0), CEGUI::UDim(0.45f, 0))));
-	hostServerButton->setText("Host Game");
-
-	ipText = wmgr.createWindow("AlfiskoSkin/Label", "Ip Label");
-	ipText->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.525f, 0), CEGUI::UDim(0.45f, 0)),
-		CEGUI::UVector2(CEGUI::UDim(0.725f, 0), CEGUI::UDim(0.5f, 0))));
-	ipText->setText("IP Address");
-
-	ipBox = wmgr.createWindow("AlfiskoSkin/Editbox", "Ip Box");
-	ipBox->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.3f, 0), CEGUI::UDim(0.45f, 0)),
-		CEGUI::UVector2(CEGUI::UDim(0.7f, 0), CEGUI::UDim(0.5f, 0))));
-
-	joinServerButton = wmgr.createWindow("AlfiskoSkin/Button", "JoinButton");
-	joinServerButton->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.3f, 0), CEGUI::UDim(0.5f, 0)),
-		CEGUI::UVector2(CEGUI::UDim(0.7f, 0), CEGUI::UDim(0.55f, 0))));
-	joinServerButton->setText("Join Game");
+	singlePlayerButton->setText("New Game");
 
 	sheet->addChild(quitButton);
 	sheet->addChild(diamondCount);
+	sheet->addChild(winTextBox);
 	sheet->addChild(singlePlayerButton);
-	sheet->addChild(hostServerButton);
-	sheet->addChild(ipText);
-	sheet->addChild(ipBox);
-	sheet->addChild(joinServerButton);
+
+	winTextBox->hide();
+	diamondCount->hide();
 
 	singlePlayerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::StartSinglePlayer, this));
 	quitButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::Quit, this));
-	hostServerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::StartServer, this));
-	joinServerButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&Application::JoinServer, this));
 }
 
 void Application::setupCameras(void) {
@@ -825,6 +801,8 @@ void Application::createObjects(void) {
 	
 
 	setupWorld();
+
+	std::cout << "After setupWorld" << std::endl;
 }
 /* 
 * End Initialization Methods
@@ -840,6 +818,7 @@ bool Application::Quit(const CEGUI::EventArgs& e) {
 }
 
 bool Application::StartSinglePlayer(const CEGUI::EventArgs& e) {
+	setState(HOME);
 	if ( !begin ) {
 		begin = true;
 		createGame();
@@ -847,69 +826,9 @@ bool Application::StartSinglePlayer(const CEGUI::EventArgs& e) {
 	setState(SINGLE);
 	return true;
 }
-
-bool Application::StartServer(const CEGUI::EventArgs& e) {
-
-	begin = true;
-	setState(SERVER);
-
-	if (!setupNetwork(gameState == SERVER)) {
-		return error();
-	}
-	else {
-		// Server will not bind connecting UDP clients without this method
-		createGame();
-		netManager->acceptConnections();
-		return true;
-	}
-}
-
-bool Application::JoinServer(const CEGUI::EventArgs& e) {
-
-	begin = true;
-	setState(CLIENT);
-
-	if(!setupNetwork(gameState == SERVER)) {
-		setState(HOME);
-		return true;
-	}
-	else {
-		createGame();
-		return true;
-	}
-}
 /* 
 * End CEGUI Button Callbacks 
 */
-
-bool Application::setupNetwork(bool isServer) {
-
-	netManager = new NetManager();
-
-	if(!netManager->initNetManager()) {
-		std::cout << "Failed to init the server!" << std::endl;
-		return false;
-	}
-	else {
-		// Opens a connection on port 51215
-		netManager->addNetworkInfo(PROTOCOL_UDP, isServer ? NULL : ipBox->getText().c_str(), 51215);
-	}
-	if (isServer) {
-		if(!netManager->startServer()) {
-			std::cout << "Failed to start the server!" << std::endl;
-			return false;
-		}
-		return true;
-	}
-	else {
-		if(!netManager->startClient()) {
-			std::cout << "Failed to start the client!" << std::endl;
-			return false;
-		}
-		return true;
-	}
-
-}
 
 bool Application::error() {
 
@@ -954,11 +873,8 @@ std::unordered_map<std::string, char*> Application::dataParser(char* buf) {
 void Application::hideGui() {
 	CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
 	quitButton->hide();
+	winTextBox->hide();
 	singlePlayerButton->hide();
-	ipBox->hide();
-	ipText->hide();
-	hostServerButton->hide();
-	joinServerButton->hide();
 
 	/* Show "Game Only" Components */
 	diamondCount->show();
@@ -968,47 +884,24 @@ void Application::showGui() {
 	CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().show();
 	quitButton->show();
 	singlePlayerButton->show();
-	ipBox->show();
-	ipText->show();
-	singlePlayerButton->show();
-	hostServerButton->show();
-	joinServerButton->show();
 
 	/* Hide "Game Only" Components */
 	diamondCount->hide();
-}
-
-void Application::resetNetManager() {
-	if(netManager) {
-		delete netManager;
-		netManager = new NetManager();
-	} 
 }
 
 void Application::setState(State state) {
 
 	switch(state) {
 		case HOME:
-			resetNetManager();
 			states.clear();
 #if defined __linux__ || defined _DEBUG
+			if ( begin )
+				singlePlayerButton->setText("Resume");
 			hideGui();
 			showGui();
 #endif
 			_oisManager->setupCameraMan(nullptr);
 			gameState = HOME;
-			break;
-		case SERVER:
-			resetNetManager();
-			_oisManager->setupCameraMan(playerCam);
-			hideGui();
-			gameState = SERVER;
-			break;
-		case CLIENT:
-			resetNetManager();
-			_oisManager->setupCameraMan(playerCam);
-			hideGui();
-			gameState = CLIENT;
 			break;
 		case SINGLE:
 			_oisManager->setupCameraMan(playerCam);
@@ -1018,7 +911,16 @@ void Application::setState(State state) {
 			gameState = SINGLE;
 			break;
 		case WIN:
+			begin = false;
+			states.clear();
+#if defined __linux__ || defined _DEBUG
 			player->setDiamondCount(0);
+			singlePlayerButton->setText("New Game");
+			hideGui();
+			showGui();
+			winTextBox->show();
+#endif
+			_oisManager->setupCameraMan(nullptr);
 			setState(HOME);
 			break;
 		case HOWTO:
