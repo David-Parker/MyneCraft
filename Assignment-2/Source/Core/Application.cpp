@@ -236,7 +236,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 // Called once per predefined frame
 bool Application::update(const FrameEvent &evt) {
 
-	buildChunks(2);
+	buildChunks(1);
 	
 	moveDayTime(1.0 / fps);
 
