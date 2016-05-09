@@ -12,6 +12,7 @@
 #include "BlockInfo.h"
 #include "Rand.h"
 #include "HashCombine.h"
+#include "Profiler.h"
 
 #define CHUNK_SIZE 16
 #define CHUNK_SCALE 50
@@ -73,6 +74,7 @@ public:
 	BlockInfo getBlockInfo(key, CubeManager::CubeType type);
 	void rebuildFromSave(const std::vector<BlockInfo>& blocks);
 	std::string getKeyName(key thekey);
+	void build();
 
 	Ogre::Vector3 _scale;
 	int _xStart = 0;

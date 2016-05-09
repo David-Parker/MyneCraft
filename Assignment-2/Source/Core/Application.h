@@ -43,6 +43,7 @@
 #include "BlockInfo.h"
 #include "Rand.h"
 #include "HashCombine.h"
+#include "Profiler.h"
 
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
@@ -96,6 +97,8 @@ public:
 	
 	std::unordered_map<std::pair<int,int>, Chunk*> prevChunks;
 	std::unordered_map<std::pair<int, int>, Chunk*> modifiedChunks;
+	std::unordered_set<Chunk*> chunksToBuild;
+
 	Chunk* currentChunk = nullptr;
 
 	int width;

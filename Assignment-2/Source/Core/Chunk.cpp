@@ -2,6 +2,7 @@
 #include "MultiPlatformHelper.h"
 
 Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeManager* biomeMgr, Perlin* perlin, Simulator* sim, bool generate) : _biomeMgr(biomeMgr), _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
+	PROFILE_SCOPED();
 	if (air == nullptr) air = new StaticObject(nullptr, CubeManager::AIR, Ogre::Vector3(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE), Ogre::Vector3::ZERO, sim, this);
 
 	_name = getChunkName(xStart, yStart);
@@ -12,18 +13,24 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 	_xEnd = xStart + CHUNK_SIZE;
 	_yEnd = yStart + CHUNK_SIZE;
 
-	_sg = mSceneManager->createStaticGeometry(_name);
+	{ PROFILE_SCOPED_DESC("Static Geom Creation");
+		
+		_sg = mSceneManager->createStaticGeometry(_name);
 
-	_sg->setRegionDimensions(Ogre::Vector3(2000, 300, 2000));
+		_sg->setRegionDimensions(Ogre::Vector3(2, 20, 2));
+		_sg->setOrigin(Ogre::Vector3(xStart*CHUNK_SCALE_FULL + CHUNK_SCALE*CHUNK_SIZE, 0, yStart*CHUNK_SCALE_FULL + CHUNK_SCALE*CHUNK_SIZE));
+		_sg->setCastShadows(false);
+	}
 
 	Biome* curBiome = biomeMgr->inBiome(_xStart, _yStart);
 
 	float worldScale = 2.0;
 
 	// Precompute perlin values
-	if(generate) {
-		for(int i = 0; i < CHUNK_SIZE + 2; i++) {
-			for(int j = 0; j < CHUNK_SIZE + 2; j++) {
+	if (generate) { 
+		{ PROFILE_SCOPED_DESC("Precompute Perlin");
+		for (int i = 0; i < CHUNK_SIZE + 2; i++) {
+			for (int j = 0; j < CHUNK_SIZE + 2; j++) {
 				int chunkx = xStart + i - 1;
 				int chunky = yStart + j - 1;
 
@@ -52,7 +59,7 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				float y4 = 1.0f / 8.0f * (perlin->getPerlin(8 * fi / worldScale, 8 * fj / worldScale)*steepnessY);
 				float y5 = 1.0f / 16.0f * (perlin->getPerlin(16 * fi / worldScale, 16 * fj / worldScale)*steepnessY);
 
-				float z1 = (perlin->getPerlin((fi+99), (fj+99))*steepnessZ);
+				float z1 = (perlin->getPerlin((fi + 99), (fj + 99))*steepnessZ);
 
 				float pvaly = y1 + y2 + y3 + y4 + y5;
 				float pvalz = z1;
@@ -70,7 +77,8 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				caves[i][j] = steepnessCaves;
 			}
 		}
-
+		}
+		{ PROFILE_SCOPED_DESC("Terrain Gen");
 		// Does this chunk generate new terrain?
 		for (int i = 0; i < CHUNK_SIZE; ++i) {
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
@@ -84,24 +92,24 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 				Ogre::Vector3 pos(chunkx*scale.x * 2, y*scale.y * 2, chunky*scale.z * 2);
 				key index = getKey(pos);
-				
+
 				/* If the surface terrain was created, water or a tree can be placed at that location. */
 				bool surfaceTerrainCreated = createTerrainColumn(i, j, pos);
 
-				if ( surfaceTerrainCreated ) {
+				if (surfaceTerrainCreated) {
 					StaticObject* so = _staticObjects[index];
 					/* Create tree returns true if a tree was created in this position. */
-					if ( !createTree(so->_pos, so->_cubeType) ) {
-						int numAir = computeMaxNeighbor(i+1, j+1, heights);
+					if (!createTree(so->_pos, so->_cubeType)) {
+						int numAir = computeMaxNeighbor(i + 1, j + 1, heights);
 
-						for(int i = 0 ; i < numAir; i++) {
-							key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*(i+1), 0));
+						for (int i = 0; i < numAir; i++) {
+							key airIndex = getKey(so->_pos + Ogre::Vector3(0, CHUNK_SCALE_FULL*(i + 1), 0));
 							_staticObjects[airIndex] = air;
 						}
 					}
 					buildWaterBlock(y, pos);
 				}
-				else if ( y <= waterLevel )
+				else if (y <= waterLevel)
 					buildWaterBlock(y, pos);
 
 				createCloud(pos);
@@ -109,8 +117,11 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				_sg->setRegionDimensions(Ogre::Vector3(2000, 300, 2000));
 			}
 		}
+		}
 
-		_sg->build();
+		{ PROFILE_SCOPED_DESC("Static Geom build");
+		//_sg->build();
+		}
 	}
 }
 
@@ -939,4 +950,8 @@ int Chunk::computeMaxNeighbor(int x, int y, int hs[CHUNK_SIZE+2][CHUNK_SIZE+2]) 
 	else {
 		return 1;
 	}
+}
+
+void Chunk::build() {
+	_sg->build();
 }

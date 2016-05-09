@@ -63,7 +63,6 @@ void Application::init()
 
 void Application::createGame() {
 	try {
-		//sg = mSceneManager->createStaticGeometry("CubeArea");
 		createObjects();
 	}
 	catch (Exception e) {
@@ -174,7 +173,7 @@ void Application::saveWorld() {
 * Update Methods 
 */
 bool Application::frameRenderingQueued(const FrameEvent &evt) {
-
+	//PROFILE_SCOPED();
 	static float dTime = t1->getMilliseconds();
 #if defined __linux__ || defined _DEBUG
 	CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
@@ -182,6 +181,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 	if (!mRunning)
 	{
 		saveWorld();
+		MyProfiler::dumphtml();
 		return false;
 	}
 	try {
@@ -245,8 +245,16 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 
 // Called once per predefined frame
 bool Application::update(const FrameEvent &evt) {
+	//PROFILE_SCOPED();
 
-	moveDayTime(evt.timeSinceLastFrame);
+	auto frameTime = evt.timeSinceLastFrame;
+	
+	if (chunksToBuild.size() > 1) {
+		(*chunksToBuild.begin())->build();
+		chunksToBuild.erase(chunksToBuild.begin());
+	}
+	
+	moveDayTime(frameTime);
 
 	// std::cout << "FPS: " << mRenderWindow->getLastFPS() << std::endl;
 
@@ -315,6 +323,8 @@ bool Application::update(const FrameEvent &evt) {
 					}
 					else {
 						chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator, true);
+
+						chunksToBuild.insert(chunks[name]);
 					}
 				}
 			}
@@ -322,6 +332,7 @@ bool Application::update(const FrameEvent &evt) {
 
 		for(auto& var : prevChunks) {
 			if(!chunks[var.first] && !modifiedChunks[var.first]) {
+				chunksToBuild.erase(var.second);
 				delete var.second;
 				var.second = nullptr;
 			}
