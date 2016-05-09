@@ -60,7 +60,7 @@ public:
 	Chunk(int, int, Ogre::SceneManager*, BiomeManager*, Perlin*, Simulator*, bool);
 	~Chunk();
 	bool pointInChunk(float x, float y);
-	void addChunksToSimulator();
+	void addChunksToSimulator(Ogre::Vector3& playerPos);
 	void addBlockToStaticGeometry(CubeManager::CubeType, Ogre::Vector3, key);
 	void addStaticObjectToGeometry(StaticObject*);
 	StaticObject* getBlock(int x, int y, int z);

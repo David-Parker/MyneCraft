@@ -218,7 +218,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 			break;
 		default: break;
 	}
-	_simulator->stepSimulation(evt.timeSinceLastFrame);
+	_simulator->stepSimulation(evt.timeSinceLastFrame, 7, 1.0 / fps);
 
 	// Code per frame in fixed FPS
 	float temp = t1->getMilliseconds();
@@ -344,9 +344,10 @@ bool Application::update(const FrameEvent &evt) {
 		if ( !chunk )
 			return false;
 		if (chunk != currentChunk) {
-			recomputeColliders(chunks, currX, currZ);
 			currentChunk = chunk;
 		}	
+
+		recomputeColliders(chunks, currX, currZ);
 
 		Ogre::Vector3 norm = playerCam->getDirection().normalisedCopy();
 		Ogre::Vector3 camPos = playerCam->getPosition();
@@ -362,9 +363,7 @@ bool Application::update(const FrameEvent &evt) {
 
 				if (_oisManager->mouseClicked) {
 					// Return value tells us if we need to recompute the colliders or not
-					if (player->clickAction(hitObj, hitNormal, chunks, modifiedChunks)) {
-						recomputeColliders(chunks, currX, currZ);
-					}
+					player->clickAction(hitObj, hitNormal, chunks, modifiedChunks);
 
 					_oisManager->mouseClicked = false;
 				}
@@ -374,7 +373,6 @@ bool Application::update(const FrameEvent &evt) {
 			// No ray hit
 			highlight->getNode()->setVisible(false);
 		}
-
 	}
 
 	catch (Exception e) {
@@ -955,6 +953,7 @@ void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chu
 
 // Remove the old static objects currently in the simulator
 	_simulator->removeStaticObjects();
+	Ogre::Vector3 playerPos = player->_body->getNode()->getPosition();
 
 	for (int i = -1; i <= 1; i++) {
 		for (int j = -1; j <= 1; j++) {
@@ -969,7 +968,7 @@ void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chu
 			auto it = chunks.find(name);
 
 			if (it != chunks.end()) {
-				it->second->addChunksToSimulator();
+				it->second->addChunksToSimulator(playerPos);
 			}
 		}
 	}

@@ -130,10 +130,13 @@ bool Chunk::pointInChunk(float x, float y) {
 	return (roundX >= _xStart*_scale.x*2 && roundX <= _xEnd*_scale.x*2) && (roundY >= _yStart*_scale.y*2 && roundY <= _yEnd*_scale.y*2);
 }
 
-void Chunk::addChunksToSimulator() {
+void Chunk::addChunksToSimulator(Ogre::Vector3& playerPos) {
 	for (auto& var : _staticObjects) {
 		if(var.second != nullptr && var.second != air)
-			var.second->addToSimulator();
+			if(var.second->_pos.distance(playerPos) <= 500) {
+				var.second->addToSimulator();
+				// std::cout << "Distance: " << var.second->_pos.distance(playerPos) << std::endl;
+			}
 	}
 }
 

@@ -546,7 +546,7 @@ void Player::getNeighborChunks(std::vector<Chunk*>& chunklist, int x, int z, std
 }
 
 void Player::constrainSpeed() {
-	static int maxSpeed = 15000;
+	static int maxSpeed = 10000;
 
 	// Limit player speed
 	btVector3 velocity = _body->getBody()->getLinearVelocity();
