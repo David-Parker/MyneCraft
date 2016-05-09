@@ -88,6 +88,7 @@ void Application::setupWorld() {
 		saveFile << magicHeader << std::endl;
 		saveFile << seed << std::endl;
 		saveFile << 0.0 << std::endl;
+		saveFile << 0 << std::endl;
 		saveFile.close();
 	}
 	else {
@@ -96,6 +97,10 @@ void Application::setupWorld() {
 
 		getline(saveFile, line);
 		lastTime = std::stof(line);
+
+		getline(saveFile, line);
+		player->setDiamondCount(std::stoi(line));
+
 
 		while (getline(saveFile, line)) {
 			if (line == "EOF") break;
@@ -143,6 +148,7 @@ void Application::saveWorld() {
 	saveFile << magicHeader << std::endl;
 	saveFile << seed << std::endl;
 	saveFile << lastTime << std::endl;
+	saveFile << player->getDiamondCount() << std::endl;
 
 	for (auto& var : modifiedChunks) {
 		if (var.second == nullptr) continue;
@@ -214,7 +220,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 		case CLIENT:
 			updateClient(evt);
 			break;
-		case ENDGAME:
+		case WIN:
 			return true;
 			break;
 		case HOWTO:
@@ -222,6 +228,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 			break;
 		default: break;
 	}
+	_simulator->stepSimulation(evt.timeSinceLastFrame, 7, 1.0 / fps);
 
 	// Code per frame in fixed FPS
 	float temp = t1->getMilliseconds();
@@ -230,8 +237,6 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 		update(evt);
 		dTime = temp;
 	}
-
-	_simulator->stepSimulation(evt.timeSinceLastFrame, 7, 1.0 / fps);
 
 	player->constrainSpeed();
 
@@ -262,13 +267,12 @@ bool Application::update(const FrameEvent &evt) {
 		setState(HOME);
 	}
 
-	if (int delta = _oisManager->getMouseWheel()) {
-		int index = player->getWeapon() + delta;
-		index = index % (Player::NUM_WEP+1);
-		if (index < 0)
-			index += Player::NUM_WEP+1;
+	/* Is the game over? */
+	if ( player->getDiamondCount() >= 7 )
+		setState(WIN);
 
-		player->setWeapon(index);
+	if (int delta = _oisManager->getMouseWheel()) {
+		player->nextWeapon(delta);
 		_oisManager->resetWheel();
 	}
 
@@ -300,12 +304,14 @@ bool Application::update(const FrameEvent &evt) {
 		 		std::pair<int, int> name(x ,z);
 
 				// Object persists
-				if(prevChunks[name]) {
-					chunks[name] = prevChunks[name];
+				Chunk* prevChunk = prevChunks[name];
+				if(prevChunk) {
+					chunks[name] = prevChunk;
 				}
 				else if(!chunks[name]) {
-					if (modifiedChunks[name]) {
-						chunks[name] = modifiedChunks[name];
+					Chunk* mod = modifiedChunks[name];
+					if (mod) {
+						chunks[name] = mod;
 					}
 					else {
 						chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator, true);
@@ -332,6 +338,8 @@ bool Application::update(const FrameEvent &evt) {
 
 		// Add only the current chunk's static objects to the bullet simulation
 		Chunk* chunk = getChunk(chunks, currX, currZ);
+		if ( !chunk )
+			return false;
 		if (chunk != currentChunk) {
 			recomputeColliders(chunks, currX, currZ);
 			currentChunk = chunk;
@@ -372,6 +380,10 @@ bool Application::update(const FrameEvent &evt) {
 	}
 
 	player->update(_oisManager);
+	
+	std::ostringstream dCnt;
+	dCnt << "Diamonds: " << player->getDiamondCount();
+	diamondCount->setText(dCnt.str());
 
 	return true;
 }
@@ -679,6 +691,12 @@ void Application::setupCEGUI(void) {
 		CEGUI::UVector2(CEGUI::UDim(0.1f, 0), CEGUI::UDim(0.05f, 0))));
 	quitButton->setText("Quit");
 
+	diamondCount = wmgr.createWindow("AlfiskoSkin/Editbox", "DiamondCount");
+	diamondCount->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.885f, 0), CEGUI::UDim(0.0f, 0)),
+		CEGUI::UVector2(CEGUI::UDim(1.0f, 0), CEGUI::UDim(0.05f, 0))));
+	static_cast<CEGUI::MultiLineEditbox*>(diamondCount)->setReadOnly(true);
+	diamondCount->hide();
+
 	singlePlayerButton = wmgr.createWindow("AlfiskoSkin/Button", "SinglePlayerButton");
 	singlePlayerButton->setArea(CEGUI::URect(CEGUI::UVector2(CEGUI::UDim(0.3f, 0), CEGUI::UDim(0.35f, 0)),
 		CEGUI::UVector2(CEGUI::UDim(0.7f, 0), CEGUI::UDim(0.4f, 0))));
@@ -704,6 +722,7 @@ void Application::setupCEGUI(void) {
 	joinServerButton->setText("Join Game");
 
 	sheet->addChild(quitButton);
+	sheet->addChild(diamondCount);
 	sheet->addChild(singlePlayerButton);
 	sheet->addChild(hostServerButton);
 	sheet->addChild(ipText);
@@ -914,6 +933,9 @@ void Application::hideGui() {
 	ipText->hide();
 	hostServerButton->hide();
 	joinServerButton->hide();
+
+	/* Show "Game Only" Components */
+	diamondCount->show();
 }
 
 void Application::showGui() {
@@ -925,6 +947,9 @@ void Application::showGui() {
 	singlePlayerButton->show();
 	hostServerButton->show();
 	joinServerButton->show();
+
+	/* Hide "Game Only" Components */
+	diamondCount->hide();
 }
 
 void Application::resetNetManager() {
@@ -966,9 +991,9 @@ void Application::setState(State state) {
 #endif
 			gameState = SINGLE;
 			break;
-		case ENDGAME:
-			hideGui();
-			gameState = ENDGAME;
+		case WIN:
+			player->setDiamondCount(0);
+			setState(HOME);
 			break;
 		case HOWTO:
 			hideGui();
@@ -981,11 +1006,12 @@ void Application::setState(State state) {
 Chunk* Application::getChunk(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int x, int z) {
 	std::pair<int, int> name(x,z);
 
-	if (chunks[name]) return chunks[name];
-	else return nullptr;
+	Chunk* toReturn = chunks[name];
+	return toReturn;
 }
 
 void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int currX, int currZ) {
+
 // Remove the old static objects currently in the simulator
 	_simulator->removeStaticObjects();
 
@@ -999,8 +1025,10 @@ void Application::recomputeColliders(std::unordered_map<std::pair<int, int>, Chu
 
 			std::pair<int, int> name(x ,z);
 
-			if (chunks[name]) {
-				chunks[name]->addChunksToSimulator();
+			auto it = chunks.find(name);
+
+			if (it != chunks.end()) {
+				it->second->addChunksToSimulator();
 			}
 		}
 	}

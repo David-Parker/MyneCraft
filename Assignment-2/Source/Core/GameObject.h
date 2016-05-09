@@ -37,7 +37,6 @@ protected:
 	Ogre::Vector3 startPos;
 	OgreMotionState* motionState;
 
-	Simulator* simulator;
 	btCollisionShape* shape;
 	btRigidBody* body;
 	btTransform tr;
@@ -63,6 +62,9 @@ public:
 	BulletContactCallback* cCallBack;
 	bool canJump = false;
 	bool isDead = false;
+	bool water = false;
+
+	Simulator* simulator;
 
 	GameObject(Ogre::String nme, GameObject::objectType tp, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::SceneNode* node, Ogre::Entity* ent, OgreMotionState* ms, Simulator* sim, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, Ogre::Real scal, bool kin);
 	GameObject(Ogre::String nme, GameObject::objectType tp, Ogre::SceneManager* scnMgr, GameManager* ssm, Ogre::SceneNode* node, Ogre::Entity* ent, OgreMotionState* ms, Simulator* sim, Ogre::Real mss, Ogre::Real rest, Ogre::Real frict, Ogre::Vector3 scal, bool kin);
@@ -71,11 +73,11 @@ public:
 	void addToSimulator();
 	virtual void updateTransform();
 	void translate(float x, float y, float z);
-	void applyForce(float x, float y, float z);
+	virtual void applyForce(float x, float y, float z);
 	void applyImpulse(const btVector3& impulse, const btVector3& rel_pos);
 	void setPosition(float x, float y, float z);
 	void setPosition(const Ogre::Vector3& pos);
-	void setVelocity(float x, float y, float z);
+	virtual void setVelocity(float x, float y, float z);
 	void setOrientation(Ogre::Quaternion qt);
 	void reflect();
 	Ogre::SceneNode* getNode();

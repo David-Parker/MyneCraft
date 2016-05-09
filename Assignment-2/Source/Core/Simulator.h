@@ -14,6 +14,8 @@
 #include <deque>
 #include <unordered_map>
 
+#include "CubeManager.h"
+
 class GameObject;
 class StaticObject;
 
@@ -29,6 +31,7 @@ protected:
        std::deque<StaticObject*> objListStatic;
 	std::unordered_map<const btCollisionObject*, StaticObject*> invertedObjectHash;
        btCollisionObject* player;
+	   void removeAllColliders();
 public: 
        Simulator(); 
        ~Simulator(); 
@@ -40,5 +43,6 @@ public:
 	   void removeObjects(); 
        void removeStaticObjects();
        bool rayHit(const btVector3& start, const btVector3& end, StaticObject*& obj, btVector3& hitNormal);
+       void setGravity(float grav);
        GameObject* outer;
 };

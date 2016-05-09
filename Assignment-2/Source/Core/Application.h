@@ -42,6 +42,7 @@
 #include "Cube.h"
 #include "BlockInfo.h"
 #include "Rand.h"
+#include "HashCombine.h"
 
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
@@ -52,7 +53,7 @@ public:
 
 	virtual void init();
 
-	enum State{ HOME, SINGLE, SERVER, CLIENT, ENDGAME, HOWTO };
+	enum State{ HOME, SINGLE, SERVER, CLIENT, WIN, HOWTO };
 	State gameState = HOME;
 
 	Ogre::Root * mRoot;
@@ -79,6 +80,7 @@ public:
     CEGUI::OgreRenderer* mRenderer;
 	
 	CEGUI::Window* quitButton;
+	CEGUI::Window* diamondCount;
     CEGUI::Window* singlePlayerButton;
     CEGUI::Window* hostServerButton;
     CEGUI::Window* ipText;
@@ -96,7 +98,6 @@ public:
 	std::unordered_map<std::pair<int, int>, Chunk*> modifiedChunks;
 	Chunk* currentChunk = nullptr;
 
-	int points;
 	int width;
 	int height;
 	int seed;
@@ -109,7 +110,7 @@ public:
 	#ifdef _DEBUG
 		int fieldOfView = 5000;
 	#else
-		int fieldOfView = 20000;
+		int fieldOfView = 15000;
 	#endif
 #endif
 #ifdef __linux__

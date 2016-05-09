@@ -11,16 +11,18 @@
 #include "Perlin.h"
 #include "BlockInfo.h"
 #include "Rand.h"
+#include "HashCombine.h"
 
 #define CHUNK_SIZE 16
 #define CHUNK_SCALE 50
 #define CHUNK_SCALE_FULL 100
+#define WATER_LEVEL -10
 
 static StaticObject* air = nullptr;
 
 class Chunk {
 private:
-	typedef std::string key;
+	typedef std::tuple<int, int, int> key;
 
 	Ogre::StaticGeometry* _sg;
 	std::string _name;
@@ -35,12 +37,13 @@ private:
 	int caveHeights[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
 	int caves[CHUNK_SIZE + 2][CHUNK_SIZE + 2];
 	int snowLevel = 15;
-	int waterLevel = -10;
+	int waterLevel = WATER_LEVEL;
 
 	std::unordered_map<key, Ogre::Light*> lights;
 
 	bool createTerrainColumn(int, int, Ogre::Vector3&);
 	void buildWaterBlock(int, Ogre::Vector3&);
+	CubeManager::CubeType getCaveCubeType();
 	void buildCaveBlock(int, int, key, Ogre::Vector3&, int, CubeManager::CubeType, int[CHUNK_SIZE+2][CHUNK_SIZE+2]); 
 	bool createTree(const Ogre::Vector3&, CubeManager::CubeType);
 	bool createCloud(const Ogre::Vector3&);
@@ -69,6 +72,7 @@ public:
 	std::unordered_map<key, StaticObject*> _staticObjects;
 	BlockInfo getBlockInfo(key, CubeManager::CubeType type);
 	void rebuildFromSave(const std::vector<BlockInfo>& blocks);
+	std::string getKeyName(key thekey);
 
 	Ogre::Vector3 _scale;
 	int _xStart = 0;

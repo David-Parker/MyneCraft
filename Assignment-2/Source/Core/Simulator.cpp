@@ -11,7 +11,6 @@ Simulator::Simulator() : objList(), collisionShapes(), objListStatic() {
   solver = new btSequentialImpulseConstraintSolver(); 
   dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration); 
   dynamicsWorld->setGravity(btVector3(0.0, -10000.0f, 0.0));
-  //Add collision shapes to reuse among rigid bodies
 }
 
 void Simulator::addObject (GameObject* o) { 
@@ -45,10 +44,13 @@ void Simulator::removeObjects() {
 }
 
 void Simulator::removeStaticObjects() {
+
+	removeAllColliders();
+
 	for (auto& var : objListStatic) {
-		dynamicsWorld->removeCollisionObject(var->getBody());
 		var->cleanUpBody();
 	}
+
 	objListStatic.clear();
 	invertedObjectHash.clear();
 }
@@ -63,10 +65,11 @@ bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObjec
 	if(RayCallback.hasHit()) {
 		for(int i = 0 ; i < RayCallback.m_collisionObjects.size(); i++) {
 			auto& var = RayCallback.m_collisionObjects[i];
-			if(var != player) {
+			StaticObject* temp = invertedObjectHash[var];
+			if(var != player && temp->_cubeType != CubeManager::WATER) {	
 				if(RayCallback.m_hitPointWorld[i].distance(start) < closest.distance(start)) {
 					closest = RayCallback.m_hitPointWorld[i];
-					obj = invertedObjectHash[var];
+					obj = temp;
 					hitNormal = RayCallback.m_hitNormalWorld[i];
 					ret = true;
 				}
@@ -75,4 +78,31 @@ bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObjec
 	}
 
 	return ret;
+}
+
+void Simulator::removeAllColliders() {
+	auto& arr = dynamicsWorld->getCollisionObjectArray();
+
+	int j = 0;
+	for (int i = 0; i < arr.size(); i++) {
+		//	Do btDiscreteDynamicsWorld::removeCollisionObject
+		auto collisionObject = arr[i];
+		btRigidBody* body = btRigidBody::upcast(collisionObject);
+		if (body) {
+			arr[j++] = arr[i];
+		}	
+		else {
+			btBroadphaseProxy* bp = collisionObject->getBroadphaseHandle();
+			if (bp) {
+				dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(bp, dispatcher);
+				dynamicsWorld->getBroadphase()->destroyProxy(bp, dispatcher);
+				collisionObject->setBroadphaseHandle(0);
+			}
+		}
+	}
+	arr.resize(j);
+}
+
+void Simulator::setGravity(float grav) {
+ 	dynamicsWorld->setGravity(btVector3(0.0, grav, 0.0));
 }

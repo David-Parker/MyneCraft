@@ -1,6 +1,6 @@
-#include "Player.h"
+ #include "Player.h"
 
-Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, GameManager* gm) : _body(body), _playerCam(camera), _sceneManager(sm), _gm(gm) {
+Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, GameManager* gm) : _body(body), _playerCam(camera), _sceneManager(sm), _gm(gm), diamondCount(0) {
 	 _body->getNode()->setVisible(false);
 	_body->getBody()->setAngularFactor(btVector3(0, 0, 0));
 
@@ -22,7 +22,6 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	node->setDirection(Ogre::Vector3(0, 1 ,0));
 	node->setScale(3, 3, 3);
 	node->setVisible(false);
-
 
 	_animation.createPickaxeAnimation(node);
 
@@ -70,6 +69,22 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	inventoryEntities.push_back(light);
 	rotNodes.push_back(rotNode);
 
+	item = CubeManager::getSingleton()->getNewEntity(CubeManager::DIAMOND);
+	item->setCastShadows(true);
+	node = _sceneManager->getRootSceneNode()->createChildSceneNode("DiamondCube"+nme);
+	rotNode = node->createChildSceneNode("DiamondCubeNode"+nme);
+	rotNode->attachObject(item);
+	rotNode->setPosition(Ogre::Vector3(0, 0, 2));
+	rotNode->roll(Ogre::Degree(90));
+	rotNode->pitch(Ogre::Degree(-90));
+	node->setScale(9, 9, 9);
+	node->setVisible(false);
+
+	_animation.createBlockAnimation(node);
+
+	inventory.push_back(node);
+	inventoryEntities.push_back(item);
+	rotNodes.push_back(rotNode);
 
 	item = CubeManager::getSingleton()->getNewEntity(CubeManager::GRASS);
 	item->setCastShadows(true);
@@ -190,6 +205,7 @@ Player::Player(Ogre::Camera* camera, GameObject* body, Ogre::SceneManager* sm, G
 	inventoryEntities.push_back(item);
 	rotNodes.push_back(rotNode);
 
+
 	equippedItem = -1;
 
 	std::cout << "Finished creating player" << std::endl;
@@ -219,12 +235,15 @@ Player::~Player() {
 }
 
 void Player::setWeapon ( int i ) {
-	if (_animation._inAction)
+	if (_animation._inAction )
+	 if ( equippedItem != DIAMOND_CUBE || diamondCount > 0 )
 		return;
 	if ( equippedItem >= 0 && equippedItem < inventory.size()) {
 		inventory[equippedItem]->setVisible(false);
 	}
 	if ( i < 0 || i >= inventory.size() )
+		equippedItem = -1;
+	else if ( diamondCount == 0 && i == DIAMOND_CUBE )
 		equippedItem = -1;
 	else {
 		equippedItem = i;
@@ -234,6 +253,29 @@ void Player::setWeapon ( int i ) {
 
 int Player::getWeapon() {
 	return equippedItem;
+}
+
+void Player::nextWeapon(int delta) {
+	if (_animation._inAction)
+		return;
+
+	int index = equippedItem + delta;
+	index = index % (Player::NUM_WEP+1);
+	if (index < 0)
+		index += Player::NUM_WEP+1;
+
+	if ( equippedItem >= 0 && equippedItem < inventory.size())
+		inventory[equippedItem]->setVisible(false);
+
+	if ( diamondCount == 0 && index == DIAMOND_CUBE )
+		equippedItem = index + delta;
+	else
+		equippedItem = index;
+
+	if ( equippedItem >= inventory.size() || equippedItem < 0 )
+		equippedItem = -1;
+	else
+		inventory[equippedItem]->setVisible(true);
 }
 
 Ogre::SceneNode* Player::getWeaponNode() {
@@ -255,6 +297,23 @@ void Player::update(OISManager* ois) {
 
 	OIS::KeyCode lastkey;
 	bool moved = false;
+
+	float buoyant = 10000.0f;
+	
+	if(_body->water) {
+		float drag = _body->getBody()->getLinearVelocity().length();
+
+		float dragVec = -(_body->getBody()->getLinearVelocity().y());
+
+		dragVec *= drag/200.0f;
+		_body->applyForce(0, dragVec + buoyant, 0);
+
+		currentY = _body->getBody()->getLinearVelocity().y();
+	}
+
+	if(_body->getNode()->getPosition().y/CHUNK_SCALE_FULL >= WATER_LEVEL-1) {
+		_body->water = false;
+	}
 
 	if (ois->isKeyDown(OIS::KC_LSHIFT)) {
 		speed = 2500;
@@ -279,8 +338,16 @@ void Player::update(OISManager* ois) {
 		_body->setVelocity(strafePos.x*-speed, currentY, strafePos.z*-speed);
 		moved = true;
 	}
-	if (ois->isKeyDown(OIS::KC_SPACE) && _body->canJump) {
-		_body->setVelocity(_body->getBody()->getLinearVelocity().x(), 2500, _body->getBody()->getLinearVelocity().z());
+	if (ois->isKeyDown(OIS::KC_SPACE) && _body->water) {
+		_body->applyForce(0, buoyant, 0);
+		currentY = _body->getBody()->getLinearVelocity().y();
+		moved = true;
+		_body->canJump = true;
+	}
+	else if (ois->isKeyDown(OIS::KC_SPACE) && _body->canJump) {
+		int power = 2500;
+		_body->setVelocity(_body->getBody()->getLinearVelocity().x(), power, _body->getBody()->getLinearVelocity().z());
+		currentY = _body->getBody()->getLinearVelocity().y();
 		moved = true;
 		_body->canJump = false;
 	}
@@ -307,6 +374,11 @@ void Player::update(OISManager* ois) {
 
 	_playerCam->setPosition(total);
 
+
+	/* Is the player out of diamonds? */
+	if ( equippedItem == DIAMOND_CUBE && diamondCount == 0 )
+		setWeapon(GRASS_CUBE);
+
 	Ogre::SceneNode* node = getWeaponNode();
 	if ( node != nullptr ) {
 		Ogre::Vector3 unit = _playerCam->getDirection().normalisedCopy();
@@ -323,7 +395,6 @@ void Player::update(OISManager* ois) {
 	}
 
 	_animation.playAnimation();
-
 }
 
 bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, std::unordered_map<std::pair<int, int>, Chunk*>& modifiedChunks) {
@@ -341,6 +412,14 @@ bool Player::clickAction(StaticObject* hitObj, const btVector3& hitnormal, std::
 		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::TORCH);
 		_animation.setActionLock(TORCH_CUBE);
 		_gm->playSound(GameManager::POP);
+		return true;
+	}
+	if (equippedItem == DIAMOND_CUBE) {
+		cubePlaceAction(hitObj, hitnormal, chunks, modifiedChunks, CubeManager::DIAMOND);
+		_animation.setActionLock(DIAMOND_CUBE);
+		_gm->playSound(GameManager::POP);
+		diamondCount--;
+		setWeapon(PICKAXE);
 		return true;
 	}
 	if (equippedItem == GRASS_CUBE) {
@@ -405,6 +484,10 @@ void Player::pickaxeAction(StaticObject* hitObj, std::unordered_map<std::pair<in
 
 			std::pair<int, int> name(x, z);
 			modifiedChunks[name] = chunk;
+
+			if ( hitObj->_cubeType == CubeManager::DIAMOND )
+				diamondCount++;
+
 		}
 	}
 }
@@ -429,6 +512,14 @@ void Player::cubePlaceAction(StaticObject* hitObj, const btVector3& hitnormal, s
 			modifiedChunks[name] = chunk;
 		}
 	}
+}
+
+int Player::getDiamondCount() {
+	return diamondCount;
+}
+
+void Player::setDiamondCount( int cnt ) {
+	diamondCount = cnt;
 }
 
 void Player::getNeighborChunks(std::vector<Chunk*>& chunklist, int x, int z, std::unordered_map<std::pair<int, int>, Chunk*>& chunks, Chunk* chunk) {
