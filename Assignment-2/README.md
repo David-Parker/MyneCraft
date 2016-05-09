@@ -4,6 +4,10 @@ Jeremy Wenzel
 David Parker
 Frank Cerasoli
 
+## Final Submission
+* MyneCraft has been polished and optimized for Visual Demo Day on Wednesday 5/11/2016.
+* All design details q
+
 ## Milestone 4.2
 We are definitely on track for the final submission. Features of our project include:
 
@@ -25,19 +29,26 @@ We are definitely on track for the final submission. Features of our project inc
 #### Summary
 * We created an infinite, fully randomly generated Minecraft world with the ability to remove and place blocks.
 
+### Endgame Condition
+* Collecting 7 diamonds from the world causes the player to win the game.
+* If a player want's to explore the world indefinitely and still mine diamonds, excess diamonds can be dropped to keep the diamond count below 7.
+
 #### Implemented
-* Random terain based on 2D perlin noise.
+* Random terain based on 2D Perlin noise.
 * Biomes, randomly generated in areas that blend in from the environment (Desert, Tundra and Rock biomes available)
 * Random tree generation, many different types of trees (oak, fir and cactus)
+* Random cave generation. Cave location and cave height are generated with 2D Perlin noise independently.
 * Day/Night cycle, time of day moves along with the sun on a sinusoidal position function, sun will set and rise.
 * Randomly generated clouds
 * Localized lighting, holding or placing a torch will create local lighting
-* Inventory, players can hold and select an item to use (supply is unlimited)
+* Unlimited inventory resources: Players can hold and select an item to use.
+* Limited inventory resources: Players can mine diamonds and can only build as many as have been mined.
 * World saving, exiting the game will save it in a file called save.txt where it is reloaded on game start up, delete this file to generate a new random world
 * Block removal, there is no pre-generated depth, blocks get created when one digs
 * Block placement, put new blocks anywhere
+* Torch placement, providing light in dark environments.
 * Heavily optimized, static geometry creation and destruction based on position, localized bullet simulation, etc.
-* Background game music
+* Origional game music produced and recorded by Frank Cerasoli
 
 #### Issues
 * Inifnite block growth (cancer blocks), when a block gets incorrectly generated, it thinks its neihbors are null and starts to generate blocks everywhere when deleted. This bug is rarare and usually only occurs when something else was setup incorrectly.

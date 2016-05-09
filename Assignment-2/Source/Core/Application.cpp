@@ -238,15 +238,19 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 // Called once per predefined frame
 bool Application::update(const FrameEvent &evt) {
 
-	moveDayTime(evt.timeSinceLastFrame);
+	moveDayTime(1.0/fps);
 
 	// std::cout << "FPS: " << mRenderWindow->getLastFPS() << std::endl;
 
-	OIS::KeyCode lastKey = _oisManager->getKeyPressed();
+	OIS::KeyCode lastKey = _oisManager->lastKeyPressed();
 	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
 
 	if (lastKey == OIS::KC_M) {
-		gameManager->mute();
+		static float prevMute = 3.0f;
+		if ( prevMute > 2.0f ) {
+			gameManager->mute();
+			prevMute = t1->getMilliseconds() - prevMute;
+		}
 	}
 	else if ( lastKey >= OIS::KC_1 && lastKey <= OIS::KC_9 ) {
 		int index = lastKey - 2;
@@ -260,7 +264,7 @@ bool Application::update(const FrameEvent &evt) {
 	}
 
 	/* Is the game over? */
-	if ( player->getDiamondCount() >= 7 )
+	if ( player->getDiamondCount() >= 2 )
 		setState(WIN);
 
 	if (int delta = _oisManager->getMouseWheel()) {
@@ -912,7 +916,6 @@ void Application::setState(State state) {
 			break;
 		case WIN:
 			begin = false;
-			states.clear();
 #if defined __linux__ || defined _DEBUG
 			player->setDiamondCount(0);
 			singlePlayerButton->setText("New Game");
