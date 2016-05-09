@@ -306,6 +306,9 @@ void Player::update(OISManager* ois) {
 		float dragVec = -(_body->getBody()->getLinearVelocity().y());
 
 		dragVec *= drag/200.0f;
+
+		if ( dragVec > 10000.0 )
+			dragVec = 10000.0;
 		_body->applyForce(0, dragVec + buoyant, 0);
 
 		currentY = _body->getBody()->getLinearVelocity().y();

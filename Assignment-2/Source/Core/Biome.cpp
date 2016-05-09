@@ -40,7 +40,7 @@ Ogre::Entity* Biome::getCubeEntity(int x, int y, int h, CubeManager::CubeType& t
 		type = biomeType;
 		return CubeManager::getSingleton()->getEntity(biomeType);
 	}
-	else if ( h >= 15 && dSq > 6 * rSQoN ) {
+	else if ( h >= 36 && dSq > 6 * rSQoN ) {
 		type = CubeManager::CubeType::SNOW;
 		return CubeManager::getSingleton()->getEntity(CubeManager::SNOW);
 	}
