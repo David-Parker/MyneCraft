@@ -1,6 +1,7 @@
 #include "Simulator.h"
 #include "GameObject.h"
 #include "StaticObject.h"
+#include "Profiler.h"
 #include <exception>
 
 Simulator::Simulator() : objList(), collisionShapes(), objListStatic() { 
@@ -27,6 +28,7 @@ void Simulator::addObject (StaticObject* o) {
 
 //Update the physics world state and any objects that have collision
 void Simulator::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, const Ogre::Real fixedTimestep) {
+	PROFILE_SCOPED();
 	dynamicsWorld->stepSimulation(elapsedTime, maxSubSteps, fixedTimestep);
 
 	for(auto& var : objList) {
@@ -44,6 +46,7 @@ void Simulator::removeObjects() {
 }
 
 void Simulator::removeStaticObjects() {
+	PROFILE_SCOPED();
 
 	removeAllColliders();
 
@@ -56,6 +59,7 @@ void Simulator::removeStaticObjects() {
 }
 
 bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObject*& obj, btVector3& hitNormal) {
+	PROFILE_SCOPED();
 	btCollisionWorld::AllHitsRayResultCallback RayCallback(start, end);
 
 	dynamicsWorld->rayTest(start, end, RayCallback);
@@ -81,6 +85,7 @@ bool Simulator::rayHit(const btVector3& start, const btVector3& end, StaticObjec
 }
 
 void Simulator::removeAllColliders() {
+	PROFILE_SCOPED();
 	auto& arr = dynamicsWorld->getCollisionObjectArray();
 
 	int j = 0;

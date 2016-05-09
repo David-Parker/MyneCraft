@@ -173,7 +173,7 @@ void Application::saveWorld() {
 * Update Methods 
 */
 bool Application::frameRenderingQueued(const FrameEvent &evt) {
-	//PROFILE_SCOPED();
+	PROFILE_SCOPED();
 	static float dTime = t1->getMilliseconds();
 #if defined __linux__ || defined _DEBUG
 	CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
@@ -228,7 +228,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 			break;
 		default: break;
 	}
-	_simulator->stepSimulation(evt.timeSinceLastFrame, 7, 1.0 / fps);
+	_simulator->stepSimulation(evt.timeSinceLastFrame, 3, 1.0 / fps);
 
 	// Code per frame in fixed FPS
 	float temp = t1->getMilliseconds();
@@ -245,18 +245,13 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 
 // Called once per predefined frame
 bool Application::update(const FrameEvent &evt) {
-	//PROFILE_SCOPED();
+	PROFILE_SCOPED();
 
 	auto frameTime = evt.timeSinceLastFrame;
-	
-	if (chunksToBuild.size() > 1) {
-		(*chunksToBuild.begin())->build();
-		chunksToBuild.erase(chunksToBuild.begin());
-	}
+
+	buildChunks(5);
 	
 	moveDayTime(frameTime);
-
-	// std::cout << "FPS: " << mRenderWindow->getLastFPS() << std::endl;
 
 	OIS::KeyCode lastKey = _oisManager->getKeyPressed();
 	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
@@ -402,6 +397,7 @@ bool Application::update(const FrameEvent &evt) {
 }
 
 bool Application::handleGUI(const FrameEvent &evt) {
+	PROFILE_SCOPED();
 
 	_oisManager->capture();
 
@@ -1107,4 +1103,17 @@ void Application::loadSeed() {
 	saveFile.close();
 
 	Rand::srand(seed);
+}
+
+void Application::buildChunks(int num) {
+	PROFILE_SCOPED();
+	for(int i = 0; i < num; i++) {
+		if (chunksToBuild.size() > 0) {
+			(*chunksToBuild.begin())->build();
+			{ PROFILE_SCOPED_DESC("erase + begin");
+
+			chunksToBuild.erase(chunksToBuild.begin());
+			}
+		}
+	}
 }

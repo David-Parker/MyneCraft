@@ -19,6 +19,7 @@
 #include <CEGUI/RendererModules/Ogre/Renderer.h>
 
 #include <unordered_map>
+#include <unordered_set>
 #include <list>
 #include <string>
 #include <cstring>
@@ -164,5 +165,6 @@ public:
 	void recomputeColliders(std::unordered_map<std::pair<int, int>, Chunk*>& chunks, int, int);
 	void moveDayTime(float time);
 	void loadSeed();
+	void buildChunks(int);
 };
 

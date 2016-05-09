@@ -20,6 +20,7 @@
 #include <OgreRenderTargetListener.h>
 #include <OgreParticleSystem.h>
 #include "Biome.h"
+#include "Profiler.h"
 
 class Chunk;
 
