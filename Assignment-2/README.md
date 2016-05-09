@@ -4,8 +4,9 @@ Jeremy Wenzel
 David Parker
 Frank Cerasoli
 
-## Milestone 4.2
-We are definitely on track for the final submission. Features of our project include:
+## Final Submission
+* MyneCraft has been polished and optimized for Visual Demo Day on Wednesday 5/11/2016.
+* All design details finalized for release/demo.
 
 ### How to Build
 * Refer to "HOW_TO_BUILD" file!
@@ -18,26 +19,39 @@ We are definitely on track for the final submission. Features of our project inc
 * Keys 1-9 will select an item from the inventory, the mouse scroll wheel will also select the next item
 * To delete blocks, equip the pickaxe and use either mouse click while looking at a block
 * To create blocks, select a block (or torch) that you want to place and use either mouse click.
-* Press ESC to pause and click quit to quit
+* Diamond blocks can be picked up and placed in other locations. 
+* Holding 7 diamonds at once wins the game.
+* Press 'M' to mute the music and sound effects.
+* Press 'P' to pause the game.
+* Press 'ESC' to pause and click quit to quit
 
 ### Progress
 
 #### Summary
-* We created an infinite, fully randomly generated Minecraft world with the ability to remove and place blocks.
+* We've created an infinite, fully randomly generated Minecraft world with the ability to remove and place blocks.
+
+### Endgame Condition
+* Collecting 7 diamonds from the world causes the player to win the game.
+* If a player want's to explore the world indefinitely and still mine diamonds, excess diamonds can be dropped to keep the diamond count below 7.
 
 #### Implemented
-* Random terain based on 2D perlin noise.
+* Random terain based on 2D Perlin noise.
 * Biomes, randomly generated in areas that blend in from the environment (Desert, Tundra and Rock biomes available)
 * Random tree generation, many different types of trees (oak, fir and cactus)
+* Random cave generation. Cave location and cave height are generated with 2D Perlin noise independently.
+* Bodies of water that the player can swim in. Immersive buoyant and drag forces are present underwater.
 * Day/Night cycle, time of day moves along with the sun on a sinusoidal position function, sun will set and rise.
 * Randomly generated clouds
 * Localized lighting, holding or placing a torch will create local lighting
-* Inventory, players can hold and select an item to use (supply is unlimited)
+* Unlimited inventory resources: Players can hold and select an item to use.
+* Limited inventory resources: Players can mine diamonds and can only build as many as have been mined.
+* Animations: Using items in the player inventory causes an animation to run and a sound to play.
 * World saving, exiting the game will save it in a file called save.txt where it is reloaded on game start up, delete this file to generate a new random world
-* Block removal, there is no pre-generated depth, blocks get created when one digs
+* Block removal, there is no pre-generated depth, blocks get created when one digs.
 * Block placement, put new blocks anywhere
+* Torch placement anywhere, providing light in dark environments.
 * Heavily optimized, static geometry creation and destruction based on position, localized bullet simulation, etc.
-* Background game music
+* Origional game music produced and recorded by Frank Cerasoli
 
 #### Issues
 * Inifnite block growth (cancer blocks), when a block gets incorrectly generated, it thinks its neihbors are null and starts to generate blocks everywhere when deleted. This bug is rarare and usually only occurs when something else was setup incorrectly.
@@ -45,10 +59,8 @@ We are definitely on track for the final submission. Features of our project inc
 * Somtimes it is possible to get pushed out of the level and fall infinitely into the ground
 
 ### Todo
-* Cave generation, use perlin + fractal noise to simualte "perlin worms" which generate nice, connected caves
 * Multiplayer, online playing with friends would be cool
 * Enhanced GUI, able to select create world or load a different save based on file name
-* More sounds
 
 ### Resources Used
 Many image and sound files were found on the internet
@@ -64,15 +76,18 @@ Many image and sound files were found on the internet
 * Minecraft rock image: http://i.imgur.com/lZIjk.png
 * Minecraft torch image: https://t5.rbxcdn.com/74bb9f32a7560018ac55b4c68b030a93
 * Minecraft plank image: http://www.pixelpapercraft.com/files/1335684299762.jpg
+* Minecraft Diamond image: http://static.planetminecraft.com/files/resource_media/screenshot/1121/minecraft_diamonds_by_jeremywindd30bw1l_64457.jpg
 * Perlin noise pseudocode: https://en.wikipedia.org/wiki/Perlin_noise
 * srand/rand code http://linux.die.net/man/3/srand
 * NetManager.h and NetManager.cpp taken from Wade Burch, supplied by Sarah
 * OGRE Basic tutorial 7 for CEGUI
 * Minecraft music downloaded from: http://downloads.khinsider.com/game-soundtracks/album/minecraft
 
+## Milestone 4.2
+We are definitely on track for the final submission. Features of our project are listed above.
+
 
 ## Milestone 4.1
-
 This project will be similar to the well-known game Minecraft. Mynecraft has random level generation made up of environmental cube blocks. The player can then explore this environment and see the different biomes contained within it. Future developments will hopefully include some AI animials that players can interact with.
 
 This game is primarily focused on level generation. To generate the maps we are using Perlin Noise to randomly create the enviroments. As a player begins to explore the map, more terrain is randomly generated. As terrain is generated, biomes will also be generated. These biomes could be deserts, mountains, plains, snowy, etc. A player will never have the same experience twice.

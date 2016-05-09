@@ -655,7 +655,7 @@ void Chunk::buildWaterBlock(int height, Ogre::Vector3& pos) {
 
 CubeManager::CubeType Chunk::getCaveCubeType() {
 	int rnd = Rand::rand()%10;
-	if ( Rand::rand()%15000 == 7 ) 
+	if ( Rand::rand()%10000 == 1234 )
 		return CubeManager::DIAMOND;
 	else if ( Rand::rand()%10 < 3 )
 		return CubeManager::DIRT;
