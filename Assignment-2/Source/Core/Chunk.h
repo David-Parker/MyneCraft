@@ -14,7 +14,7 @@
 #include "HashCombine.h"
 #include "Profiler.h"
 
-#define CHUNK_SIZE 12
+#define CHUNK_SIZE 16
 #define CHUNK_SCALE 50
 #define CHUNK_SCALE_FULL 100
 #define WATER_LEVEL -10

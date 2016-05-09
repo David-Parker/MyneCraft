@@ -228,7 +228,7 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 			break;
 		default: break;
 	}
-	_simulator->stepSimulation(evt.timeSinceLastFrame, 3, 1.0 / fps);
+	_simulator->stepSimulation(evt.timeSinceLastFrame);
 
 	// Code per frame in fixed FPS
 	float temp = t1->getMilliseconds();
@@ -247,11 +247,9 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 bool Application::update(const FrameEvent &evt) {
 	PROFILE_SCOPED();
 
-	auto frameTime = evt.timeSinceLastFrame;
-
-	buildChunks(5);
+	buildChunks(2);
 	
-	moveDayTime(frameTime);
+	moveDayTime(1.0 / fps);
 
 	OIS::KeyCode lastKey = _oisManager->getKeyPressed();
 	Ogre::Camera* camMan = mSceneManager->getCamera("Camera Man");
@@ -287,7 +285,7 @@ bool Application::update(const FrameEvent &evt) {
 
 		float fx = (pos.x / CHUNK_SCALE_FULL);
 		float fz = (pos.z / CHUNK_SCALE_FULL);
-		int numChunks = (fieldOfView*1.1 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
+		int numChunks = (fieldOfView*1.0 / (CHUNK_SCALE_FULL*CHUNK_SIZE));
 
 		int currX = ((int)fx - ((int)fx % CHUNK_SIZE));
 		int currZ = ((int)fz - ((int)fz % CHUNK_SIZE));
@@ -318,12 +316,21 @@ bool Application::update(const FrameEvent &evt) {
 					}
 					else {
 						chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator, true);
+						{PROFILE_SCOPED_DESC("Insert");
 
-						chunksToBuild.insert(chunks[name]);
+						if(frame == 0)
+							chunks[name]->build();
+						else
+							chunksToBuild.insert(chunks[name]);
+						}
 					}
 				}
 			}
 		}
+
+		frame++;
+
+		{ PROFILE_SCOPED_DESC("Collider Computer");
 
 		for(auto& var : prevChunks) {
 			if(!chunks[var.first] && !modifiedChunks[var.first]) {
@@ -333,7 +340,7 @@ bool Application::update(const FrameEvent &evt) {
 			}
 		}
 
-		prevChunks.swap(chunks);
+		prevChunks = chunks;
 
 		if (pos.x < 0) {
 			currX -= CHUNK_SIZE;
@@ -377,6 +384,8 @@ bool Application::update(const FrameEvent &evt) {
 			// No ray hit
 			highlight->getNode()->setVisible(false);
 		}
+		}
+
 	}
 
 	catch (Exception e) {

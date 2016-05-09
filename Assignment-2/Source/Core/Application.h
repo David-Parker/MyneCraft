@@ -72,6 +72,7 @@ public:
 	GameObject* otherPlayerObj = NULL;
 	Cube* highlight = NULL;
 	Ogre::Light* sun;
+	long long frame = 0;
 
 	NetManager* netManager = nullptr;
 
@@ -118,7 +119,7 @@ public:
 	#endif
 #endif
 #ifdef __linux__
-	int fieldOfView = 20000;
+	int fieldOfView = 18000;
 #endif
 
 	bool begin = false;
