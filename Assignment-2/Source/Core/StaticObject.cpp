@@ -6,18 +6,15 @@ btCollisionShape* StaticObject::_shape = new btBoxShape(btVector3(50, 50, 50));
 StaticObject::StaticObject(Ogre::Entity* mesh, CubeManager::CubeType ot, Ogre::Vector3 scale, Ogre::Vector3 pos, Simulator* simulator, Chunk* chunk) :
 _geom(mesh), _cubeType(ot), _scale(scale), _pos(pos), _simulator(simulator), _mass(1.0f), _friction(0.0f), _restitution(0.0f), _tr(), _chunk(chunk)
 {
-	PROFILE_SCOPED();
 }
 
 StaticObject::~StaticObject() {
-	PROFILE_SCOPED();
 	cleanUpBody();
 }
 
 void StaticObject::update() {}
 
 void StaticObject::addToSimulator() {
-	PROFILE_SCOPED();
 	// using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
 	 updateTransform();
 	 _collisionObject = new btCollisionObject();
@@ -36,13 +33,11 @@ void StaticObject::addToSimulator() {
 }
 
 void StaticObject::updateTransform() {
-	PROFILE_SCOPED();
 	_tr.setOrigin(btVector3(_pos.x, _pos.y, _pos.z));
 	_tr.setRotation(btQuaternion(_orientation.x, _orientation.y, _orientation.z, _orientation.w));
 }
 
 void StaticObject::cleanUpBody() {
-	PROFILE_SCOPED();
 	if(_collisionObject != nullptr) {
 		delete _collisionObject;
 		_collisionObject = nullptr;	

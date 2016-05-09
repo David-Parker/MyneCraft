@@ -27,7 +27,6 @@
 #include <vector>
 #include <utility>
 
-
 #include "Perlin.h"
 #include "NetManager.h"
 #include "GameState.h"
@@ -44,8 +43,6 @@
 #include "BlockInfo.h"
 #include "Rand.h"
 #include "HashCombine.h"
-#include "Profiler.h"
-
 
 class Application : public Ogre::FrameListener, public Ogre::WindowEventListener, public Ogre::RenderTargetListener
 {

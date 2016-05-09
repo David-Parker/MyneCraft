@@ -286,7 +286,6 @@ Ogre::SceneNode* Player::getWeaponNode() {
 }
 
 void Player::update(OISManager* ois) {
-	PROFILE_SCOPED();
 	static int speed = 1000;
 	static int camAvgIndex = 0;
 

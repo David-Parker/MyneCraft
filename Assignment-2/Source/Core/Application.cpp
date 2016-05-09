@@ -173,7 +173,6 @@ void Application::saveWorld() {
 * Update Methods 
 */
 bool Application::frameRenderingQueued(const FrameEvent &evt) {
-	PROFILE_SCOPED();
 	static float dTime = t1->getMilliseconds();
 #if defined __linux__ || defined _DEBUG
 	CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
@@ -181,7 +180,6 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 	if (!mRunning)
 	{
 		saveWorld();
-		MyProfiler::dumphtml();
 		return false;
 	}
 	try {
@@ -245,7 +243,6 @@ bool Application::frameRenderingQueued(const FrameEvent &evt) {
 
 // Called once per predefined frame
 bool Application::update(const FrameEvent &evt) {
-	PROFILE_SCOPED();
 
 	buildChunks(2);
 	
@@ -316,21 +313,17 @@ bool Application::update(const FrameEvent &evt) {
 					}
 					else {
 						chunks[name] = new Chunk(x, z, mSceneManager, biomeManager, perlin, _simulator, true);
-						{PROFILE_SCOPED_DESC("Insert");
 
 						if(frame == 0)
 							chunks[name]->build();
 						else
 							chunksToBuild.insert(chunks[name]);
-						}
 					}
 				}
 			}
 		}
 
 		frame++;
-
-		{ PROFILE_SCOPED_DESC("Collider Computer");
 
 		for(auto& var : prevChunks) {
 			if(!chunks[var.first] && !modifiedChunks[var.first]) {
@@ -384,7 +377,6 @@ bool Application::update(const FrameEvent &evt) {
 			// No ray hit
 			highlight->getNode()->setVisible(false);
 		}
-		}
 
 	}
 
@@ -406,7 +398,6 @@ bool Application::update(const FrameEvent &evt) {
 }
 
 bool Application::handleGUI(const FrameEvent &evt) {
-	PROFILE_SCOPED();
 
 	_oisManager->capture();
 
@@ -1115,14 +1106,11 @@ void Application::loadSeed() {
 }
 
 void Application::buildChunks(int num) {
-	PROFILE_SCOPED();
 	for(int i = 0; i < num; i++) {
 		if (chunksToBuild.size() > 0) {
 			(*chunksToBuild.begin())->build();
-			{ PROFILE_SCOPED_DESC("erase + begin");
 
 			chunksToBuild.erase(chunksToBuild.begin());
-			}
 		}
 	}
 }

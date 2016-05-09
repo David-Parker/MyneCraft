@@ -2,7 +2,6 @@
 #include "MultiPlatformHelper.h"
 
 Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeManager* biomeMgr, Perlin* perlin, Simulator* sim, bool generate) : _biomeMgr(biomeMgr), _xStart(xStart), _yStart(yStart), _mSceneManager(mSceneManager), _simulator(sim) {
-	PROFILE_SCOPED();
 	if (air == nullptr) air = new StaticObject(nullptr, CubeManager::AIR, Ogre::Vector3(CHUNK_SCALE, CHUNK_SCALE, CHUNK_SCALE), Ogre::Vector3::ZERO, sim, this);
 
 	_name = getChunkName(xStart, yStart);
@@ -13,14 +12,11 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 	_xEnd = xStart + CHUNK_SIZE;
 	_yEnd = yStart + CHUNK_SIZE;
 
-	{ PROFILE_SCOPED_DESC("Static Geom Creation");
-		
-		_sg = mSceneManager->createStaticGeometry(_name);
+	_sg = mSceneManager->createStaticGeometry(_name);
 
-		_sg->setRegionDimensions(Ogre::Vector3(2, 20, 2));
-		_sg->setOrigin(Ogre::Vector3(xStart*CHUNK_SCALE_FULL + CHUNK_SCALE*CHUNK_SIZE, 0, yStart*CHUNK_SCALE_FULL + CHUNK_SCALE*CHUNK_SIZE));
-		_sg->setCastShadows(false);
-	}
+	_sg->setRegionDimensions(Ogre::Vector3(2, 20, 2));
+	_sg->setOrigin(Ogre::Vector3(xStart*CHUNK_SCALE_FULL + CHUNK_SCALE*CHUNK_SIZE, 0, yStart*CHUNK_SCALE_FULL + CHUNK_SCALE*CHUNK_SIZE));
+	_sg->setCastShadows(false);
 
 	Biome* curBiome = biomeMgr->inBiome(_xStart, _yStart);
 
@@ -28,7 +24,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 	// Precompute perlin values
 	if (generate) { 
-		{ PROFILE_SCOPED_DESC("Precompute Perlin");
 		for (int i = 0; i < CHUNK_SIZE + 2; i++) {
 			for (int j = 0; j < CHUNK_SIZE + 2; j++) {
 				int chunkx = xStart + i - 1;
@@ -77,8 +72,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 				caves[i][j] = steepnessCaves;
 			}
 		}
-		}
-		{ PROFILE_SCOPED_DESC("Terrain Gen");
 		// Does this chunk generate new terrain?
 		for (int i = 0; i < CHUNK_SIZE; ++i) {
 			for (int j = 0; j < CHUNK_SIZE; ++j) {
@@ -116,11 +109,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 				_sg->setRegionDimensions(Ogre::Vector3(2000, 300, 2000));
 			}
-		}
-		}
-
-		{ PROFILE_SCOPED_DESC("Static Geom build");
-		//_sg->build();
 		}
 	}
 }

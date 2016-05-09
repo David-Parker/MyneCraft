@@ -8,7 +8,6 @@
 #include "OISManager.h"
 #include "Chunk.h"
 #include "Animation.h"
-#include "Profiler.h"
 
 const static int averageSize = 10;
 const static int axeDistance = 70;
