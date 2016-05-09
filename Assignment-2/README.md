@@ -41,17 +41,18 @@ Frank Cerasoli
 * Random cave generation. Cave location and cave height are generated with 2D Perlin noise independently.
 * Bodies of water that the player can swim in. Immersive buoyant and drag forces are present underwater.
 * Day/Night cycle, time of day moves along with the sun on a sinusoidal position function, sun will set and rise.
-* Randomly generated clouds
-* Localized lighting, holding or placing a torch will create local lighting
+* Randomly generated clouds.
+* Localized lighting, holding or placing a torch will create local lighting.
 * Unlimited inventory resources: Players can hold and select an item to use.
 * Limited inventory resources: Players can mine diamonds and can only build as many as have been mined.
 * Animations: Using items in the player inventory causes an animation to run and a sound to play.
-* World saving, exiting the game will save it in a file called save.txt where it is reloaded on game start up, delete this file to generate a new random world
 * Block removal, there is no pre-generated depth, blocks get created when one digs.
-* Block placement, put new blocks anywhere
+* Block placement, put new blocks anywhere.
 * Torch placement anywhere, providing light in dark environments.
 * Heavily optimized, static geometry creation and destruction based on position, localized bullet simulation, etc.
-* Origional game music produced and recorded by Frank Cerasoli
+* Dynamic world generation broken into "chunks" to reduce the number of static geometries active at any given time.
+* World saving, exiting the game will save it in a file called save.txt where it is reloaded on game start up, delete this file to generate a new random world.
+* Origional game music produced and recorded by Frank Cerasoli.
 
 #### Issues
 * Inifnite block growth (cancer blocks), when a block gets incorrectly generated, it thinks its neihbors are null and starts to generate blocks everywhere when deleted. This bug is rarare and usually only occurs when something else was setup incorrectly.
@@ -61,6 +62,7 @@ Frank Cerasoli
 ### Todo
 * Multiplayer, online playing with friends would be cool
 * Enhanced GUI, able to select create world or load a different save based on file name
+* Load new seeds into Rand for user defined Perlin noise (still random, just a known seed).
 
 ### Resources Used
 Many image and sound files were found on the internet
@@ -85,7 +87,6 @@ Many image and sound files were found on the internet
 
 ## Milestone 4.2
 We are definitely on track for the final submission. Features of our project are listed above.
-
 
 ## Milestone 4.1
 This project will be similar to the well-known game Minecraft. Mynecraft has random level generation made up of environmental cube blocks. The player can then explore this environment and see the different biomes contained within it. Future developments will hopefully include some AI animials that players can interact with.
