@@ -133,7 +133,7 @@ bool Chunk::pointInChunk(float x, float y) {
 void Chunk::addChunksToSimulator(Ogre::Vector3& playerPos) {
 	for (auto& var : _staticObjects) {
 		if(var.second != nullptr && var.second != air)
-			if(var.second->_pos.distance(playerPos) <= 425) {
+			if(var.second->_pos.distance(playerPos) <= 550) {
 				var.second->addToSimulator();
 			}
 	}
