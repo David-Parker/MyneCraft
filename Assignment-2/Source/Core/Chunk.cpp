@@ -14,7 +14,6 @@ Chunk::Chunk(int xStart, int yStart, Ogre::SceneManager* mSceneManager, BiomeMan
 
 	_sg = mSceneManager->createStaticGeometry(_name);
 
-	_sg->setRegionDimensions(Ogre::Vector3(2, 20, 2));
 	_sg->setOrigin(Ogre::Vector3(xStart*CHUNK_SCALE_FULL + CHUNK_SCALE*CHUNK_SIZE, 0, yStart*CHUNK_SCALE_FULL + CHUNK_SCALE*CHUNK_SIZE));
 	_sg->setCastShadows(false);
 
